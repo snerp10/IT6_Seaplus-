@@ -1,3 +1,4 @@
+<?php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,8 +14,8 @@ class Product extends Model
         'name',
         'category',
         'price',
-        'unit_of_measurement',
-        'stock_quantity',
+        'unit',
+        'stock',
         'supplier_id',
     ];
 

@@ -17,22 +17,22 @@
                         </tr>
                         <tr>
                             <th>Unit:</th>
-                            <td>{{ $product->unit_of_measurement }}</td>
+                            <td>{{ $product->unit }}</td>
                         </tr>
                         <tr>
                             <th>Available Stock:</th>
-                            <td>{{ $product->stock_quantity }}</td>
+                            <td>{{ $product->stock }}</td>
                         </tr>
                     </table>
                 </div>
                 <div class="col-md-6">
-                    @if($product->stock_quantity > 0)
+                    @if($product->stock > 0)
                     <form action="{{ route('orders.create') }}" method="GET">
                         <input type="hidden" name="product_id" value="{{ $product->product_id }}">
                         <div class="form-group">
                             <label>Quantity:</label>
                             <input type="number" name="quantity" class="form-control" 
-                                   min="1" max="{{ $product->stock_quantity }}" required>
+                                   min="1" max="{{ $product->stock }}" required>
                         </div>
                         <button type="submit" class="btn btn-primary mt-3">Proceed to Order</button>
                     </form>

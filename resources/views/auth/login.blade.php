@@ -2,7 +2,10 @@
     @csrf
     <div>
         <label>Email</label>
-        <input type="email" name="email" required>
+        <input type="email" name="email" value="{{ old('email') }}" required autofocus>
+        @error('email')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
     </div>
     <div>
         <label>Password</label>

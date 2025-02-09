@@ -27,10 +27,16 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+            // Regenerate session
+            $request->session()->regenerate();
+            
+            // Redirect to dashboard
             return redirect()->intended('/dashboard');
         }
-
-        return back()->withErrors(['email' => 'Invalid credentials']);
+    
+        return back()->withErrors([
+            'email' => 'Invalid credentials',
+        ])->withInput($request->only('email'));
     }
 
     public function register(Request $request)
@@ -59,17 +65,25 @@ class AuthController extends Controller
                 throw new \Exception('Failed to create user');
             }
 
-            Customer::create([
+        
+            $customer = Customer::create([
                 'user_id' => $user->user_id, // Changed from $user->id to $user->user_id
                 'address' => $request->address,
                 'customer_type' => 'Regular'
             ]);
 
-            Auth::login($user);
+            Auth::login($customer);
             return redirect('/login')->with('success', 'Registration successful!');
-
-        } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'Registration failed. Please try again.']);
+              
+            } catch (\Exception $e) {
+                return back()->withInput()->withErrors(['error' => 'Registration failed. Please try again.']);
+            }
         }
-    }
+
+        public function logout()
+        {
+            Auth::logout();
+            return redirect('/login');
+        }
+    
 }

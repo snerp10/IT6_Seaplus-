@@ -17,7 +17,7 @@
             <tr>
                 <td>{{ $product->name }}</td>
                 <td>{{ $product->price }}</td>
-                <td>{{ $product->stock_quantity }}</td>
+                <td>{{ $product->stock }}</td>
                 <td>
                     <a href="{{ route('products.show', $product->product_id) }}" class="btn btn-info">View</a>
                 </td>

@@ -1,3 +1,4 @@
+<?php
 namespace App\Http\Controllers;
 
 use App\Models\Product;
@@ -7,10 +8,12 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $category = $request->query('category', 'Sand');
-        $products = Product::where('category', $category)
-                         ->where('stock_quantity', '>', 0)
-                         ->get();
+        $category = $request->query('category');
+        $products = Product::when($category, function($query) use ($category) {
+            return $query->where('category', $category);
+        })->where('stock', '>', 0)
+          ->get();
+
         return view('products.index', compact('products', 'category'));
     }
 

@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
+    protected $table = 'users';
     protected $primaryKey = 'user_id';
 
     protected $fillable = [
@@ -34,11 +36,20 @@ class User extends Authenticatable
 
     public function customer()
     {
-        return $this->hasOne(Customer::class);
+        return $this->hasOne(Customer::class, 'user_id', 'user_id');
+    }
+
+    public function hasRole($role)
+    {
+        if ($role === 'customer') {
+            return $this->customer()->exists();
+        }
+        return $this->role === $role;
     }
 
     public function employee()
     {
-        return $this->hasOne(Employee::class);
+        return $this->hasOne(Employee::class, 'user_id');
     }
+
 }

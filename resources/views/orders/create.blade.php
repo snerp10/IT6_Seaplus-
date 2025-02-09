@@ -21,7 +21,7 @@
                                             <p class="text-muted">{{ $product->category }}</p>
                                         </div>
                                         <div class="col-md-3">
-                                            <p>₱{{ number_format($product->price, 2) }} / {{ $product->unit_of_measurement }}</p>
+                                            <p>₱{{ number_format($product->price, 2) }} / {{ $product->unit }}</p>
                                         </div>
                                         <div class="col-md-3">
                                             <input type="number" 
@@ -29,7 +29,7 @@
                                                    class="form-control quantity-input"
                                                    data-price="{{ $product->price }}"
                                                    min="0"
-                                                   max="{{ $product->stock_quantity }}"
+                                                   max="{{ $product->stock }}"
                                                    value="0">
                                         </div>
                                         <div class="col-md-2">
