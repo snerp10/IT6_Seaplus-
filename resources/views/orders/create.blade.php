@@ -68,7 +68,9 @@
                                 </div>
                                 
                                 <input type="hidden" name="total_amount" id="total_amount" value="0">
-                                <button type="submit" class="btn btn-primary w-100 mt-3">Place Order</button>
+                                <button type="submit" class="btn btn-primary w-100 mt-3" id="submitOrder">
+                                    Place Order and Add Delivery Details
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -80,6 +82,19 @@
 
 @push('scripts')
 <script>
+document.getElementById('orderForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const total = parseFloat(document.getElementById('total_amount').value);
+    if (total <= 0) {
+        alert('Please add at least one product to your order.');
+        return;
+    }
+
+    // Submit form normally if validation passes
+    this.submit();
+});
+
 document.querySelectorAll('.quantity-input').forEach(input => {
     input.addEventListener('change', updateSubtotals);
 });

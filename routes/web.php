@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,12 +35,23 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/cart/update/{id}', [CartController::class, 'updateCart'])->name('cart.update');
     
     // Orders
-    Route::resource('orders', OrderController::class);
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+    Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
+    Route::get('/orders/{order}/payment', [PaymentController::class, 'create'])->name('orders.payment');
+    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+
+    Route::post('/orders/{order}/payment', [OrderController::class, 'processPayment'])->name('orders.payment');
+    
+    // GCash Payment Routes
+    Route::get('/payments/gcash/redirect', [PaymentController::class, 'gcashRedirect'])->name('payments.gcash.redirect');
+    Route::get('/payments/gcash/callback', [PaymentController::class, 'gcashCallback'])->name('payments.gcash.callback');
+    Route::post('/payments/gcash/verify', [PaymentController::class, 'gcashVerify'])->name('payments.gcash.verify');
     
     // Customer Profile
     Route::get('/profile', [CustomerController::class, 'show'])->name('customer.profile');

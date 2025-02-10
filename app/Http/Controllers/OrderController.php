@@ -27,53 +27,53 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        
-
-        // Start database transaction
         DB::beginTransaction();
         
         try {
-            // Get customer ID from authenticated user
-            $customer = Customer::where('user_id', auth()->id())->first();
+            $customer = Customer::where('user_id', auth()->id())->firstOrFail();
             
-            // Create the order
+            // Create basic order first
             $order = Order::create([
                 'customer_id' => $customer->customer_id,
                 'order_date' => now(),
-                'total_amount' => $request->total_amount,
-                'payment_method' => $request->payment_method,
-                'payment_status' => 'Unpaid', // Default status
+                'total_amount' => 0,
+                'payment_method' => $request->payment_method, 
                 'order_type' => $request->order_type,
-                'delivery_status' => 'Pending' // Default status
+                'payment_status' => 'Pending',
+                'delivery_status' => 'Pending',
+                'delivery_address' => null,
+                'delivery_schedule' => null,
+                'special_instructions' => null
             ]);
 
-            // Process each product in the order
+            // Process products and calculate total
+            $totalAmount = 0;
             foreach ($request->products as $productId => $details) {
                 $quantity = intval($details['quantity']);
                 if ($quantity > 0) {
                     $product = Product::findOrFail($productId);
-                    
-                    // Check if enough stock available
                     if ($product->stock < $quantity) {
                         throw new \Exception("Insufficient stock for {$product->name}");
                     }
 
-                    // Create order detail
+                    $subtotal = $product->price * $quantity;
                     OrderDetail::create([
                         'order_id' => $order->order_id,
                         'product_id' => $productId,
                         'quantity' => $quantity,
-                        'subtotal' => $product->price * $quantity
+                        'subtotal' => $subtotal
                     ]);
 
-                    // Update product stock
                     $product->decrement('stock', $quantity);
+                    $totalAmount += $subtotal;
                 }
             }
 
+            $order->update(['total_amount' => $totalAmount]);
+
             DB::commit();
-            return redirect()->route('orders.show', $order->order_id)
-                           ->with('success', 'Order placed successfully!');
+            return redirect()->route('orders.edit', $order->order_id)
+                           ->with('success', 'Order created! Please add delivery details.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -106,8 +106,23 @@ class OrderController extends Controller
         if (auth()->id() !== $order->customer_id) {
             abort(403, 'Unauthorized action.');
         }
-        $order->update($request->only(['payment_method', 'payment_status']));
-        return redirect()->route('orders.show', $order);
+
+        if ($order->payment_status === 'Paid') {
+            return back()->with('error', 'Paid orders cannot be modified.');
+        }
+
+        // Only validate delivery-related fields
+        $validated = $request->validate([
+            'delivery_address' => 'required|string|max:500',
+            'delivery_schedule' => 'required|date|after:now',
+            'special_instructions' => 'nullable|string|max:500'
+        ]);
+
+        $order->update($validated);
+
+        // Redirect to payment page after adding delivery details
+        return redirect()->route('orders.payment', $order)
+                       ->with('success', 'Delivery details saved. Please complete your payment.');
     }
 
     public function destroy(Order $order)
@@ -118,4 +133,15 @@ class OrderController extends Controller
         $order->delete();
         return redirect()->route('orders.index');
     }
-}
+  
+    public function processPayment(Order $order)
+    {
+        try {
+            if ($order->customer_id !== auth()->id()) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            $order->update([
+                'payment_status' => 'Paid',
+                'delivery_status' => 'Processing'
+            ]);            return redirect()->route('orders.show', $order->order_id)                            ->with('success', 'Payment processed successfully!');        } catch (\Exception $e) {            return back()->with('error', 'Payment processing failed: ' . $e->getMessage());        }    }}

@@ -1,0 +1,40 @@
+
+
+/* Payment Methods Styling */
+.payment-methods {
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+    border-radius: 0.25rem;
+}
+
+.payment-methods .form-check {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.payment-methods .form-check:hover {
+    background-color: #f8f9fa;
+}
+
+.payment-methods .form-check-input:checked + .form-check-label {
+    font-weight: bold;
+}
+
+#gcashQRCode {
+    margin: 1rem auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#gcashRedirectBtn {
+    background-color: #007eff;
+    border-color: #007eff;
+}
+
+#gcashRedirectBtn:hover {
+    background-color: #0066cc;
+    border-color: #0066cc;
+}

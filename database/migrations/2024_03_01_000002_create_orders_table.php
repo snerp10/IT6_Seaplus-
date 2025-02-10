@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('payment_status');
             $table->string('order_type');
             $table->string('delivery_status');
+            $table->text('delivery_address')->nullable();
+            $table->string('delivery_schedule')->nullable();
+            $table->text('special_instructions')->nullable();
             $table->timestamps();
         });
     }

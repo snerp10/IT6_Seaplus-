@@ -18,6 +18,10 @@ class Order extends Model
         'payment_status',
         'order_type',
         'delivery_status',
+        'delivery_address',
+        'delivery_schedule',
+        'special_instructions'
+        
     ];
 
     public function orderDetails()

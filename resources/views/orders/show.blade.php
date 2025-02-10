@@ -92,6 +92,16 @@
                     </tr>
                 </tfoot>
             </table>
+            <div class="mt-4 text-end">
+                @if($order->payment_status != 'Paid')
+                    <form action="{{ route('orders.payment', $order->order_id) }}" style="display:inline;">
+                         @csrf
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-money-bill"></i> Proceed to Payment
+                        </button>
+                    </form>
+                @endif
+            </div>
         </div>
     </div>
 </div>
