@@ -22,32 +22,33 @@ class OrderPolicy
      */
     public function view(User $user, Order $order)
     {
-        return $user->id === $order->customer_id;
+        return $user->id === $order->customer->user_id;
     }
+    
+    public function update(User $user, Order $order)
+    {
+        return $user->id === $order->customer->user_id;
+    }
+    
     
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user)
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Order $order): bool
-    {
-        return false;
-    }
-
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Order $order): bool
+    public function delete(User $user, Order $order)
     {
-        return false;
+        return $user->id === $order->customer->user_id;
     }
 
     /**

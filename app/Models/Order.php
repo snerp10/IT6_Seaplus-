@@ -16,12 +16,7 @@ class Order extends Model
         'total_amount',
         'payment_method',
         'payment_status',
-        'order_type',
-        'delivery_status',
-        'delivery_address',
-        'delivery_schedule',
-        'special_instructions'
-        
+        'order_type'
     ];
 
     public function orderDetails()
@@ -31,6 +26,12 @@ class Order extends Model
 
     public function customer()
     {
-        return $this->belongsTo(User::class, 'customer_id');
+       return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+    }
+    public function delivery()
+    {
+        return $this->hasOne(Delivery::class, 'order_id', 'order_id');
     }
 }
+
+

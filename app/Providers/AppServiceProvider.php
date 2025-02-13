@@ -7,9 +7,6 @@ use App\Models\Customer;
 
 class AppServiceProvider extends ServiceProvider
 {
-    protected $policies = [
-        Order::class => OrderPolicy::class,
-    ];
     
     public function register(): void
     {

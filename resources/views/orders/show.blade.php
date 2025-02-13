@@ -50,8 +50,8 @@
                         <tr>
                             <th>Delivery Status:</th>
                             <td>
-                                <span class="badge bg-{{ $order->delivery_status == 'Delivered' ? 'success' : 'info' }}">
-                                    {{ $order->delivery_status }}
+                                <span class="badge bg-{{ $order->delivery->delivery_status == 'Delivered' ? 'success' : 'info' }}">
+                                    {{ $order->delivery->delivery_status }}
                                 </span>
                             </td>
                         </tr>
