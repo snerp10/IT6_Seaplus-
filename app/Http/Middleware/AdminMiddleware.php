@@ -6,11 +6,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class CustomerMiddleware
-{       
+class AdminMiddleware
+{
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->role !== 'Customer') {
+        if (!Auth::check() || Auth::user()->role !== 'Admin') {
             return redirect()->route('login');
         }
 

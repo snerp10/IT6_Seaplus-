@@ -26,10 +26,18 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
+
         if (Auth::attempt($credentials)) {
             // Regenerate session
             $request->session()->regenerate();
             
+            if(Auth::user()->role === 'Customer') {
+                return redirect()->intended('/customer/dashboard');
+            } else if(Auth::user()->role === 'Admin') {
+                return redirect()->intended('/admin/dashboard');
+            } else if(Auth::user()->role === 'Employee') {
+                return redirect()->intended('/employee/dashboard');
+            }
             // Redirect to dashboard
             return redirect()->intended('/dashboard');
         }
