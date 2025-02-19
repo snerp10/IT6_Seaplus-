@@ -73,25 +73,27 @@ class AuthController extends Controller
                 throw new \Exception('Failed to create user');
             }
 
-        
+            // Log the created user ID for debugging
+            \Log::info('User created with ID: ' . $user->user_id);
+
             $customer = Customer::create([
-                'user_id' => $user->user_id, // Changed from $user->id to $user->user_id
+                'user_id' => $user->user_id, // Ensure this is $user->id
                 'address' => $request->address,
                 'customer_type' => 'Regular'
             ]);
-
-            Auth::login($customer);
+            //Auth::login($user);
             return redirect('/login')->with('success', 'Registration successful!');
               
-            } catch (\Exception $e) {
-                return back()->withInput()->withErrors(['error' => 'Registration failed. Please try again.']);
-            }
+        } catch (\Exception $e) {
+            \Log::error('Registration failed: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => 'Registration failed. Please try again.']);
         }
+    }
 
-        public function logout()
-        {
-            Auth::logout();
-            return redirect('/login');
-        }
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
     
 }

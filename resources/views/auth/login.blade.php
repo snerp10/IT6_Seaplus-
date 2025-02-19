@@ -12,4 +12,5 @@
         <input type="password" name="password" required>
     </div>
     <button type="submit">Login</button>
+    <a href="{{ route('register') }}">Register</a>
 </form>

@@ -11,7 +11,7 @@ class PaymentController extends Controller
 {
     public function create(Order $order)
     {
-        return view('payments.create', compact('order'));
+        return view('orders.show', compact('order'));
     }
 
     public function store(Request $request)
@@ -36,7 +36,7 @@ class PaymentController extends Controller
         }
         
 
-        return redirect()->route('orders.show', $order->order_id)
+        return redirect()->route('orders.payment', $order->order_id)
             ->with('success', 'Payment processed successfully!');
     }
 

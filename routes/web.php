@@ -9,6 +9,10 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\SupplierController;
 
 // Public Routes
 Route::get('/', function () {
@@ -37,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Orders
         Route::resource('orders', OrderController::class);
-        Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
+        //Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
         
         // Payments
         Route::get('/orders/{order}/payment', [PaymentController::class, 'create'])->name('orders.payment');
@@ -52,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/orders/{order}/delivery', [DeliveryController::class, 'update'])->name('delivery.update');
 
         // Additional custom Order routes
-        Route::get('/orders/{order}/payment', [OrderController::class, 'create'])->name('orders.payment');
+        //Route::get('/orders/{order}/payment', [OrderController::class, 'create'])->name('orders.payment');
         Route::post('/orders/{order}/payment', [OrderController::class, 'processPayment'])->name('orders.processPayment');
 
         // GCash Payment Routes
@@ -63,12 +67,32 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin Routes
     Route::middleware(['Admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'adminIndex'])->name('dashboard.index');
+        // Admin Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'adminIndex'])->name('dashboard');
+
+        // Manage Products
         Route::resource('products', ProductController::class);
+
+        // Manage Orders
         Route::resource('orders', OrderController::class);
-        Route::resource('customers', CustomerController::class);
-        Route::resource('payments', PaymentController::class);
+
+        // Manage Employees
+        Route::resource('employees', EmployeeController::class);
+
+        // Manage Deliveries
         Route::resource('deliveries', DeliveryController::class);
+
+        // Manage Inventory
+        Route::resource('inventory', InventoryController::class);
+
+        // Manage Payments
+        Route::resource('payments', PaymentController::class);
+
+        // Manage Sales Reports
+        Route::resource('sales', SalesReportController::class);
+
+        // Manage Suppliers
+        Route::resource('suppliers', SupplierController::class);
     });
 });
 

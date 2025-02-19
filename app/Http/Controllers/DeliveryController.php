@@ -10,6 +10,8 @@ class DeliveryController extends Controller
 {
     public function edit(Order $order)
     {
+        \Log::info('Authenticated user ID: ' . auth()->id());
+        \Log::info('Order customer ID: ' . $order->customer_id);
         // Authorization check: siguraduhin na ang logged-in user ay may access sa order na ito.
         if (auth()->id() !== $order->customer_id) {
             abort(403, 'Unauthorized action.');
@@ -22,7 +24,8 @@ class DeliveryController extends Controller
 
     public function update(Request $request, Order $order)
     {
-
+        \Log::info('Authenticated user ID: ' . auth()->id());
+        \Log::info('Order customer ID: ' . $order->customer_id);
         // Authorization check: siguraduhin na ang logged-in user ay may access sa order na ito.
         if (auth()->id() !== $order->customer_id) {
             abort(403, 'Unauthorized action.');

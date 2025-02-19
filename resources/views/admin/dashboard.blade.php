@@ -1,34 +1,40 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 <div class="container">
-    <h1>Admin Dashboard</h1>
+    <h1 class="mb-4">Admin Dashboard</h1>
     <div class="row">
-        <div class="col-md-6">
-            <h2>Manage Products</h2>
-            <ul>
-                <li><a href="{{ route('admin.products.index') }}">View Products</a></li>
-                <li><a href="{{ route('admin.products.create') }}">Add Product</a></li>
-            </ul>
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Orders</h5>
+                    <p class="card-text display-4">{{ $totalOrders }}</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <h2>Manage Orders</h2>
-            <ul>
-                <li><a href="{{ route('admin.orders.index') }}">View Orders</a></li>
-            </ul>
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <p class="card-text display-4">{{ $totalProducts }}</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <h2>Manage Customers</h2>
-            <ul>
-                <li><a href="{{ route('admin.customers.index') }}">View Customers</a></li>
-                <li><a href="{{ route('admin.customers.create') }}">Add Customer</a></li>
-            </ul>
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Sales</h5>
+                    <p class="card-text display-4">₱{{ number_format($totalSales, 2) }}</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <h2>Manage Payments</h2>
-            <ul>
-                <li><a href="{{ route('admin.payments.index') }}">View Payments</a></li>
-            </ul>
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Deliveries</h5>
+                    <p class="card-text display-4">{{ $pendingDeliveries }}</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
