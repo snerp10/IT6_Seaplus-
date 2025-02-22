@@ -13,6 +13,11 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminEmployeeController;
+use App\Http\Controllers\Admin\AdminDeliveryController;
 
 // Public Routes
 Route::get('/', function () {
@@ -25,6 +30,14 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/search', [ProductController::class, 'search'])->name('search');
+    Route::get('/terms', function () {
+        return view('auth.terms');
+    })->name('terms');
+    Route::get('/privacy', function () {
+        return view('auth.privacy');
+    })->name('privacy');
+
 });
 
 // Authenticated Routes
@@ -41,11 +54,24 @@ Route::middleware(['auth'])->group(function () {
         
         // Orders
         Route::resource('orders', OrderController::class);
+        
+        //Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        //Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+        //Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+        //Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        //Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+        //Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+        //Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        //Route::get('/orders/history', [OrderController::class, 'history'])->name('orders.history');
         //Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
         
         // Payments
         Route::get('/orders/{order}/payment', [PaymentController::class, 'create'])->name('orders.payment');
         Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+        Route::get('/invoices/{order}', [PaymentController::class, 'showInvoice'])->name('invoices.show');
+        Route::get('/invoices/{order}/download', [PaymentController::class, 'downloadInvoice'])->name('invoices.download');
+        
+        
         
         // Profile
         Route::get('/profile', [CustomerController::class, 'show'])->name('customer.profile');
@@ -68,19 +94,24 @@ Route::middleware(['auth'])->group(function () {
     // Admin Routes
     Route::middleware(['Admin'])->prefix('admin')->name('admin.')->group(function () {
         // Admin Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'adminIndex'])->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'AdminIndex'])->name('dashboard');
 
         // Manage Products
-        Route::resource('products', ProductController::class);
+        Route::resource('products', AdminProductController::class);
 
         // Manage Orders
-        Route::resource('orders', OrderController::class);
+        Route::resource('orders', AdminOrderController::class);
 
         // Manage Employees
-        Route::resource('employees', EmployeeController::class);
+        Route::resource('employees', AdminEmployeeController::class);
 
         // Manage Deliveries
-        Route::resource('deliveries', DeliveryController::class);
+        Route::get('deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');
+        Route::get('deliveries/{delivery}', [AdminDeliveryController::class, 'show'])->name('deliveries.show');
+        Route::post('deliveries/{delivery}/confirm', [AdminDeliveryController::class, 'confirmDelivery'])->name('deliveries.confirm');
+        Route::post('deliveries/{delivery}/edit', [AdminDeliveryController::class, 'edit'])->name('deliveries.edit');
+        Route::resource('deliveries', AdminDeliveryController::class);
+
 
         // Manage Inventory
         Route::resource('inventory', InventoryController::class);

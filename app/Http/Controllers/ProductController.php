@@ -14,11 +14,20 @@ class ProductController extends Controller
         })->where('stock', '>', 0)
           ->get();
 
-        return view('products.index', compact('products', 'category'));
+        return view('customer.products.index', compact('products', 'category'));
     }
-
     public function show(Product $product)
     {
-        return view('products.show', compact('product'));
+        return view('customer.products.show', compact('product'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->query('query');
+        $products = Product::where('name', 'like', "%$query%")
+            ->orWhere('category', 'like', "%$query%")
+            ->get();
+
+        return view('customer.products.search', compact('products', 'query'));
     }
 }

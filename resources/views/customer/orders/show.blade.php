@@ -9,13 +9,25 @@
                 <div>
                     <a href="{{ route('orders.edit', $order->order_id) }}" class="btn btn-warning">Edit Order</a>
                     <form action="{{ route('orders.destroy', $order->order_id) }}" 
-                          method="POST" 
-                          style="display:inline;"
-                          onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                        method="POST" 
+                        style="display:inline;"
+                        onsubmit="return confirm('Are you sure you want to cancel this order?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Cancel Order</button>
+                        <button type="submit" class="btn btn-danger" 
+                            @if($order->payment_status === 'Paid') disabled @endif>
+                            Cancel Order
+                        </button>
+                        @if($order->payment_status === 'Paid')
+                            <div class="btn-group" role="group">
+                                <a href="{{ route('invoices.show', $order->order_id) }}" class="btn btn-info">
+                                    <i class="fas fa-file-invoice"></i> View Invoice
+                                </a>
+                            </div>
+                        @endif
+
                     </form>
+
                 </div>
             </div>
         </div>

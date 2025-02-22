@@ -74,14 +74,15 @@ class AuthController extends Controller
             }
 
             // Log the created user ID for debugging
-            \Log::info('User created with ID: ' . $user->user_id);
+            \Log::info('User created with ID: ' . $user->id);
 
             $customer = Customer::create([
                 'user_id' => $user->user_id, // Ensure this is $user->id
                 'address' => $request->address,
                 'customer_type' => 'Regular'
             ]);
-            //Auth::login($user);
+
+           
             return redirect('/login')->with('success', 'Registration successful!');
               
         } catch (\Exception $e) {

@@ -4,20 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Delivery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use PDF;
+use Storage;
 
 class PaymentController extends Controller
 {
     public function create(Order $order)
     {
-        return view('orders.show', compact('order'));
+        $totalAmount = $order->total_amount;
+        $minimumDownpayment = $order->order_type === 'Bulk' ? ($totalAmount * 0.30) : $totalAmount;
+        
+        return view('customer.payments.create', compact('order', 'minimumDownpayment'));
     }
 
     public function store(Request $request)
     {
         $order = Order::findOrFail($request->order_id);
+        $minimumDownpayment = $order->order_type === 'Bulk' ? ($order->total_amount * 0.30) : $order->total_amount;    
         
+        // Validate minimum downpayment for bulk orders
+        if ($order->order_type === 'Bulk' && $request->amount_paid < $minimumDownpayment) {
+            return back()->with('error', 'Bulk orders require a minimum downpayment of 30% (₱' . number_format($minimumDownpayment, 2) . ')');
+        }
+
         $payment = Payment::create([
             'customer_id' => auth()->id(),
             'order_id' => $order->order_id,
@@ -28,15 +40,21 @@ class PaymentController extends Controller
             'invoice_number' => 'INV-' . time()
         ]);
 
-        if($payment->outstanding_balance <= 0) {
-            $order->update([
-                'payment_status' => 'Paid',
+        // Update the outstanding balance of the order
+        $order->update([
+            'total_amount' => $payment->outstanding_balance,
+            'payment_status' => $payment->outstanding_balance <= 0 ? 'Paid' : 'Partially Paid',
+            'delivery_status' => 'Processing'
+        ]);
+
+        $delivery = Delivery::where('order_id', $order->order_id)->first();
+        if ($delivery) {
+            $delivery->update([
                 'delivery_status' => 'Processing'
             ]);
         }
-        
 
-        return redirect()->route('orders.payment', $order->order_id)
+        return view('customer.payments.invoice', compact('order', 'payment'))
             ->with('success', 'Payment processed successfully!');
     }
 
@@ -44,27 +62,37 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,order_id',
-            'amount_paid' => 'required|numeric'
-        ]);
+            'amount_paid' => 'required|numeric|min:0'
+           ]);
 
         $order = Order::findOrFail($request->order_id);
-        
-        // Verify exact amount
-        if (floatval($request->amount_paid) != floatval($order->total_amount)) {
-            return back()->with('error', 'Please enter the exact amount for GCash payment.');
+
+        // Calculate minimum required payment
+        $minimumPayment = $order->order_type === 'Bulk' ? ($order->total_amount * 0.30) : $order->total_amount;
+
+    // Validate payment amount
+    if ($order->order_type === 'Bulk') {
+        if ($request->amount_paid < $minimumPayment) {
+            return back()->with('error', 'Bulk orders require a minimum downpayment of 30% (₱' . number_format($minimumPayment, 2) . ')');
         }
-
-        // Store payment details in session
-        session([
-            'gcash_payment_details' => json_encode([
-                'orderId' => $order->order_id,
-                'amount' => $request->amount_paid
-            ])
-        ]);
-
-        // For demo purposes, directly process the payment
-        return $this->processGcashPayment($request);
+    } else {
+        if ($request->amount_paid != $order->total_amount) {
+            return back()->with('error', 'Please enter the exact amount for Retail orders.');
+        }
     }
+
+    // Store payment details in session
+    session([
+        'gcash_payment_details' => json_encode([
+            'orderId' => $order->order_id,
+            'amount' => $request->amount_paid
+        ])
+    ]);
+
+    // For demo purposes, directly process the payment
+    return $this->processGcashPayment($request);
+}
+
 
     private function processGcashPayment(Request $request)
     {
@@ -87,7 +115,12 @@ class PaymentController extends Controller
                 'payment_status' => 'Paid',
                 'delivery_status' => 'Processing'
             ]);
-
+            $delivery = Delivery::where('order_id', $order->order_id)->first();
+            if ($delivery) {
+                $delivery->update([
+                    'delivery_status' => 'Processing'
+                ]);
+            }
             // Clear payment session data
             $request->session()->forget(['gcash_payment_id', 'gcash_payment_details']);
 
@@ -98,5 +131,19 @@ class PaymentController extends Controller
             return redirect()->route('payments.create')
                            ->with('error', 'GCash payment failed: ' . $e->getMessage());
         }
+    }
+
+    public function showInvoice(Order $order)
+    {
+        // Check if user is authorized to view this invoice
+        if ($order->customer_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $payment = Payment::where('order_id', $order->order_id)
+                        ->latest()
+                        ->firstOrFail();
+
+        return view('customer.payments.invoice', compact('order', 'payment'));
     }
 }

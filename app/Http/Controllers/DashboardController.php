@@ -15,15 +15,4 @@ class DashboardController extends Controller
     {
         return view('customer.dashboard.index');
     }
-    public function adminIndex()
-    {
-        $data = [
-            'totalOrders' => Order::count(),
-            'totalProducts' => Product::count(),
-            'totalSales' => SalesReport::sum('total_sales'),
-            'pendingDeliveries' => Delivery::where('delivery_status')->count(),
-        ];
-
-        return view('admin.dashboard', $data);
-    }
 }

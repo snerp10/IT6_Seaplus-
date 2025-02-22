@@ -46,6 +46,7 @@
                 @else
                     <button type="submit" class="btn btn-primary">Process Cash Payment</button>
                 @endif
+                <a href="{{ route('orders.index') }}" class="btn btn-secondary">Back to Orders</a>
             </form>
         </div>
     </div>

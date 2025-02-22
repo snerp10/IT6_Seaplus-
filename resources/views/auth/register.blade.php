@@ -1,71 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login & Registration</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f4f4f4;
-        }
-        .container {
-            margin-top: 50px;
-            max-width: 400px;
-        }
-        .card {
-            border-radius: 10px;
-        }
-        .btn-custom {
-            width: 100%;
-        }
-        .text-small {
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="container">
-    <div class="card shadow p-4">   
-            <h3 class="text-center">Admin Registration</h3>
-            <form method="POST" action= "{{ route ('register') }}">
-                @csrf
-                <div class="mb-3">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">username</label>
-                    <input type="username" name="username" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <button type="submit" name="register" class="btn btn-success btn-custom">Register</button>
-            </form>
-            <p class="text-center text-small mt-3">
-                Already have an account? <a href="admin.php">Login here</a>
-            </p>
-            <h3 class="text-center">Admin Login</h3>
-            <form method="POST">
-                <div class="mb-3">
-                    <label class="form-label">username</label>
-                    <input type="username" name="username" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <button type="submit" name="login" class="btn btn-primary btn-custom">Login</button>
-            </form>
-            <p class="text-center text-small mt-3">
-                Don't have an account? <a href="admin.php?register=true">Register here</a>
-            </p>
+@section('content')
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg rounded-lg">
+            <div class="card-header bg-success text-white text-center">
+                <h3><i class="fas fa-user-plus"></i> Register</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" name="email" class="form-control rounded-pill" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" name="password" class="form-control rounded-pill" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-user"></i> First Name</label>
+                        <input type="text" name="first_name" class="form-control rounded-pill" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-user"></i> Last Name</label>
+                        <input type="text" name="last_name" class="form-control rounded-pill" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-phone"></i> Phone</label>
+                        <input type="text" name="phone" class="form-control rounded-pill" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-home"></i> Address</label>
+                        <textarea name="address" class="form-control rounded-pill" required></textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success rounded-pill px-4">
+                            <i class="fas fa-user-plus"></i> Register
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <p>Already have an account? 
+                            <a href="{{ route('login') }}" class="text-primary fw-bold">Login here</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

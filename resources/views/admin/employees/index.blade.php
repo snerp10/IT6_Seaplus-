@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin.content')
 <div class="container">
     <h1>Employees</h1>
     <a href="{{ route('admin.employees.create') }}" class="btn btn-primary mb-3">Add Employee</a>

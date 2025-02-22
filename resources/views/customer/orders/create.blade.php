@@ -1,28 +1,35 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h2>Create New Order</h2>
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">🛒 Create New Order</h2>
         </div>
         <div class="card-body">
             <form action="{{ route('orders.store') }}" method="POST" id="orderForm">
                 @csrf
                 <div class="row">
+                    <!-- Product Selection -->
                     <div class="col-md-8">
                         <div class="product-list">
                             @foreach($products as $product)
-                            <div class="card mb-3">
+                            <div class="card mb-3 shadow-sm">
                                 <div class="card-body">
                                     <div class="row align-items-center">
+                                        <!-- Product Name & Category -->
                                         <div class="col-md-4">
-                                            <h5>{{ $product->name }}</h5>
-                                            <p class="text-muted">{{ $product->category }}</p>
+                                            <h5 class="fw-bold">{{ $product->name }}</h5>
+                                            <span class="badge bg-secondary">{{ $product->category }}</span>
                                         </div>
+
+                                        <!-- Price & Unit -->
                                         <div class="col-md-3">
-                                            <p>₱{{ number_format($product->price, 2) }} / {{ $product->unit }}</p>
+                                            <p class="text-success fw-bold mb-0">₱{{ number_format($product->price, 2) }}</p>
+                                            <small class="text-muted">per {{ $product->unit }}</small>
                                         </div>
+
+                                        <!-- Quantity Input -->
                                         <div class="col-md-3">
                                             <input type="number" 
                                                    name="products[{{ $product->product_id }}][quantity]"
@@ -32,8 +39,10 @@
                                                    max="{{ $product->stock }}"
                                                    value="0">
                                         </div>
-                                        <div class="col-md-2">
-                                            <span class="subtotal">₱0.00</span>
+
+                                        <!-- Subtotal -->
+                                        <div class="col-md-2 text-end">
+                                            <span class="subtotal fw-bold text-primary">₱0.00</span>
                                         </div>
                                     </div>
                                 </div>
@@ -42,34 +51,41 @@
                         </div>
                     </div>
                     
+                    <!-- Order Summary -->
                     <div class="col-md-4">
-                        <div class="card">
+                        <div class="card shadow-sm">
                             <div class="card-body">
-                                <h4>Order Summary</h4>
+                                <h4 class="text-center fw-bold">📝 Order Summary</h4>
                                 <hr>
-                                <div class="form-group mb-3">
-                                    <label>Payment Method</label>
+
+                                <!-- Payment Method -->
+                                <div class="mb-3">
+                                    <label class="fw-bold">💰 Payment Method</label>
                                     <select name="payment_method" class="form-control" required>
                                         <option value="Cash">Cash</option>
                                         <option value="GCash">GCash</option>
                                     </select>
                                 </div>
                                 
-                                <div class="form-group mb-3">
-                                    <label>Order Type</label>
+                                <!-- Order Type -->
+                                <div class="mb-3">
+                                    <label class="fw-bold">📦 Order Type</label>
                                     <select name="order_type" class="form-control" required>
                                         <option value="Retail">Retail</option>
                                         <option value="Bulk">Bulk</option>
                                     </select>
                                 </div>
                                 
-                                <div class="total-amount mt-4">
-                                    <h5>Total Amount: ₱<span id="total">0.00</span></h5>
+                                <!-- Total Amount -->
+                                <div class="total-amount text-center mt-4">
+                                    <h5 class="fw-bold text-danger">Total Amount: ₱<span id="total">0.00</span></h5>
                                 </div>
                                 
                                 <input type="hidden" name="total_amount" id="total_amount" value="0">
-                                <button type="submit" class="btn btn-primary w-100 mt-3" id="submitOrder">
-                                    Place Order and Add Delivery Details
+
+                                <!-- Place Order Button -->
+                                <button type="submit" class="btn btn-primary w-100 mt-3 shadow-sm" id="submitOrder">
+                                    <i class="fas fa-check-circle"></i> Place Order and Add Delivery Details
                                 </button>
                             </div>
                         </div>
@@ -79,6 +95,7 @@
         </div>
     </div>
 </div>
+
 
 @push('scripts')
 <script>

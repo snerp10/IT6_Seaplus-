@@ -17,13 +17,13 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::where('customer_id', auth()->id())->latest()->get();
-        return view('orders.index', compact('orders'));
+        return view('customer.orders.index', compact('orders'));
     }
 
     public function create()
     {
         $products = Product::where('stock', '>', 0)->get();
-        return view('orders.create', compact('products'));
+        return view('customer.orders.create', compact('products'));
     }
 
     public function store(Request $request)
@@ -99,13 +99,13 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load('delivery');
-        return view('orders.show', compact('order'));
+        return view('customer.orders.show', compact('order'));
     }
 
     public function edit(Order $order)
     {
         
-        return view('orders.edit', compact('order'));
+        return view('customer.orders.edit', compact('order'));
     }
 
     public function update(Request $request, Order $order)
@@ -142,4 +142,5 @@ class OrderController extends Controller
         return redirect()->route('orders.show', $order->order_id)
                          ->with('success', 'Payment processed successfully!');
     }
+
 }
