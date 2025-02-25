@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -26,22 +27,42 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
+        // Find the customer by email
+        $customer = Customer::where('email', $credentials['email'])->first();
 
-        if (Auth::attempt($credentials)) {
-            // Regenerate session
-            $request->session()->regenerate();
-            
-            if(Auth::user()->role === 'Customer') {
-                return redirect()->intended('/customer/dashboard');
-            } else if(Auth::user()->role === 'Admin') {
-                return redirect()->intended('/admin/dashboard');
-            } else if(Auth::user()->role === 'Employee') {
-                return redirect()->intended('/employee/dashboard');
+        if ($customer) {
+            // Find the user by customer ID
+            $user = User::where('cus_id', $customer->cus_id)->first();
+
+            if ($user && Hash::check($credentials['password'], $user->password)) {
+                // Log in the user
+                Auth::login($user);
+                $request->session()->regenerate();
+
+                if ($user->role === 'Customer') {
+                    return redirect()->intended('/customer/dashboard');
+                } else if ($user->role === 'Employee') {
+                    return redirect()->intended('/employee/dashboard');
+                }
             }
-            // Redirect to dashboard
-            return redirect()->intended('/dashboard');
         }
-    
+
+        // Check if it's an employee
+        $employee = Employee::where('email', $credentials['email'])->first();
+
+        if ($employee) {
+            // Find the user by employee ID
+            $user = User::where('emp_id', $employee->emp_id)->first();
+
+            if ($user->password) {
+                // Log in the user
+                Auth::login($user);
+                $request->session()->regenerate();
+
+                return redirect()->intended('/admin/dashboard');
+            }
+        }
+
         return back()->withErrors([
             'email' => 'Invalid credentials',
         ])->withInput($request->only('email'));
@@ -50,23 +71,40 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email|unique:customers,email',
             'password' => 'required|min:6',
             'first_name' => 'required',
+            'middle_name' => 'nullable',
             'last_name' => 'required',
+            'birthdate' => 'required',
             'phone' => 'required',
-            'address' => 'required'
+            'address' => 'required',
         ]);
 
         try {
-            $user = User::create([
-                'name' => $request->first_name . ' ' . $request->last_name,
+            $customer = Customer::create([
+                'fname' => $request->first_name,
+                'mname' => $request->middle_name,
+                'lname' => $request->last_name,
+                'birthdate' => $request->birthdate,
+                'contact_number' => $request->phone,
                 'email' => $request->email,
-                'username' => strtolower($request->first_name),
+                'address' => $request->address
+            ]);
+
+            if (!$customer) {
+                throw new \Exception('Failed to create customer');
+            }
+
+            // Log the created customer ID for debugging
+            \Log::info('Customer created with ID: ' . $customer->cus_id);
+
+            $user = User::create([
+                'username' => $request->first_name,
                 'password' => Hash::make($request->password),
                 'role' => 'Customer',
-                'contact_number' => $request->phone,
-                'status' => 'Active'
+                'cus_id' => $customer->cus_id,
+                'emp_id' => null
             ]);
 
             if (!$user) {
@@ -74,15 +112,8 @@ class AuthController extends Controller
             }
 
             // Log the created user ID for debugging
-            \Log::info('User created with ID: ' . $user->id);
+            \Log::info('User created with ID: ' . $user->user_id);
 
-            $customer = Customer::create([
-                'user_id' => $user->user_id, // Ensure this is $user->id
-                'address' => $request->address,
-                'customer_type' => 'Regular'
-            ]);
-
-           
             return redirect('/login')->with('success', 'Registration successful!');
               
         } catch (\Exception $e) {

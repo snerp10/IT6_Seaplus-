@@ -23,24 +23,25 @@ class CustomerController extends Controller
 
     // Validate all fields
     $validatedData = $request->validate([
-        'name'             => 'required|string|max:255',
+        'fname'             => 'required|string|max:255',
+        'mname'            => 'nullable|string|max:255',
+        'lname'             => 'required|string|max:255',
+        'birthdate'         => 'required|date',
         'email'            => 'required|email|max:255',
         'contact_number'   => 'required|string|max:20',
         'address' => 'nullable|string'
     ]);
 
     // Update User fields
-    $user->update([
-        'name'           => $validatedData['name'],
-        'email'          => $validatedData['email'],
-        'contact_number' => $validatedData['contact_number']
-    ]);
-
-    // Update Customer field
     $customer->update([
-        'address' => $validatedData['address'],
+        'fname'           => $validatedData['fname'],
+        'mname'          => $validatedData['mname'],
+        'lname'          => $validatedData['lname'],
+        'birthdate'      => $validatedData['birthdate'],
+        'email'          => $validatedData['email'],
+        'contact_number' => $validatedData['contact_number'],
+        'address'        => $validatedData['address']
     ]);
-
     return redirect()->route('customer.profile')->with('success', 'Profile updated successfully');
 }
 

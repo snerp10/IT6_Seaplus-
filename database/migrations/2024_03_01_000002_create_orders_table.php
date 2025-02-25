@@ -9,11 +9,11 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id('order_id');
-            $table->foreignId('customer_id')->constrained('customers', 'customer_id')->onDelete('cascade');
+            $table->foreignId('cus_id')->constrained('customers', 'cus_id')->onDelete('cascade');
             $table->dateTime('order_date');
             $table->decimal('total_amount', 10, 2);
-            $table->string('payment_method');
-            $table->string('payment_status');
+            $table->string('pay_method');
+            $table->string('pay_status');
             $table->string('order_type');
             $table->timestamps();
         });

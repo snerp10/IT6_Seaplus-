@@ -8,9 +8,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('order_details', function (Blueprint $table) {
-            $table->id('order_detail_id');
+            $table->id('detail_id');
             $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products', 'product_id')->onDelete('cascade');
+            $table->foreignId('prod_id')->constrained('products', 'prod_id')->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('subtotal', 8, 2);
             $table->timestamps();

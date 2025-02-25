@@ -9,13 +9,13 @@ class Supplier extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'supplier_id';
+    protected $primaryKey = 'supp_id';
 
     protected $fillable = [
-        'name',
+        'company_name',
         'email',
         'contact_number',
         'address',
-        'payment_terms',
+        'prod_type',
     ];
 }

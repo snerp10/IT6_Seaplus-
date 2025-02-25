@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
-class SupplierController extends Controller
+class AdminSupplierController extends Controller
 {
     public function index()
     {
@@ -21,11 +22,11 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255',
             'email' => 'required|email|unique:suppliers,email',
             'contact_number' => 'required|string|max:15',
             'address' => 'required|string|max:255',
-            'payment_terms' => 'required|string|max:255',
+            'prod_type' => 'required|string|max:255',
         ]);
 
         Supplier::create($request->all());
@@ -46,11 +47,11 @@ class SupplierController extends Controller
     public function update(Request $request, Supplier $supplier)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:suppliers,email,' . $supplier->supplier_id . ',supplier_id',
+            'company_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:suppliers,email,' . $supplier->supp_id . ',supp_id',
             'contact_number' => 'required|string|max:15',
             'address' => 'required|string|max:255',
-            'payment_terms' => 'required|string|max:255',
+            'prod_type' => 'required|string|max:255',
         ]);
 
         $supplier->update($request->all());

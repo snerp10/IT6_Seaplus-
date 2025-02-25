@@ -3,30 +3,33 @@
 @section('admin.content')
 <div class="container">
     <h1>Employees</h1>
-    <a href="{{ route('admin.employees.create') }}" class="btn btn-primary mb-3">Add Employee</a>
+    <a href="{{ route('admin.employees.create') }}" class="btn btn-primary mb-3"><i class="fas fa-plus"></i> Add Employee</a>
     <table class="table">
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Birthdate</th>
+                <th>Contact Number</th>
                 <th>Email</th>
-                <th>Role</th>
+                <th>Address</th>
+                <th>Position</th>
+                <th>Salary</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach($employees as $employee)
             <tr>
-                <td>{{ $employee->name }}</td>
+                <td>{{ $employee->fname }} {{ $employee->mname }} {{ $employee->lname }}</td>
+                <td>{{ $employee->birthdate }}</td>
+                <td>{{ $employee->contact_number }}</td>
                 <td>{{ $employee->email }}</td>
-                <td>{{ $employee->role }}</td>
+                <td>{{ $employee->address }}</td>
+                <td>{{ $employee->position }}</td>
+                <td>{{ $employee->salary }}</td>
                 <td>
-                    <a href="{{ route('admin.employees.show', $employee->id) }}" class="btn btn-info">View</a>
-                    <a href="{{ route('admin.employees.edit', $employee->id) }}" class="btn btn-warning">Edit</a>
-                    <form action="{{ route('admin.employees.destroy', $employee->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                    <a href="{{ route('admin.employees.show', ['employee' => $employee->emp_id]) }}" class="btn btn-info mb-2 btn-block">View Employee</a>
+                    <a href="{{ route('admin.employees.edit', ['employee' => $employee->emp_id]) }}" class="btn btn-warning mb-2 btn-block">Update Employee</a>
                 </td>
             </tr>
             @endforeach
@@ -34,3 +37,4 @@
     </table>
 </div>
 @endsection
+

@@ -9,13 +9,19 @@ class Inventory extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'inventory_id';
+    protected $primaryKey = 'inv_id';
 
     protected $fillable = [
-        'current_stock',
-        'movement_type',
+        'prod_id',
+        'curr_stock',
+        'move_type',
         'quantity',
-        'movement_date',
+        'move_date',
     ];
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'prod_id', 'prod_id');
+    }
 }
+

@@ -11,9 +11,9 @@ class DeliveryController extends Controller
     public function edit(Order $order)
     {
         \Log::info('Authenticated user ID: ' . auth()->id());
-        \Log::info('Order customer ID: ' . $order->customer_id);
+        \Log::info('Order customer ID: ' . $order->cus_id);
         // Authorization check: siguraduhin na ang logged-in user ay may access sa order na ito.
-        if (auth()->id() !== $order->customer_id) {
+        if (auth()->id() !== $order->cus_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -25,9 +25,10 @@ class DeliveryController extends Controller
     public function update(Request $request, Order $order)
     {
         \Log::info('Authenticated user ID: ' . auth()->id());
-        \Log::info('Order customer ID: ' . $order->customer_id);
+        \Log::info('Order customer ID: ' . $order->cus_id);
+
         // Authorization check: siguraduhin na ang logged-in user ay may access sa order na ito.
-        if (auth()->id() !== $order->customer_id) {
+        if (auth()->id() !== $order->cus_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -47,7 +48,7 @@ class DeliveryController extends Controller
         $validated['delivery_date'] = date('Y-m-d', strtotime($validated['delivery_date']));
 
 
-         $delivery->update($validated);
+        $delivery->update($validated);
 
         return redirect()->route('orders.payment', $order->order_id)->with('success', 'Delivery details updated.');
 

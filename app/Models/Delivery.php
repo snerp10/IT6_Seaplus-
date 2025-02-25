@@ -21,7 +21,6 @@ class Delivery extends Model
         'order_id',
         'delivery_date',
         'delivery_address',
-        'truck_driver',
         'special_instructions',
         'delivery_status',
         'delivery_cost',

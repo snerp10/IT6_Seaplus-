@@ -8,10 +8,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create('customers', function (Blueprint $table) {
-            $table->id('customer_id');
-            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
-            $table->text('address');
-            $table->enum('customer_type', ['Regular', 'Walk-in', 'Contractor'])->default('Regular');
+            $table->id('cus_id');
+            $table->string('fname');
+            $table->string('mname');
+            $table->string('lname');
+            $table->date('birthdate');
+            $table->string('contact_number');
+            $table->string('email')->unique();
+            $table->string('address');
             $table->timestamps();
         });
     }

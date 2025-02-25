@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'product_id';
+    protected $primaryKey = 'prod_id';
 
     protected $fillable = [
         'name',
@@ -16,17 +17,17 @@ class Product extends Model
         'price',
         'unit',
         'stock',
-        'supplier_id',
+        'supp_id',
     ];
 
     public function orderDetails()
     {
-        return $this->hasMany(OrderDetail::class, 'product_id');
+        return $this->hasMany(OrderDetail::class, 'prod_id');
     }
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
+        return $this->belongsTo(Supplier::class, 'supp_id');
     }
 
     public function getCategoryProducts($category)
@@ -34,3 +35,4 @@ class Product extends Model
         return $this->where('category', $category)->get();
     }
 }
+

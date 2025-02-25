@@ -8,11 +8,11 @@ class OrderDetail extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'order_detail_id';
+    protected $primaryKey = 'detail_id';
 
     protected $fillable = [
         'order_id',
-        'product_id',
+        'prod_id',
         'quantity',
         'subtotal',
     ];
@@ -23,6 +23,6 @@ class OrderDetail extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class, 'prod_id');
     }
 }

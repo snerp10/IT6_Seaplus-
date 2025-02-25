@@ -12,7 +12,7 @@
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text">{{ number_format($product->price, 2) }} PHP / {{ $product->unit }}</p>
                         @auth
-                            <a href="{{ route('products.show', $product->product_id) }}" class="btn btn-primary">View</a>
+                            <a href="{{ route('products.show', $product->prod_id) }}" class="btn btn-primary">View</a>
                         @else
                             <a href="{{ route('login') }}" class="btn btn-warning">You must be logged in</a>
                         @endauth

@@ -58,7 +58,7 @@
                        
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            {{ Auth::user()->name }}
+                            {{ Auth::user()->username }}
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ route('customer.profile') }}">Profile</a></li>

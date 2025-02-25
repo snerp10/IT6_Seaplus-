@@ -38,13 +38,13 @@
                         <a class="nav-link" href="{{ route('admin.deliveries.index') }}">Deliveries</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.inventory.index') }}">Inventory</a>
+                        <a class="nav-link" href="{{ route('admin.inventories.index') }}">Inventory</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.payments.index') }}">Payments</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.sales.index') }}">Sales</a>
+                        <a class="nav-link" href="{{ route('admin.sales_reports.index') }}">Sales</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.suppliers.index') }}">Suppliers</a>

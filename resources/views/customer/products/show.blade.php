@@ -36,7 +36,7 @@
                     <!-- Order Button or Out of Stock Message -->
                     @if($product->stock > 0)
                         <form action="{{ route('orders.create') }}" method="GET">
-                            <input type="hidden" name="product_id" value="{{ $product->product_id }}">
+                            <input type="hidden" name="prod_id" value="{{ $product->prod_id }}">
                             <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 shadow-sm">
                                 <i class="fas fa-shopping-cart"></i> Proceed to Order
                             </button>

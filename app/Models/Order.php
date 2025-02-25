@@ -11,11 +11,11 @@ class Order extends Model
     protected $primaryKey = 'order_id';
 
     protected $fillable = [
-        'customer_id',
+        'cus_id',
         'order_date',
         'total_amount',
-        'payment_method',
-        'payment_status',
+        'pay_method',
+        'pay_status',
         'order_type'
     ];
 
@@ -26,7 +26,7 @@ class Order extends Model
 
     public function customer()
     {
-       return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+       return $this->belongsTo(Customer::class, 'cus_id', 'cus_id');
     }
     public function delivery()
     {

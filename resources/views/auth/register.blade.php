@@ -10,7 +10,6 @@
             <div class="card-body">
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
-
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
                         <input type="email" name="email" class="form-control rounded-pill" required>
@@ -27,8 +26,18 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-user"></i> Middle Name</label>
+                        <input type="text" name="middle_name" class="form-control rounded-pill">
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label"><i class="fas fa-user"></i> Last Name</label>
                         <input type="text" name="last_name" class="form-control rounded-pill" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar-alt"></i> Birthdate</label>
+                        <input type="date" name="birthdate" class="form-control rounded-pill" required>
                     </div>
 
                     <div class="mb-3">

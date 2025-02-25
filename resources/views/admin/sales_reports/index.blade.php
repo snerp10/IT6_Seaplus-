@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin.content')
 <div class="container">
     <h1>Sales Reports</h1>
-    <a href="{{ route('sales_reports.create') }}" class="btn btn-primary mb-3">Create Sales Report</a>
+    <a href="{{ route('admin.sales_reports.create') }}" class="btn btn-primary mb-3">Create Sales Report</a>
     <table class="table">
         <thead>
             <tr>
@@ -26,9 +26,9 @@
                 <td>{{ ucfirst($report->report_type) }}</td>
                 <td>{{ $report->user->name }}</td>
                 <td>
-                    <a href="{{ route('sales_reports.show', $report->report_id) }}" class="btn btn-info">View</a>
-                    <a href="{{ route('sales_reports.edit', $report->report_id) }}" class="btn btn-warning">Edit</a>
-                    <form action="{{ route('sales_reports.destroy', $report->report_id) }}" method="POST" style="display:inline;">
+                    <a href="{{ route('admin.sales_reports.show', $report->report_id) }}" class="btn btn-info">View</a>
+                    <a href="{{ route('admin.sales_reports.edit', $report->report_id) }}" class="btn btn-warning">Edit</a>
+                    <form action="{{ route('admin.sales_reports.destroy', $report->report_id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Delete</button>

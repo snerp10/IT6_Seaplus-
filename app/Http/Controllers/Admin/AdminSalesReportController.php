@@ -1,21 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\SalesReport;
 use Illuminate\Http\Request;
 
-class SalesReportController extends Controller
+class AdminSalesReportController extends Controller
 {
     public function index()
     {
         $reports = SalesReport::all();
-        return view('sales_reports.index', compact('reports'));
+        return view('admin.sales_reports.index', compact('reports'));
     }
 
     public function create()
     {
-        return view('sales_reports.create');
+        return view('admin.sales_reports.create');
     }
 
     public function store(Request $request)
@@ -36,12 +37,12 @@ class SalesReportController extends Controller
 
     public function show(SalesReport $salesReport)
     {
-        return view('sales_reports.show', compact('salesReport'));
+        return view('admin.sales_reports.show', compact('salesReport'));
     }
 
     public function edit(SalesReport $salesReport)
     {
-        return view('sales_reports.edit', compact('salesReport'));
+        return view('admin.sales_reports.edit', compact('salesReport'));
     }
 
     public function update(Request $request, SalesReport $salesReport)
@@ -57,13 +58,13 @@ class SalesReportController extends Controller
 
         $salesReport->update($request->all());
 
-        return redirect()->route('sales_reports.index')->with('success', 'Sales report updated successfully.');
+        return redirect()->route('admin.sales_reports.index')->with('success', 'Sales report updated successfully.');
     }
 
     public function destroy(SalesReport $salesReport)
     {
         $salesReport->delete();
 
-        return redirect()->route('sales_reports.index')->with('success', 'Sales report deleted successfully.');
+        return redirect()->route('admin.sales_reports.index')->with('success', 'Sales report deleted successfully.');
     }
 }

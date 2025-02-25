@@ -26,7 +26,7 @@
                     </table>
                 </div>
                 <div class="col-md-6">
-                    <a href="{{ route('admin.products.edit', $product->product_id) }}" class="btn btn-warning mt-3">Edit Product</a>
+                    <a href="{{ route('admin.products.edit', $product->prod_id) }}" class="btn btn-warning mt-3">Add Stock</a>
                 </div>
             </div>
         </div>

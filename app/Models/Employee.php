@@ -8,16 +8,22 @@ class Employee extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'employee_id';
+    protected $primaryKey = 'emp_id';
 
     protected $fillable = [
-        'user_id',
+        'fname',
+        'mname',
+        'lname',
+        'birthdate',
+        'contact_number',
+        'email',
+        'address',
         'position',
         'salary'
     ];
 
-    public function user()
+    public function salesReports()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasMany(SalesReport::class, 'generated_by', 'emp_id');
     }
 }

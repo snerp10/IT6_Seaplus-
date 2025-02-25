@@ -24,7 +24,7 @@ class Customer extends Authenticatable
      *
      * @var string
      */
-    protected $primaryKey = 'customer_id';
+    protected $primaryKey = 'cus_id';
 
     /**
      * The attributes that are mass assignable.
@@ -32,9 +32,13 @@ class Customer extends Authenticatable
      * @var array<string>
      */
     protected $fillable = [
-        'user_id',
-        'address',
-        'customer_type'
+        'fname',
+        'mname',
+        'lname',
+        'birthdate',
+        'contact_number',
+        'email',
+        'address'
     ];
 
     /**
@@ -48,16 +52,6 @@ class Customer extends Authenticatable
     ];
 
     /**
-     * Get the user that owns the customer.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
-    }
-
-    /**
      * Get the orders for the customer.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -67,3 +61,4 @@ class Customer extends Authenticatable
         return $this->hasMany(Order::class);
     }
 }
+

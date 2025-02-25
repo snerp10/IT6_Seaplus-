@@ -15,7 +15,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text">{{ number_format($product->price, 2) }} PHP / {{ $product->unit }}</p>
-                        <form action="{{ route('products.show', $product->product_id) }}" method="GET" style="display:inline;">
+                        <form action="{{ route('products.show', $product->prod_id) }}" method="GET" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-success">Add to Order</button>
                         </form>

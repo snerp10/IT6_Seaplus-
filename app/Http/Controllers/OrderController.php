@@ -16,7 +16,7 @@ class OrderController extends Controller
     use AuthorizesRequests;
     public function index()
     {
-        $orders = Order::where('customer_id', auth()->id())->latest()->get();
+        $orders = Order::where('cus_id', auth()->id())->latest()->get();
         return view('customer.orders.index', compact('orders'));
     }
 
@@ -30,7 +30,7 @@ class OrderController extends Controller
     {
          // Validate the incoming request data
          $validatedData = $request->validate([
-            'payment_method' => 'required|string',
+            'pay_method' => 'required|string',
             'order_type'     => 'required|string|in:Retail,Bulk',
             'products'       => 'required|array',
             'products.*.quantity' => 'required|integer|min:0'
@@ -42,17 +42,16 @@ class OrderController extends Controller
             
             // Create basic order first
             $order = Order::create([
-                'customer_id' => $customer->customer_id,
+                'cus_id' => $customer->cus_id,
                 'order_date' => now(),
                 'total_amount' => 0,
-                'payment_method' => $validatedData['payment_method'], 
+                'pay_method' => $validatedData['pay_method'], 
                 'order_type' => $validatedData['order_type'],
-                'payment_status' => 'Pending'
+                'pay_status' => 'Pending'
             ]);
 
             Delivery::create([
                 'order_id' => $order->order_id,
-                'truck_driver' => 'TBD', // Default value, update later
                 'delivery_status' => 'Pending',
                 'delivery_cost' => 0 // Default cost, update later
             ]);
@@ -70,7 +69,7 @@ class OrderController extends Controller
                     $subtotal = $product->price * $quantity;
                     OrderDetail::create([
                         'order_id' => $order->order_id,
-                        'product_id' => $productId,
+                        'prod_id' => $productId,
                         'quantity' => $quantity,
                         'subtotal' => $subtotal
                     ]);
@@ -112,7 +111,7 @@ class OrderController extends Controller
     {
        
 
-        if ($order->payment_status === 'Paid') {
+        if ($order->pay_status === 'Paid') {
             return back()->with('error', 'Paid orders cannot be modified.');
         }
 
@@ -137,7 +136,7 @@ class OrderController extends Controller
     {
        
         
-        $order->update(['payment_status' => 'Paid']);
+        $order->update(['pay_status' => 'Paid']);
 
         return redirect()->route('orders.show', $order->order_id)
                          ->with('success', 'Payment processed successfully!');

@@ -18,6 +18,10 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminEmployeeController;
 use App\Http\Controllers\Admin\AdminDeliveryController;
+use App\Http\Controllers\Admin\AdminInventoryController;
+use App\Http\Controllers\Admin\AdminPaymentController;
+use App\Http\Controllers\Admin\AdminSalesReportController;
+use App\Http\Controllers\Admin\AdminSupplierController;
 
 // Public Routes
 Route::get('/', function () {
@@ -105,25 +109,26 @@ Route::middleware(['auth'])->group(function () {
         // Manage Employees
         Route::resource('employees', AdminEmployeeController::class);
 
+        
         // Manage Deliveries
-        Route::get('deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');
-        Route::get('deliveries/{delivery}', [AdminDeliveryController::class, 'show'])->name('deliveries.show');
-        Route::post('deliveries/{delivery}/confirm', [AdminDeliveryController::class, 'confirmDelivery'])->name('deliveries.confirm');
-        Route::post('deliveries/{delivery}/edit', [AdminDeliveryController::class, 'edit'])->name('deliveries.edit');
         Route::resource('deliveries', AdminDeliveryController::class);
-
+        //Route::get('/deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');
 
         // Manage Inventory
-        Route::resource('inventory', InventoryController::class);
+        Route::get('inventories/export', [AdminInventoryController::class, 'export'])->name('inventories.export');
+        Route::get('inventories/lowStockAlerts', [AdminInventoryController::class, 'lowStockAlerts'])->name('inventories.low_stock_alerts');
+        Route::get('inventories/stockHistory', [AdminInventoryController::class, 'stockHistory'])->name('inventories.stock_history');
 
+        Route::resource('inventories', AdminInventoryController::class);
+        
         // Manage Payments
-        Route::resource('payments', PaymentController::class);
+        Route::resource('payments', AdminPaymentController::class);
 
         // Manage Sales Reports
-        Route::resource('sales', SalesReportController::class);
+        Route::resource('sales_reports', AdminSalesReportController::class);
 
         // Manage Suppliers
-        Route::resource('suppliers', SupplierController::class);
+        Route::resource('suppliers', AdminSupplierController::class);
     });
 });
 

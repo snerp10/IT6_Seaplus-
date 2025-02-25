@@ -20,10 +20,8 @@ class CreateSalesReportsTable extends Migration
             $table->decimal('total_expenses', 15, 2);
             $table->decimal('net_profit', 15, 2);
             $table->enum('report_type', ['daily', 'weekly', 'monthly']);
-            $table->foreignId('generated_by')->constrained('users', 'user_id')->onDelete('cascade');
+            $table->foreignId('generated_by')->constrained('employees', 'emp_id')->onDelete('cascade');
             $table->timestamps();
-
-            
         });
     }
 

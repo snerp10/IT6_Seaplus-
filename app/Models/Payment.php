@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    protected $primaryKey = 'payment_id';
+    protected $primaryKey = 'pay_id';
     
     protected $fillable = [
-        'customer_id',
+        'cus_id',
         'order_id',
         'amount_paid',
-        'payment_date',
-        'payment_method',
+        'pay_date',
+        'pay_method',
         'outstanding_balance',
         'invoice_number'
     ];
@@ -25,6 +25,6 @@ class Payment extends Model
 
     public function customer()
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        return $this->belongsTo(User::class, 'cus_id');
     }
 }

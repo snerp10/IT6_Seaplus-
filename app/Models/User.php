@@ -15,13 +15,11 @@ class User extends Authenticatable
     protected $primaryKey = 'user_id';
 
     protected $fillable = [
-        'name',
-        'email',
         'username',
         'password',
         'role',
-        'contact_number',
-        'status'
+        'cus_id',
+        'emp_id',
     ];
 
     protected $hidden = [
@@ -30,26 +28,23 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
     public function customer()
     {
-        return $this->hasOne(Customer::class, 'user_id', 'user_id');
+        return $this->belongsTo(Customer::class, 'cus_id', 'cus_id');
     }
 
     public function hasRole($role)
     {
-        if ($role === 'customer') {
-            return $this->customer()->exists();
-        }
         return $this->role === $role;
     }
 
     public function employee()
     {
-        return $this->hasOne(Employee::class, 'user_id');
+        return $this->belongsTo(Employee::class, 'emp_id', 'emp_id');
     }
 
 }
+

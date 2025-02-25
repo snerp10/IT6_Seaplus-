@@ -14,12 +14,12 @@ class CreateInventoriesTable extends Migration
     public function up()
     {
         Schema::create('inventories', function (Blueprint $table) {
-            $table->id('inventory_id');
-            $table->foreignId('product_id')->constrained('products', 'product_id')->onDelete('cascade');
-            $table->integer('current_stock');
-            $table->enum('movement_type', ['Stock_in', 'Stock_out']);
+            $table->id('inv_id');
+            $table->foreignId('prod_id')->constrained('products', 'prod_id')->onDelete('cascade');
+            $table->integer('curr_stock');
+            $table->enum('move_type', ['Stock_in', 'Stock_out']);
             $table->integer('quantity');
-            $table->date('movement_date');
+            $table->date('move_date');
             $table->timestamps();
         });
     }

@@ -20,8 +20,8 @@ class SalesReport extends Model
         'generated_by',
     ];
 
-    public function user()
+    public function employee()
     {
-        return $this->belongsTo(User::class, 'generated_by');
+        return $this->belongsTo(Employee::class, 'generated_by');
     }
 }
