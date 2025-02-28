@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Delivery;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Inventory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // Import this
 use DB;
 
@@ -28,24 +29,24 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-         // Validate the incoming request data
-         $validatedData = $request->validate([
+        // Validate the incoming request data
+        $validatedData = $request->validate([
             'pay_method' => 'required|string',
-            'order_type'     => 'required|string|in:Retail,Bulk',
-            'products'       => 'required|array',
+            'order_type' => 'required|string|in:Retail,Bulk',
+            'products' => 'required|array',
             'products.*.quantity' => 'required|integer|min:0'
         ]);
         DB::beginTransaction();
-        
+
         try {
-            $customer = Customer::where('user_id', auth()->id())->firstOrFail();
-            
+            $customer = auth()->user()->customer;
+
             // Create basic order first
             $order = Order::create([
                 'cus_id' => $customer->cus_id,
                 'order_date' => now(),
                 'total_amount' => 0,
-                'pay_method' => $validatedData['pay_method'], 
+                'pay_method' => $validatedData['pay_method'],
                 'order_type' => $validatedData['order_type'],
                 'pay_status' => 'Pending'
             ]);
@@ -76,6 +77,15 @@ class OrderController extends Controller
 
                     $product->decrement('stock', $quantity);
                     $totalAmount += $subtotal;
+
+                    // Record stock out in inventory
+                    Inventory::create([
+                        'prod_id' => $productId,
+                        'curr_stock' => $product->stock,
+                        'move_type' => 'Stock_out',
+                        'quantity' => $quantity,
+                        'move_date' => now(),
+                    ]);
                 }
             }
 
@@ -83,13 +93,13 @@ class OrderController extends Controller
 
             DB::commit();
             return redirect()->route('orders.edit', $order->order_id)
-                           ->with('success', 'Order created! Please add delivery details.');
+                ->with('success', 'Order created! Please add delivery details.');
 
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Order creation failed: ' . $e->getMessage());
             return back()->withInput()
-                        ->with('error', 'Failed to place order: ' . $e->getMessage());
+                ->with('error', 'Failed to place order: ' . $e->getMessage());
         }
     }
         
@@ -127,9 +137,36 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
-        
-        $order->delete();
-        return redirect()->route('orders.index')->with('success', 'Order deleted successfully.');
+        \Log::info('Attempting to cancel order: ' . $order->order_id); // Add this line
+        if ($order->pay_status === 'Paid') {
+            return back()->with('error', 'Paid orders cannot be canceled.');
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($order->orderDetails as $detail) {
+                $product = Product::findOrFail($detail->prod_id);
+                $product->increment('stock', $detail->quantity);
+
+                Inventory::create([
+                    'prod_id' => $product->prod_id,
+                    'curr_stock' => $product->stock,
+                    'move_type' => 'Stock_in(Canceled)',
+                    'quantity' => $detail->quantity,
+                    'move_date' => now(),
+                ]);
+            }
+
+            $order->delete();
+            DB::commit();
+            return redirect()->route('orders.index')->with('success', 'Order canceled successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Order cancelation failed: ' . $e->getMessage());
+            return back()->withInput()
+                ->with('error', 'Failed to cancel order: ' . $e->getMessage());
+        }
     }
   
     public function processPayment(Order $order)

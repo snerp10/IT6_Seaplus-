@@ -32,7 +32,7 @@
                                         <!-- Quantity Input -->
                                         <div class="col-md-3">
                                             <input type="number" 
-                                                   name="products[{{ $product->product_id }}][quantity]"
+                                                   name="products[{{ $product->prod_id }}][quantity]"
                                                    class="form-control quantity-input"
                                                    data-price="{{ $product->price }}"
                                                    min="0"
@@ -61,7 +61,7 @@
                                 <!-- Payment Method -->
                                 <div class="mb-3">
                                     <label class="fw-bold">💰 Payment Method</label>
-                                    <select name="payment_method" class="form-control" required>
+                                    <select name="pay_method" class="form-control" required>
                                         <option value="Cash">Cash</option>
                                         <option value="GCash">GCash</option>
                                     </select>

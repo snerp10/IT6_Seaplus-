@@ -10,7 +10,7 @@
             <form action="{{ route('payments.store') }}" method="POST" id="paymentForm">
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $order->order_id }}">
-                <input type="hidden" name="payment_method" value="{{ $order->payment_method }}">
+                <input type="hidden" name="payment_method" value="{{ $order->pay_method }}">
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                @if($order->payment_method === 'GCash')
+                @if($order->pay_method === 'GCash')
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="card">

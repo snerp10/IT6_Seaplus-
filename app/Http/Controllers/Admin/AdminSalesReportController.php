@@ -58,7 +58,7 @@ class AdminSalesReportController extends Controller
 
         $salesReport->update($request->all());
 
-        return redirect()->route('admin.sales_reports.index')->with('success', 'Sales report updated successfully.');
+        return redirect()->route('sales_reports.index')->with('success', 'Sales report updated successfully.');
     }
 
     public function destroy(SalesReport $salesReport)

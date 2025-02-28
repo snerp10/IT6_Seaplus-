@@ -17,11 +17,14 @@ class CreateSuppliersTable extends Migration
             $table->id('supp_id');
             $table->string('company_name');
             $table->string('email')->unique();
-            $table->string('contact_number');
-            $table->string('address');
-            $table->string('prod_type');
+            $table->string('contact_number', 15); // Standardized length
+            $table->string('street');
+            $table->string('city');
+            $table->string('province');
+            $table->text('prod_type'); // Para mas maraming product types
             $table->timestamps();
         });
+        
     }
 
     /**

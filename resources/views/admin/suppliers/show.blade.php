@@ -3,6 +3,7 @@
 @section('admin.content')
 <div class="container">
     <h1>Supplier Details</h1>
+    <a href="{{ route('admin.suppliers.index') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
     <table class="table">
         <tr>
             <th>Company Name:</th>
@@ -25,11 +26,6 @@
             <td>{{ $supplier->prod_type }}</td>
         </tr>
     </table>
-    <a href="{{ route('admin.suppliers.edit', $supplier->supp_id) }}" class="btn btn-warning">Edit</a>
-    <form action="{{ route('admin.suppliers.destroy', $supplier->supp_id) }}" method="POST" style="display:inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger">Delete</button>
-    </form>
+    <a href="{{ route('admin.suppliers.edit', $supplier->supp_id) }}" class="btn btn-warning">Edit Supplier</a>
 </div>
 @endsection

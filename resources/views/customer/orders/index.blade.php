@@ -21,10 +21,10 @@
                     @foreach($orders as $order)
                     <tr>
                         <td>{{ $order->order_date }}</td>
-                        <td class="fw-bold text-success">₱{{ number_format($order->total_amount, 2) }}</td>
+                        <td class="fw-bold text-success">₱{{ number_format($order->orderDetails->sum('subtotal'), 2) }}</td>
                         <td>
-                            <span class="badge bg-{{ $order->payment_status == 'Paid' ? 'success' : 'warning' }}">
-                                {{ $order->payment_status }}
+                            <span class="badge bg-{{ $order->pay_status == 'Paid' ? 'success' : 'warning' }}">
+                                {{ $order->pay_status }}
                             </span>
                         </td>
                         <td>
@@ -43,7 +43,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger" 
-                                    @if($order->payment_status === 'Paid') disabled @endif>
+                                    @if($order->pay_status === 'Paid') disabled @endif>
                                     <i class="fas fa-times"></i> Cancel
                                 </button>
                             </form>

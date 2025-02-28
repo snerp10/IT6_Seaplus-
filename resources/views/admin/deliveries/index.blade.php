@@ -32,7 +32,7 @@
                         @foreach($deliveries as $delivery)
                         <tr>
                             <td>{{ $delivery->order->order_id }}</td>
-                            <td>{{ $delivery->order->customer->user->name }}</td>
+                            <td>{{ $delivery->order->customer->fname . ' ' . $delivery->order->customer->mname . ' ' . $delivery->order->customer->lname }}</td>
                             <td>
                                 <span class="badge bg-{{ $delivery->delivery_status === 'Delivered' ? 'success' : 'info' }}">
                                     {{ $delivery->delivery_status }}

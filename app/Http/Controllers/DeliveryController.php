@@ -10,47 +10,44 @@ class DeliveryController extends Controller
 {
     public function edit(Order $order)
     {
-        \Log::info('Authenticated user ID: ' . auth()->id());
-        \Log::info('Order customer ID: ' . $order->cus_id);
-        // Authorization check: siguraduhin na ang logged-in user ay may access sa order na ito.
-        if (auth()->id() !== $order->cus_id) {
+        // Check if user is authorized
+        if ($order->cus_id !== auth()->user()->cus_id) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Directly retrieve the delivery record using the relationship.
-        $delivery = $order->delivery; // assumes one-to-one relationship is properly set up.
-        return view('deliveries.edit', compact('order', 'delivery'));
+        return view('customer.deliveries.edit', compact('order'));
     }
 
     public function update(Request $request, Order $order)
     {
-        \Log::info('Authenticated user ID: ' . auth()->id());
-        \Log::info('Order customer ID: ' . $order->cus_id);
-
-        // Authorization check: siguraduhin na ang logged-in user ay may access sa order na ito.
-        if (auth()->id() !== $order->cus_id) {
+        // Check if user is authorized
+        if ($order->cus_id !== auth()->user()->cus_id) {
             abort(403, 'Unauthorized action.');
         }
 
-        $delivery = Delivery::where('order_id', $order->order_id)->first();
-
-        if (!$delivery) {
-            return redirect()->back()->with('error', 'No delivery record found.');
-        }
-
-        // Validate request input
-        $validated = $request->validate([
-            'delivery_address'    => 'required|string|max:255',
-            'delivery_date'       => 'required|date',
-            'special_instructions'=> 'nullable|string'
+        $request->validate([
+            'delivery_date' => 'required|date',
+            'street' => 'required|string',
+            'city' => 'required|string',
+            'province' => 'required|string',
+            'special_instructions' => 'nullable|string',
         ]);
 
-        $validated['delivery_date'] = date('Y-m-d', strtotime($validated['delivery_date']));
+        $delivery = $order->delivery;
 
+        if (!$delivery) {
+            $delivery = new Delivery();
+            $delivery->order_id = $order->order_id;
+        }
 
-        $delivery->update($validated);
+        $delivery->delivery_date = $request->delivery_date;
+        $delivery->street = $request->street;
+        $delivery->city = $request->city;
+        $delivery->province = $request->province;
+        $delivery->special_instructions = $request->special_instructions;
+        $delivery->save();
 
-        return redirect()->route('orders.payment', $order->order_id)->with('success', 'Delivery details updated.');
-
+        return redirect()->route('orders.show', $order->order_id)
+                         ->with('success', 'Delivery details updated successfully!');
     }
 }

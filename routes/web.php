@@ -57,6 +57,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('products', ProductController::class)->only(['index', 'show']);
         
         // Orders
+        Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::resource('orders', OrderController::class);
         
         //Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
@@ -104,6 +105,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('products', AdminProductController::class);
 
         // Manage Orders
+        Route::get('orders/dashboard', [AdminOrderController::class, 'dashboard'])->name('orders.dashboard');
+        Route::post('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::post('orders/{order}/payment', [AdminOrderController::class, 'addPayment'])->name('orders.add-payment');
+        Route::get('orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
         Route::resource('orders', AdminOrderController::class);
 
         // Manage Employees

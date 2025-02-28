@@ -13,16 +13,20 @@
                     <p><strong>Order ID:</strong> #{{ $order->order_id }}</p>
                     <p><strong>Order Type:</strong> {{ $order->order_type }}</p>
                     <p><strong>Order Date:</strong> {{ $order->order_date }}</p>
-                    <p><strong>Payment Method:</strong> {{ $payment->payment_method }}</p>
+                    <p><strong>Payment Method:</strong> {{ $payment->pay_method }}</p>
                 </div>
                 <div class="col-md-6 text-end">
                     <h5 class="mb-3">Payment Summary</h5>
-                    <p><strong>Total Amount:</strong> ₱{{ number_format($order->total_amount, 2) }}</p>
+                    @if(isset($orderDetails))
+                        <p><strong>Total Amount:</strong> ₱{{ number_format($orderDetails->subtotal, 2) }}</p>
+                    @else
+                        <p><strong>Total Amount:</strong> Not available</p>
+                    @endif
                     <p><strong>Amount Paid:</strong> ₱{{ number_format($payment->amount_paid, 2) }}</p>
                     <p><strong>Outstanding Balance:</strong> ₱{{ number_format($payment->outstanding_balance, 2) }}</p>
                     <p><strong>Payment Status:</strong> 
-                        <span class="badge bg-{{ $order->payment_status === 'Paid' ? 'success' : 'warning' }}">
-                            {{ $order->payment_status }}
+                        <span class="badge bg-{{ $order->pay_status === 'Paid' ? 'success' : 'warning' }}">
+                            {{ $order->pay_status }}
                         </span>
                     </p>
                 </div>

@@ -20,7 +20,9 @@ class Delivery extends Model
     protected $fillable = [
         'order_id',
         'delivery_date',
-        'delivery_address',
+        'street',
+        'city',
+        'province',
         'special_instructions',
         'delivery_status',
         'delivery_cost',

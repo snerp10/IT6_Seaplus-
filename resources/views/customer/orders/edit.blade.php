@@ -25,11 +25,11 @@
                             </tr>
                             <tr>
                                 <th>Payment Method:</th>
-                                <td>{{ $order->payment_method }}</td>
+                                <td>{{ $order->pay_method }}</td>
                             </tr>
                             <tr>
                                 <th>Payment Status:</th>
-                                <td>{{ $order->payment_status }}</td>
+                                <td>{{ $order->pay_status }}</td>
                             </tr>
                             <tr>
                                 <th>Total Amount:</th>
@@ -45,7 +45,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Order Type</label>
-                            <select name="order_type" class="form-control" {{ $order->payment_status === 'Paid' ? 'disabled' : '' }}>
+                            <select name="order_type" class="form-control" {{ $order->pay_status === 'Paid' ? 'disabled' : '' }}>
                                 <option value="Retail" {{ $order->order_type === 'Retail' ? 'selected' : '' }}>Retail</option>
                                 <option value="Bulk" {{ $order->order_type === 'Bulk' ? 'selected' : '' }}>Bulk</option>
                             </select>
@@ -70,7 +70,7 @@
                             <label class="form-label required">Preferred Delivery Date</label>
                             <input type="date" name="delivery_date" class="form-control" 
                                     value="{{ old('delivery_date', optional($order->delivery)->delivery_date) }}"
-                                    required {{ $order->payment_status === 'Paid' ? 'disabled' : '' }}>
+                                    required {{ $order->pay_status === 'Paid' ? 'disabled' : '' }}>
                         </div>
 
                         <div class="mb-3">

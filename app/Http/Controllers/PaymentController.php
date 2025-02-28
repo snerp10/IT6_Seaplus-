@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\Product;
+use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Delivery;
 use Illuminate\Http\Request;
@@ -31,11 +34,11 @@ class PaymentController extends Controller
         }
 
         $payment = Payment::create([
-            'customer_id' => auth()->id(),
+            'cus_id' => auth()->id(),
             'order_id' => $order->order_id,
             'amount_paid' => $request->amount_paid,
-            'payment_date' => now(),
-            'payment_method' => $request->payment_method,
+            'pay_date' => now(),
+            'pay_method' => $request->payment_method,
             'outstanding_balance' => $order->total_amount - $request->amount_paid,
             'invoice_number' => 'INV-' . time()
         ]);
@@ -43,7 +46,7 @@ class PaymentController extends Controller
         // Update the outstanding balance of the order
         $order->update([
             'total_amount' => $payment->outstanding_balance,
-            'payment_status' => $payment->outstanding_balance <= 0 ? 'Paid' : 'Partially Paid',
+            'pay_status' => $payment->outstanding_balance <= 0 ? 'Paid' : 'Partially Paid',
             'delivery_status' => 'Processing'
         ]);
 
@@ -54,7 +57,9 @@ class PaymentController extends Controller
             ]);
         }
 
-        return view('customer.payments.invoice', compact('order', 'payment'))
+        $orderDetails = OrderDetail::where('order_id', $order->order_id)->first(); // Retrieve order details
+
+        return view('customer.payments.invoice', compact('order', 'payment', 'orderDetails'))
             ->with('success', 'Payment processed successfully!');
     }
 
@@ -136,7 +141,7 @@ class PaymentController extends Controller
     public function showInvoice(Order $order)
     {
         // Check if user is authorized to view this invoice
-        if ($order->customer_id !== auth()->id()) {
+        if ($order->cus_id !== auth()->id()) {
             abort(403);
         }
 
@@ -144,6 +149,8 @@ class PaymentController extends Controller
                         ->latest()
                         ->firstOrFail();
 
-        return view('customer.payments.invoice', compact('order', 'payment'));
+        $orderDetails = OrderDetail::where('order_id', $order->order_id)->first(); // Retrieve order details
+
+        return view('customer.payments.invoice', compact('order', 'payment', 'orderDetails'));
     }
 }

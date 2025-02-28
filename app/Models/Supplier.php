@@ -15,7 +15,24 @@ class Supplier extends Model
         'company_name',
         'email',
         'contact_number',
-        'address',
+        'street',
+        'city',
+        'province',
         'prod_type',
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'supp_id', 'supp_id');
+    }
+    
+    public function supplierProducts()
+    {
+        return $this->hasMany(SupplierProduct::class, 'supp_id', 'supp_id');
+    }
+    
+    public function getAddressAttribute()
+    {
+        return $this->street . ', ' . $this->city . ', ' . $this->province;
+    }
 }

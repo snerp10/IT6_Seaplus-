@@ -5,28 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Inventory extends Model
+class Pricing extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'inv_id';
+    protected $primaryKey = 'price_id';
+    protected $table = 'pricing';
 
     protected $fillable = [
         'prod_id',
-        'curr_stock',
-        'move_type',
-        'stock_in',
-        'stock_out',
-        'move_date',
+        'original_price',
+        'selling_price',
+        'markup',
+        'start_date',
+        'end_date',
     ];
 
     protected $casts = [
-        'move_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
-    public function product()
+    public function products()
     {
         return $this->belongsTo(Product::class, 'prod_id', 'prod_id');
     }
 }
-

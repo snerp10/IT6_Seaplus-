@@ -15,10 +15,10 @@
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger" 
-                            @if($order->payment_status === 'Paid') disabled @endif>
+                            @if($order->pay_status === 'Paid') disabled @endif>
                             Cancel Order
                         </button>
-                        @if($order->payment_status === 'Paid')
+                        @if($order->pay_status === 'Paid')
                             <div class="btn-group" role="group">
                                 <a href="{{ route('invoices.show', $order->order_id) }}" class="btn btn-info">
                                     <i class="fas fa-file-invoice"></i> View Invoice
@@ -41,13 +41,13 @@
                         </tr>
                         <tr>
                             <th>Payment Method:</th>
-                            <td>{{ $order->payment_method }}</td>
+                            <td>{{ $order->pay_method }}</td>
                         </tr>
                         <tr>
                             <th>Payment Status:</th>
                             <td>
-                                <span class="badge bg-{{ $order->payment_status == 'Paid' ? 'success' : 'warning' }}">
-                                    {{ $order->payment_status }}
+                                <span class="badge bg-{{ $order->pay_status == 'Paid' ? 'success' : 'warning' }}">
+                                    {{ $order->pay_status }}
                                 </span>
                             </td>
                         </tr>
@@ -68,7 +68,11 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Total Amount:</th>
+                            <th>Subtotal:</th>
+                            <td>₱{{ number_format($order->orderDetails->sum('subtotal'), 2) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Balance:</th>
                             <td>₱{{ number_format($order->total_amount, 2) }}</td>
                         </tr>
                     </table>
@@ -100,13 +104,21 @@
                 <tfoot>
                     <tr>
                         <th colspan="4" class="text-end">Total:</th>
+                        <th>₱{{ number_format($order->orderDetails->sum('subtotal'), 2) }}</th>
+                    </tr>
+                    @if($order->orderDetails->sum('subtotal') != $order->total_amount)
+                        <th colspan="4" class="text-end">Paid:</th>
+                        <th>₱{{ number_format($order->total_amount - $order->orderDetails->sum('subtotal'), 2) }}</th>
+                    @endif
+                    <tr>
+                        <th colspan="4" class="text-end">Remaining Balance:</th>
                         <th>₱{{ number_format($order->total_amount, 2) }}</th>
                     </tr>
                 </tfoot>
             </table>
             <div class="mt-4 text-end">
-                @if($order->payment_status != 'Paid')
-                    <form action="{{ route('orders.payment', $order->order_id) }}" style="display:inline;">
+                @if($order->pay_status != 'Paid')
+                    <form action="{{ route('orders.payment', $order->order_id) }}" method="POST" style="display:inline;">
                          @csrf
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-money-bill"></i> Proceed to Payment

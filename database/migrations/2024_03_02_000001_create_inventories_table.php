@@ -18,7 +18,8 @@ class CreateInventoriesTable extends Migration
             $table->foreignId('prod_id')->constrained('products', 'prod_id')->onDelete('cascade');
             $table->integer('curr_stock');
             $table->enum('move_type', ['Stock_in', 'Stock_out']);
-            $table->integer('quantity');
+            $table->integer('stock_in')->default(0); // Para sa Stock In
+            $table->integer('stock_out')->default(0); // Para sa Stock Out
             $table->date('move_date');
             $table->timestamps();
         });

@@ -35,10 +35,16 @@ class Customer extends Authenticatable
         'fname',
         'mname',
         'lname',
+        'gender',
         'birthdate',
         'contact_number',
         'email',
-        'address'
+        'street',
+        'barangay',
+        'city',
+        'province',
+        'postal_code',
+        'country',
     ];
 
     /**
@@ -58,7 +64,37 @@ class Customer extends Authenticatable
      */
     public function orders()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class, 'cus_id', 'cus_id');
+    }
+
+    /**
+     * Get the payments for the customer.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'cus_id', 'cus_id');
+    }
+
+    /**
+     * Get the user that owns the customer.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the customer's full name.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return $this->fname . ' ' . ($this->mname ? $this->mname . ' ' : '') . $this->lname;
     }
 }
 

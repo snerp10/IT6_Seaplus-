@@ -11,9 +11,10 @@ return new class extends Migration
             $table->id('detail_id');
             $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
             $table->foreignId('prod_id')->constrained('products', 'prod_id')->onDelete('cascade');
-            $table->integer('quantity');
+            $table->integer('quantity')->unsigned();
             $table->decimal('subtotal', 8, 2);
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
         });
     }
 

@@ -15,14 +15,17 @@ class CreateSalesReportsTable extends Migration
     {
         Schema::create('sales_reports', function (Blueprint $table) {
             $table->id('report_id');
-            $table->date('date_generated');
-            $table->decimal('total_sales', 15, 2);
-            $table->decimal('total_expenses', 15, 2);
-            $table->decimal('net_profit', 15, 2);
-            $table->enum('report_type', ['daily', 'weekly', 'monthly']);
-            $table->foreignId('generated_by')->constrained('employees', 'emp_id')->onDelete('cascade');
+            $table->timestamp('date_generated')->useCurrent(); // Para may exact date & time
+            $table->decimal('total_sales', 15, 2)->nullable();
+            $table->decimal('total_expenses', 15, 2)->nullable();
+            $table->decimal('net_profit', 15, 2)->nullable();
+            
+            $table->enum('report_type', ['daily', 'weekly', 'monthly', 'quarterly', 'yearly']); // Mas flexible
+            $table->foreignId('generated_by')->nullable()->constrained('employees', 'emp_id')->onDelete('cascade'); 
+        
             $table->timestamps();
         });
+        
     }
 
     /**

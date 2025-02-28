@@ -12,10 +12,9 @@ return new class extends Migration
             $table->foreignId('cus_id')->constrained('customers', 'cus_id')->onDelete('cascade');
             $table->dateTime('order_date');
             $table->decimal('total_amount', 10, 2);
-            $table->string('pay_method');
-            $table->string('pay_status');
-            $table->string('order_type');
-            $table->timestamps();
+            $table->enum('pay_status', ['Paid', 'Unpaid']);
+            $table->enum('order_type', ['Online', 'Walk-in']);
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

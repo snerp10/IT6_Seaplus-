@@ -21,15 +21,17 @@ class AdminSupplierController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'email' => 'required|email|unique:suppliers,email',
             'contact_number' => 'required|string|max:15',
-            'address' => 'required|string|max:255',
-            'prod_type' => 'required|string|max:255',
+            'street' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+            'prod_type' => 'required|string',
         ]);
 
-        Supplier::create($request->all());
+        Supplier::create($validated);
 
         return redirect()->route('admin.suppliers.index')->with('success', 'Supplier created successfully.');
     }
@@ -46,23 +48,30 @@ class AdminSupplierController extends Controller
 
     public function update(Request $request, Supplier $supplier)
     {
-        $request->validate([
+        $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'email' => 'required|email|unique:suppliers,email,' . $supplier->supp_id . ',supp_id',
             'contact_number' => 'required|string|max:15',
-            'address' => 'required|string|max:255',
-            'prod_type' => 'required|string|max:255',
+            'street' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+            'prod_type' => 'required|string',
         ]);
 
-        $supplier->update($request->all());
+        $supplier->update($validated);
 
         return redirect()->route('admin.suppliers.index')->with('success', 'Supplier updated successfully.');
     }
 
     public function destroy(Supplier $supplier)
     {
-        $supplier->delete();
+        // Check if supplier has associated products
+        if ($supplier->products()->count() > 0) {
+            return redirect()->route('admin.suppliers.index')
+                ->with('error', 'Cannot delete supplier with associated products.');
+        }
 
+        $supplier->delete();
         return redirect()->route('admin.suppliers.index')->with('success', 'Supplier deleted successfully.');
     }
 }

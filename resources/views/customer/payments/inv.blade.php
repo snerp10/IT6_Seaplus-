@@ -16,7 +16,7 @@
             <div class="col-md-12">
                 <div class="invoice-header">
                     <h1 class="text-center">Invoice #{{ $payment->invoice_number }}</h1>
-                    <p class="text-center">Date: {{ $payment->payment_date }}</p>
+                    <p class="text-center">Date: {{ $payment->pay_date }}</p>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
             <div class="col-md-12">
                 <div class="invoice-details">
                     <p><strong>Order ID:</strong> {{ $order->order_id }}</p>
-                    <p><strong>Payment Method:</strong> {{ $payment->payment_method }}</p>
+                    <p><strong>Payment Method:</strong> {{ $payment->pay_method }}</p>
                     <p><strong>Amount Paid:</strong> ₱{{ number_format($payment->amount_paid, 2) }}</p>
                 </div>
             </div>

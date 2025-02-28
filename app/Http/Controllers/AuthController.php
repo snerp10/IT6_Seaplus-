@@ -73,23 +73,34 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email|unique:customers,email',
             'password' => 'required|min:6',
-            'first_name' => 'required',
-            'middle_name' => 'nullable',
-            'last_name' => 'required',
-            'birthdate' => 'required',
-            'phone' => 'required',
-            'address' => 'required',
+            'fname' => 'required',
+            'mname' => 'nullable',
+            'lname' => 'required',
+            'gender' => 'nullable|in:Male,Female,Other',
+            'birthdate' => 'required|date',
+            'contact_number' => 'required',
+            'street' => 'nullable',
+            'barangay' => 'nullable',
+            'city' => 'required',
+            'province' => 'required',
+            'postal_code' => 'nullable',
         ]);
 
         try {
             $customer = Customer::create([
-                'fname' => $request->first_name,
-                'mname' => $request->middle_name,
-                'lname' => $request->last_name,
+                'fname' => $request->fname,
+                'mname' => $request->mname,
+                'lname' => $request->lname,
+                'gender' => $request->gender,
                 'birthdate' => $request->birthdate,
-                'contact_number' => $request->phone,
+                'contact_number' => $request->contact_number,
                 'email' => $request->email,
-                'address' => $request->address
+                'street' => $request->street,
+                'barangay' => $request->barangay,
+                'city' => $request->city,
+                'province' => $request->province,
+                'postal_code' => $request->postal_code,
+                'country' => 'Philippines', // Default country
             ]);
 
             if (!$customer) {
@@ -100,7 +111,7 @@ class AuthController extends Controller
             \Log::info('Customer created with ID: ' . $customer->cus_id);
 
             $user = User::create([
-                'username' => $request->first_name,
+                'username' => $request->fname,
                 'password' => Hash::make($request->password),
                 'role' => 'Customer',
                 'cus_id' => $customer->cus_id,
