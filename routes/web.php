@@ -104,20 +104,29 @@ Route::middleware(['auth'])->group(function () {
         // Manage Products
         Route::resource('products', AdminProductController::class);
 
-        // Manage Orders
+        // Manage Orders - IMPORTANT: Define specific routes BEFORE the resource route
+        Route::post('orders/calculate', [AdminOrderController::class, 'calculate'])->name('orders.calculate');
         Route::get('orders/dashboard', [AdminOrderController::class, 'dashboard'])->name('orders.dashboard');
+        Route::get('orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
         Route::post('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
         Route::post('orders/{order}/payment', [AdminOrderController::class, 'addPayment'])->name('orders.add-payment');
-        Route::get('orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
-        Route::resource('orders', AdminOrderController::class);
+        
+        // Now define the resource route WITHOUT conflicting with the above specific routes
+        Route::resource('orders', AdminOrderController::class)->except(['store']);
+        // Define store separately to avoid conflicts with calculate route
+        Route::post('orders', [AdminOrderController::class, 'store'])->name('orders.store');
 
         // Manage Employees
         Route::resource('employees', AdminEmployeeController::class);
 
         
         // Manage Deliveries
+        Route::get('/deliveries/export', [AdminDeliveryController::class, 'export'])->name('deliveries.export');
+        Route::get('/deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');
+
+
         Route::resource('deliveries', AdminDeliveryController::class);
-        //Route::get('/deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');
+        
 
         // Manage Inventory
         Route::get('inventories/export', [AdminInventoryController::class, 'export'])->name('inventories.export');

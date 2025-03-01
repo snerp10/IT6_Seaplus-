@@ -40,7 +40,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalOrders }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $total_orders }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
@@ -56,7 +56,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paid Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $paidOrders }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $paid_orders }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -72,7 +72,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingOrders }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pending_orders }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-clock fa-2x text-gray-300"></i>
@@ -87,11 +87,11 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Today's Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $todayOrders }}</div>
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Partially Paid Orders</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $partially_paid_orders }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
@@ -185,7 +185,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ $order->order_date->format('M d, Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
                             <td class="font-weight-bold text-primary">₱{{ number_format($order->total_amount, 2) }}</td>
                             <td>
                                 <span class="badge bg-{{ $order->order_type == 'Bulk' ? 'danger' : 'info' }}">
