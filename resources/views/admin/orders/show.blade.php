@@ -259,7 +259,7 @@
 <div class="modal fade" id="addPaymentModal" tabindex="-1" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('admin.orders.add-payment', $order->order_id) }}" method="POST">
+            <form action="{{ route('admin.payments.create_from_order', $order->order_id) }}" method="POST">
                 @csrf
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="addPaymentModalLabel">Add Payment</h5>
@@ -281,8 +281,7 @@
                         <select class="form-control" id="pay_method" name="pay_method" required>
                             <option value="Cash">Cash</option>
                             <option value="GCash">GCash</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="Credit Card">Credit Card</option>
+                            <option value="Bank Transfer">Cash on Delivery</option>
                         </select>
                     </div>
 

@@ -136,7 +136,12 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('inventories', AdminInventoryController::class);
         
         // Manage Payments
+        Route::post('payments/create-from-order/{order}', [AdminPaymentController::class, 'createFromOrder'])->name('payments.create_from_order');
+        Route::get('payments/reports', [AdminPaymentController::class, 'reports'])->name('payments.reports');
+        Route::get('payments/export', [AdminPaymentController::class, 'export'])->name('payments.export');
+        Route::post('payments/{payment}/change-status', [AdminPaymentController::class, 'changeStatus'])->name('payments.change-status');
         Route::resource('payments', AdminPaymentController::class);
+
 
         // Manage Sales Reports
         Route::resource('sales_reports', AdminSalesReportController::class);

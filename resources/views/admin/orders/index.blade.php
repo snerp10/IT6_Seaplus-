@@ -186,7 +186,7 @@
                                 </div>
                             </td>
                             <td>{{ \Carbon\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
-                            <td class="font-weight-bold text-primary">₱{{ number_format($order->total_amount, 2) }}</td>
+                            <td class="font-weight-bold text-primary">₱{{ number_format($order->total_amount + ($order->delivery ? $order->delivery->delivery_cost : 0), 2) }}</td>
                             <td>
                                 <span class="badge bg-{{ $order->order_type == 'Bulk' ? 'danger' : 'info' }}">
                                     {{ $order->order_type }}

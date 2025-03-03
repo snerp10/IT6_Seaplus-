@@ -37,6 +37,14 @@ class Order extends Model
     {
         return $this->hasMany(Payment::class, 'order_id', 'order_id');
     }
+
+    /**
+     * Check if the order is a bulk order
+     */
+    public function isBulkOrder()
+    {
+        return $this->order_type === 'bulk';
+    }
 }
 
 
