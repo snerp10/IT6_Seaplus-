@@ -1,158 +1,448 @@
 @extends('layouts.admin')
 
+@section('title', 'Payment Reports')
+
 @section('admin.content')
 <div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Edit Product</h1>
-        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Back to Products
-        </a>
-    </div>
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Product Information</h6>
+    <!-- Content Header -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1><i class="fas fa-chart-bar mr-2"></i>Payment Reports &amp; Analytics</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.payments.index') }}">Payments</a></li>
+                        <li class="breadcrumb-item active">Reports</li>
+                    </ol>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <form action="{{ route('admin.products.update', $product->prod_id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                id="name" name="name" value="{{ old('name', $product->name) }}" required>
-                            @error('name')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <a href="{{ route('admin.payments.index') }}" class="btn btn-default btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to Payments
+                </a>
+                <a href="{{ route('admin.payments.export') }}" class="btn btn-success btn-sm ml-2">
+                    <i class="fas fa-file-export"></i> Export Report Data
+                </a>
+            </div>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Filter Report Data</h6>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.payments.reports') }}" method="GET" class="mb-0">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="date_from" class="form-label small">Start Date</label>
+                            <input type="date" name="date_from" id="date_from" class="form-control form-control-sm" 
+                                   value="{{ request('date_from', now()->subDays(30)->format('Y-m-d')) }}">
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('category') is-invalid @enderror" 
-                                id="category" name="category" value="{{ old('category', $product->category) }}" required>
-                            @error('category')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
+                        <div class="col-md-4">
+                            <label for="date_to" class="form-label small">End Date</label>
+                            <input type="date" name="date_to" id="date_to" class="form-control form-control-sm" 
+                                   value="{{ request('date_to', now()->format('Y-m-d')) }}">
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="unit" class="form-label">Unit of Measurement <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('unit') is-invalid @enderror" 
-                                id="unit" name="unit" value="{{ old('unit', $product->unit) }}" required>
-                            <small class="form-text text-muted">Example: kg, pcs, box, etc.</small>
-                            @error('unit')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
-                                <option value="Active" {{ (old('status', $product->status) == 'Active') ? 'selected' : '' }}>Active</option>
-                                <option value="Inactive" {{ (old('status', $product->status) == 'Inactive') ? 'selected' : '' }}>Inactive</option>
-                            </select>
-                            @error('status')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
+                        <div class="col-md-4">
+                            <label class="form-label d-block small">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary btn-sm mr-2">
+                                <i class="fas fa-filter"></i> Apply Filter
+                            </button>
+                            <a href="{{ route('admin.payments.reports') }}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-undo"></i> Reset
+                            </a>
                         </div>
                     </div>
-                    
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="supp_id" class="form-label">Supplier <span class="text-danger">*</span></label>
-                            <select class="form-control @error('supp_id') is-invalid @enderror" id="supp_id" name="supp_id" required>
-                                <option value="">Select Supplier</option>
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->supp_id }}" 
-                                        {{ old('supp_id', $product->supp_id) == $supplier->supp_id ? 'selected' : '' }}>
-                                        {{ $supplier->company_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('supp_id')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="original_price" class="form-label">Original Price (₱) <span class="text-danger">*</span></label>
-                            <input type="number" step="0.01" class="form-control @error('original_price') is-invalid @enderror" 
-                                id="original_price" name="original_price" 
-                                value="{{ old('original_price', $product->pricing()->latest('start_date')->first()?->original_price) }}" required>
-                            @error('original_price')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="selling_price" class="form-label">Selling Price (₱) <span class="text-danger">*</span></label>
-                            <input type="number" step="0.01" class="form-control @error('selling_price') is-invalid @enderror" 
-                                id="selling_price" name="selling_price" 
-                                value="{{ old('selling_price', $product->pricing()->latest('start_date')->first()?->selling_price) }}" required>
-                            @error('selling_price')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="markup" class="form-label">Markup (₱)</label>
-                            <input type="text" class="form-control" id="markup" 
-                                value="{{ number_format($product->pricing()->latest('start_date')->first()?->markup ?? 0, 2) }}" readonly>
-                            <small class="form-text text-muted">Automatically calculated</small>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <!-- Total Payments -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body py-2">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Payments</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Paid')->sum('total'), 2) }}
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label for="description" class="form-label">Product Description</label>
-                    <textarea class="form-control @error('description') is-invalid @enderror" 
-                        id="description" name="description" rows="3">{{ old('description', $product->description ?? '') }}</textarea>
-                    @error('description')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
+            </div>
+
+            <!-- Pending -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body py-2">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Payments</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Pending')->sum('total'), 2) }}
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clock fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <hr>
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Update Product
-                    </button>
-                    
-                    <form action="{{ route('admin.products.destroy', $product->prod_id) }}" method="POST" 
-                          onsubmit="return confirm('Are you sure you want to delete this product?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash me-1"></i> Delete Product
-                        </button>
-                    </form>
+            </div>
+
+            <!-- Partially Paid -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body py-2">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Partially Paid</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Partially Paid')->sum('total'), 2) }}
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
+
+            <!-- All Payments -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body py-2">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">All Payments</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    ₱{{ number_format($paymentsByStatus->sum('total'), 2) }}
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-wallet fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div class="row">
+            <!-- Payment Status Summary -->
+            <div class="col-xl-6 col-lg-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Payment Status Summary</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie mb-4">
+                            <canvas id="paymentStatusChart" height="300"></canvas>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Count</th>
+                                        <th>Amount</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $totalAmount = $paymentsByStatus->sum('total');
+                                        $statusColors = [
+                                            'Paid' => 'success',
+                                            'Pending' => 'warning',
+                                            'Partially Paid' => 'danger'
+                                        ];
+                                    @endphp
+                                    @foreach($paymentsByStatus as $status)
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-{{ $statusColors[$status->pay_status] ?? 'secondary' }}">
+                                                {{ ucfirst($status->pay_status) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $status->count }}</td>
+                                        <td class="text-right">₱{{ number_format($status->total, 2) }}</td>
+                                        <td>{{ round(($status->total / ($totalAmount ?: 1)) * 100, 2) }}%</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot class="thead-light">
+                                    <tr>
+                                        <th>Total</th>
+                                        <th>{{ $paymentsByStatus->sum('count') }}</th>
+                                        <th class="text-right">₱{{ number_format($totalAmount, 2) }}</th>
+                                        <th>100%</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method Summary -->
+            <div class="col-xl-6 col-lg-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Payment Method Distribution</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie mb-4">
+                            <canvas id="paymentMethodChart" height="300"></canvas>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Count</th>
+                                        <th>Amount</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $totalMethodAmount = $paymentsByMethod->sum('total');
+                                        $methodColors = [
+                                            'cash' => 'success',
+                                            'credit_card' => 'primary',
+                                            'debit_card' => 'secondary',
+                                            'bank_transfer' => 'warning',
+                                            'gcash' => 'info',
+                                            'paymaya' => 'danger'
+                                        ];
+                                    @endphp
+                                    @foreach($paymentsByMethod as $method)
+                                    <tr>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $method->pay_method)) }}</td>
+                                        <td>{{ $method->count }}</td>
+                                        <td class="text-right">₱{{ number_format($method->total, 2) }}</td>
+                                        <td>{{ round(($method->total / ($totalMethodAmount ?: 1)) * 100, 2) }}%</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot class="thead-light">
+                                    <tr>
+                                        <th>Total</th>
+                                        <th>{{ $paymentsByMethod->sum('count') }}</th>
+                                        <th class="text-right">₱{{ number_format($totalMethodAmount, 2) }}</th>
+                                        <th>100%</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Payment Trends -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Daily Payment Trends (Last 30 Days)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="dailyPaymentsChart" height="100"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-primary"></i> Daily Payment Totals
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-success"></i> Trend Line
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-$(document).ready(function() {
-    // Calculate markup on price change
-    $('#original_price, #selling_price').on('input', function() {
-        const originalPrice = parseFloat($('#original_price').val()) || 0;
-        const sellingPrice = parseFloat($('#selling_price').val()) || 0;
-        const markup = sellingPrice - originalPrice;
-        $('#markup').val(markup.toFixed(2));
+    $(function() {
+        // Status Chart
+        const statusCtx = document.getElementById('paymentStatusChart').getContext('2d');
+        const statusData = {
+            labels: [
+                @foreach($paymentsByStatus as $status)
+                    '{{ ucfirst($status->pay_status) }}',
+                @endforeach
+            ],
+            datasets: [{
+                data: [
+                    @foreach($paymentsByStatus as $status)
+                        {{ $status->total }},
+                    @endforeach
+                ],
+                backgroundColor: [
+                    @foreach($paymentsByStatus as $status)
+                        '{{ $status->pay_status == "Paid" ? "#1cc88a" : 
+                           ($status->pay_status == "Pending" ? "#f6c23e" : 
+                           ($status->pay_status == "Partially Paid" ? "#36b9cc" : "#e74a3b")) }}',
+                    @endforeach
+                ],
+                hoverBackgroundColor: [
+                    @foreach($paymentsByStatus as $status)
+                        '{{ $status->pay_status == "Paid" ? "#17a673" : 
+                           ($status->pay_status == "Pending" ? "#dda20a" : 
+                           ($status->pay_status == "Partially Paid" ? "#258391" : "#be2617")) }}',
+                    @endforeach
+                ],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        };
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: statusData,
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            const label = data.labels[tooltipItem.index];
+                            const value = data.datasets[0].data[tooltipItem.index];
+                            return `${label}: ₱${Number(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'right',
+                    align: 'start'
+                },
+                cutout: '60%'
+            }
+        });
+
+        // Method Chart
+        const methodCtx = document.getElementById('paymentMethodChart').getContext('2d');
+        const methodData = {
+            labels: [
+                @foreach($paymentsByMethod as $method)
+                    '{{ ucfirst(str_replace("_", " ", $method->pay_method)) }}',
+                @endforeach
+            ],
+            datasets: [{
+                data: [
+                    @foreach($paymentsByMethod as $method)
+                        {{ $method->total }},
+                    @endforeach
+                ],
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69'
+                ],
+                hoverBackgroundColor: [
+                    '#2e59d9', '#17a673', '#258391', '#dda20a', '#be2617', '#3a3b45'
+                ],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        };
+        new Chart(methodCtx, {
+            type: 'pie',
+            data: methodData,
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            const label = data.labels[tooltipItem.index];
+                            const value = data.datasets[0].data[tooltipItem.index];
+                            return `${label}: ₱${Number(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'right',
+                    align: 'start'
+                }
+            }
+        });
+
+        // Daily Payments Chart
+        const dailyCtx = document.getElementById('dailyPaymentsChart').getContext('2d');
+        const dailyData = {
+            labels: [
+                @foreach($dailyPayments as $daily)
+                    '{{ \Carbon\Carbon::parse($daily->date)->format("M d") }}',
+                @endforeach
+            ],
+            datasets: [{
+                label: 'Daily Payment Total',
+                data: [
+                    @foreach($dailyPayments as $daily)
+                        {{ $daily->total }},
+                    @endforeach
+                ],
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointBorderColor: 'rgba(78, 115, 223, 1)',
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                fill: true,
+                lineTension: 0.3
+            }]
+        };
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: dailyData,
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₱' + Number(value).toLocaleString('en-US');
+                            }
+                        }
+                    }
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return 'Total: ₱' + Number(tooltipItem.raw).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        }
+                    }
+                }
+            }
+        });
     });
-});
 </script>
 @endpush
 @endsection
-

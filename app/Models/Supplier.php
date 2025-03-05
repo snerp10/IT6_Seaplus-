@@ -10,29 +10,29 @@ class Supplier extends Model
     use HasFactory;
 
     protected $primaryKey = 'supp_id';
-
+    
     protected $fillable = [
         'company_name',
-        'email',
         'contact_number',
+        'email',
         'street',
         'city',
         'province',
-        'prod_type',
+        'postal_code',
+        'prod_type'
     ];
 
+    // Get all products associated with this supplier through the junction table
     public function products()
-    {
-        return $this->hasMany(Product::class, 'supp_id', 'supp_id');
-    }
-    
+{
+    return $this->belongsToMany(Product::class, 'supplier_products', 'supp_id', 'prod_id')
+        ->withPivot('min_order_qty')
+        ->withTimestamps();
+}
+
+    // Get all supplier-product relationships
     public function supplierProducts()
     {
         return $this->hasMany(SupplierProduct::class, 'supp_id', 'supp_id');
-    }
-    
-    public function getAddressAttribute()
-    {
-        return $this->street . ', ' . $this->city . ', ' . $this->province;
     }
 }

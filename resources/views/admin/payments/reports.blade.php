@@ -77,7 +77,7 @@
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Payments</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'completed')->sum('total'), 2) }}
+                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Paid')->sum('total'), 2) }}
                                 </div>
                             </div>
                             <div class="col-auto">
@@ -96,7 +96,7 @@
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Payments</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'pending')->sum('total'), 2) }}
+                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Pending')->sum('total'), 2) }}
                                 </div>
                             </div>
                             <div class="col-auto">
@@ -107,38 +107,38 @@
                 </div>
             </div>
 
-            <!-- Failed -->
+            <!-- Partially Paid -->
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-danger shadow h-100 py-2">
                     <div class="card-body py-2">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Failed Payments</div>
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Partially Paid</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'failed')->sum('total'), 2) }}
+                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Partially Paid')->sum('total'), 2) }}
                                 </div>
                             </div>
                             <div class="col-auto">
-                                <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                <i class="fas fa-percentage fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Refunded -->
+            <!-- All Payments -->
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-info shadow h-100 py-2">
                     <div class="card-body py-2">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Refunded</div>
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">All Payments</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'refunded')->sum('total'), 2) }}
+                                    ₱{{ number_format($paymentsByStatus->sum('total'), 2) }}
                                 </div>
                             </div>
                             <div class="col-auto">
-                                <i class="fas fa-undo-alt fa-2x text-gray-300"></i>
+                                <i class="fas fa-wallet fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>
@@ -171,16 +171,15 @@
                                     @php
                                         $totalAmount = $paymentsByStatus->sum('total');
                                         $statusColors = [
-                                            'completed' => 'success',
-                                            'pending' => 'warning',
-                                            'failed' => 'danger',
-                                            'refunded' => 'info'
+                                            'Paid' => 'success',
+                                            'Pending' => 'warning',
+                                            'Partially Paid' => 'danger'
                                         ];
                                     @endphp
                                     @foreach($paymentsByStatus as $status)
                                     <tr>
                                         <td>
-                                            <span class="badge badge-{{ $statusColors[$status->pay_status] ?? 'secondary' }}">
+                                            <span class="badge bg-{{ $statusColors[$status->pay_status] ?? 'secondary' }}">
                                                 {{ ucfirst($status->pay_status) }}
                                             </span>
                                         </td>
@@ -302,16 +301,16 @@
                 ],
                 backgroundColor: [
                     @foreach($paymentsByStatus as $status)
-                        '{{ $status->pay_status == "completed" ? "#1cc88a" : 
-                           ($status->pay_status == "pending" ? "#f6c23e" : 
-                           ($status->pay_status == "refunded" ? "#36b9cc" : "#e74a3b")) }}',
+                        '{{ $status->pay_status == "Paid" ? "#1cc88a" : 
+                           ($status->pay_status == "Pending" ? "#f6c23e" : 
+                           ($status->pay_status == "Partially Paid" ? "#36b9cc" : "#e74a3b")) }}',
                     @endforeach
                 ],
                 hoverBackgroundColor: [
                     @foreach($paymentsByStatus as $status)
-                        '{{ $status->pay_status == "completed" ? "#17a673" : 
-                           ($status->pay_status == "pending" ? "#dda20a" : 
-                           ($status->pay_status == "refunded" ? "#258391" : "#be2617")) }}',
+                        '{{ $status->pay_status == "Paid" ? "#17a673" : 
+                           ($status->pay_status == "Pending" ? "#dda20a" : 
+                           ($status->pay_status == "Partially Paid" ? "#258391" : "#be2617")) }}',
                     @endforeach
                 ],
                 hoverBorderColor: "rgba(234, 236, 244, 1)",

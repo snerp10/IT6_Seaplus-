@@ -538,24 +538,32 @@ class AdminPaymentController extends Controller
      */
     public function reports(Request $request)
     {
+        // Get date range filters
+        $dateFrom = $request->input('date_from', now()->subDays(30)->format('Y-m-d'));
+        $dateTo = $request->input('date_to', now()->format('Y-m-d'));
+        
+        // Base query with date filtering
+        $baseQuery = DB::table('payments')
+            ->whereDate('pay_date', '>=', $dateFrom)
+            ->whereDate('pay_date', '<=', $dateTo);
+        
         // Payment summary by status
-        $paymentsByStatus = DB::table('payments')
+        $paymentsByStatus = (clone $baseQuery)
             ->select('pay_status', DB::raw('count(*) as count'), DB::raw('sum(amount_paid) as total'))
             ->groupBy('pay_status')
             ->get();
             
         // Payment summary by method
-        $paymentsByMethod = DB::table('payments')
+        $paymentsByMethod = (clone $baseQuery)
             ->select('pay_method', DB::raw('count(*) as count'), DB::raw('sum(amount_paid) as total'))
-            ->where('pay_status', 'completed')
+            ->where('pay_status', 'Paid') // Changed from 'completed' to 'Paid'
             ->groupBy('pay_method')
             ->get();
             
-        // Daily payments for the last 30 days
-        $dailyPayments = DB::table('payments')
+        // Daily payments for the selected date range
+        $dailyPayments = (clone $baseQuery)
             ->select(DB::raw('DATE(pay_date) as date'), DB::raw('sum(amount_paid) as total'))
-            ->where('pay_status', 'completed')
-            ->where('pay_date', '>=', now()->subDays(30))
+            ->where('pay_status', 'Paid') // Changed from 'completed' to 'Paid'
             ->groupBy(DB::raw('DATE(pay_date)'))
             ->orderBy('date')
             ->get();
@@ -563,7 +571,9 @@ class AdminPaymentController extends Controller
         return view('admin.payments.reports', compact(
             'paymentsByStatus', 
             'paymentsByMethod',
-            'dailyPayments'
+            'dailyPayments',
+            'dateFrom',
+            'dateTo'
         ));
     }
     

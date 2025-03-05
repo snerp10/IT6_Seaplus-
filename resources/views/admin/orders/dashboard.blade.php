@@ -142,10 +142,10 @@
                                     <td>{{ $order->order_date->format('M d, Y') }}</td>
                                     <td>
                                         <span class="badge bg-{{ 
-                                            $order->pay_status == 'Paid' ? 'success' : 
-                                            ($order->pay_status == 'Partially Paid' ? 'warning' : 'secondary') 
+                                            $order->order_status == 'Paid' ? 'success' : 
+                                            ($order->order_status == 'Partially Paid' ? 'warning' : 'secondary') 
                                         }}">
-                                            {{ $order->pay_status }}
+                                            {{ $order->order_status }}
                                         </span>
                                     </td>
                                     <td>

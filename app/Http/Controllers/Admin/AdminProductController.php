@@ -9,6 +9,7 @@ use App\Models\Inventory;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AdminProductController extends Controller
 {
@@ -18,7 +19,7 @@ class AdminProductController extends Controller
             $query->whereNull('end_date')->orWhere('end_date', '>=', now());
         }, 'inventories' => function($query) {
             $query->latest('inv_id')->limit(1);
-        }]);
+        }, 'supplier']);
         
         // Apply filters if present
         if ($request->has('category') && !empty($request->category)) {
@@ -51,13 +52,13 @@ class AdminProductController extends Controller
             'original_price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            // Add validation for image if needed
+            'image' => 'nullable|image|max:2048',
         ]);
 
         DB::beginTransaction();
         
         try {
-            // Create product
+            // Create product with direct supplier relationship
             $product = Product::create([
                 'name' => $validated['name'],
                 'category' => $validated['category'],
@@ -65,7 +66,7 @@ class AdminProductController extends Controller
                 'status' => $validated['status'],
                 'supp_id' => $validated['supp_id'],
             ]);
-
+            
             // Calculate markup
             $markup = $validated['selling_price'] - $validated['original_price'];
             
@@ -77,7 +78,7 @@ class AdminProductController extends Controller
                 'markup' => $markup,
                 'start_date' => now(),
             ]);
-
+            
             // Create initial inventory record with zero stock
             Inventory::create([
                 'prod_id' => $product->prod_id,
@@ -87,8 +88,13 @@ class AdminProductController extends Controller
                 'stock_out' => 0,
                 'move_date' => now(),
             ]);
-
+            
             // Handle image upload if needed
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('products', 'public');
+                $product->image = $path;
+                $product->save();
+            }
             
             DB::commit();
             
@@ -105,22 +111,30 @@ class AdminProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['pricing' => function($query) {
-            $query->whereNull('end_date')->orWhere('end_date', '>=', now());
-        }, 'inventories' => function($query) {
-            $query->latest('inv_id')->limit(1);
-        }, 'supplier']);
+        $product->load([
+            'pricing' => function($query) {
+                $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+            }, 
+            'inventories' => function($query) {
+                $query->latest('inv_id')->limit(1);
+            },
+            'supplier'
+        ]);
         
         return view('admin.products.show', compact('product'));
     }
 
     public function edit(Product $product)
     {
-        $product->load(['pricing' => function($query) {
-            $query->whereNull('end_date')->orWhere('end_date', '>=', now());
-        }]);
+        $product->load([
+            'pricing' => function($query) {
+                $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+            },
+            'supplier'
+        ]);
         
         $suppliers = Supplier::all();
+        
         return view('admin.products.edit', compact('product', 'suppliers'));
     }
 
@@ -135,13 +149,13 @@ class AdminProductController extends Controller
             'original_price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            // Add validation for image if needed
+            'image' => 'nullable|image|max:2048',
         ]);
 
         DB::beginTransaction();
         
         try {
-            // Update product
+            // Update product with direct supplier relationship
             $product->update([
                 'name' => $validated['name'],
                 'category' => $validated['category'],
@@ -186,6 +200,16 @@ class AdminProductController extends Controller
             }
             
             // Handle image upload if needed
+            if ($request->hasFile('image')) {
+                // Remove old image if exists
+                if ($product->image && Storage::disk('public')->exists($product->image)) {
+                    Storage::disk('public')->delete($product->image);
+                }
+                
+                $path = $request->file('image')->store('products', 'public');
+                $product->image = $path;
+                $product->save();
+            }
             
             DB::commit();
             

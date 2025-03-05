@@ -25,7 +25,7 @@ class AdminOrderController extends Controller
         
         // Apply filters if present
         if ($request->has('status') && !empty($request->status)) {
-            $orders = $orders->where('pay_status', $request->status);
+            $orders = $orders->where('order_status', $request->status);
         }
         
         if ($request->has('type') && !empty($request->type)) {
@@ -92,7 +92,7 @@ class AdminOrderController extends Controller
                 'cus_id' => $request->cus_id,
                 'order_date' => now(),
                 'total_amount' => 0, 
-                'pay_status' => 'Pending',
+                'order_status' => 'Pending',
                 'order_type' => $request->order_type
             ]);
             \Log::debug('Order created successfully', ['order_id' => $order->order_id]);
@@ -117,7 +117,7 @@ class AdminOrderController extends Controller
                 'pay_method' => $request->pay_method,
                 'reference_number' => $request->pay_method === 'GCash' ? ($request->reference_number ?? null) : null,
                 'invoice_number' => 'INV-' . time() . '-' . $order->order_id, // Make more unique
-                'pay_status' => 'Pending',
+                'order_status' => 'Pending',
             ]);
 
             \Log::debug('Checkpoint 3');
@@ -258,7 +258,7 @@ class AdminOrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'pay_status' => 'required|in:Paid,Pending,Partially Paid,Cancelled',
+            'order_status' => 'required|in:Paid,Pending,Partially Paid,Cancelled',
             'order_type' => 'required|in:Retail,Bulk',
             'products' => 'nullable|array',
             'products.*.prod_id' => 'nullable|exists:products,prod_id',
@@ -276,7 +276,7 @@ class AdminOrderController extends Controller
         try {
             // Update basic order information
             $order->update([
-                'pay_status' => $validated['pay_status'],
+                'order_status' => $validated['order_status'],
                 'order_type' => $validated['order_type']
             ]);
             
@@ -426,9 +426,9 @@ class AdminOrderController extends Controller
                 // Check if payment status needs to be updated based on total
                 $totalPaid = $order->payments->sum('amount_paid');
                 if ($totalPaid >= $totalAmount && $totalAmount > 0) {
-                    $order->update(['pay_status' => 'Paid']);
+                    $order->update(['order_status' => 'Paid']);
                 } elseif ($totalPaid > 0 && $totalPaid < $totalAmount) {
-                    $order->update(['pay_status' => 'Partially Paid']);
+                    $order->update(['order_status' => 'Partially Paid']);
                 }
             }
             
@@ -498,7 +498,7 @@ class AdminOrderController extends Controller
             'status' => 'required|in:Paid,Pending,Partially Paid,Cancelled',
         ]);
         
-        $order->update(['pay_status' => $validated['status']]);
+        $order->update(['order_status' => $validated['status']]);
         
         return response()->json([
             'success' => true,
@@ -541,16 +541,16 @@ class AdminOrderController extends Controller
                 'pay_date' => now(),
                 'pay_method' => $validated['pay_method'],
                 'invoice_number' => 'INV-' . time() . '-' . $order->order_id,
-                'pay_status' => 'Completed',
+                'order_status' => 'Completed',
                 'reference_number' => $request->reference_number ?? null,
             ]);
             
             // Update order status based on total payments
             $newTotalPaid = $totalPaid + $newPaymentAmount;
             if ($newTotalPaid >= $order->total_amount) {
-                $order->update(['pay_status' => 'Paid']);
+                $order->update(['order_status' => 'Paid']);
             } else {
-                $order->update(['pay_status' => 'Partially Paid']);
+                $order->update(['order_status' => 'Partially Paid']);
             }
             
             DB::commit();
@@ -602,7 +602,7 @@ class AdminOrderController extends Controller
         // Additional analytics that are only needed for the dashboard
         $analytics = [
             // Sales analytics over time
-            'monthly_sales' => Order::where('pay_status', 'Paid')
+            'monthly_sales' => Order::where('order_status', 'Paid')
                 ->selectRaw('MONTH(order_date) as month, SUM(total_amount) as total')
                 ->whereYear('order_date', date('Y'))
                 ->groupBy('month')
@@ -779,12 +779,12 @@ class AdminOrderController extends Controller
     {
         return [
             'total_orders' => Order::count(),
-            'pending_orders' => Order::where('pay_status', 'Pending')->count(),
-            'paid_orders' => Order::where('pay_status', 'Paid')->count(),
-            'partially_paid_orders' => Order::where('pay_status', 'Partially Paid')->count(),
-            'cancelled_orders' => Order::where('pay_status', 'Cancelled')->count(),
-            'total_revenue' => Order::where('pay_status', 'Paid')->sum('total_amount'),
-            'pending_revenue' => Order::where('pay_status', 'Pending')->sum('total_amount'),
+            'pending_orders' => Order::where('order_status', 'Pending')->count(),
+            'paid_orders' => Order::where('order_status', 'Paid')->count(),
+            'partially_paid_orders' => Order::where('order_status', 'Partially Paid')->count(),
+            'cancelled_orders' => Order::where('order_status', 'Cancelled')->count(),
+            'total_revenue' => Order::where('order_status', 'Paid')->sum('total_amount'),
+            'pending_revenue' => Order::where('order_status', 'Pending')->sum('total_amount'),
         ];
     }
 }

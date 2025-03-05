@@ -14,7 +14,7 @@ class Order extends Model
         'cus_id',
         'order_date',
         'total_amount',
-        'pay_status',
+        'order_status',
         'order_type'
     ];
 

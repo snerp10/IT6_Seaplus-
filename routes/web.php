@@ -117,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('orders', [AdminOrderController::class, 'store'])->name('orders.store');
 
         // Manage Employees
+        
         Route::resource('employees', AdminEmployeeController::class);
 
         
@@ -144,9 +145,12 @@ Route::middleware(['auth'])->group(function () {
 
 
         // Manage Sales Reports
+        Route::get('sales_reports/export', [AdminSalesReportController::class, 'export'])->name('sales_reports.export');
         Route::resource('sales_reports', AdminSalesReportController::class);
 
         // Manage Suppliers
+        Route::get('suppliers/export', [AdminSupplierController::class, 'export'])->name('suppliers.export');
+        
         Route::resource('suppliers', AdminSupplierController::class);
     });
 });

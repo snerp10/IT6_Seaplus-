@@ -134,7 +134,7 @@
         </div>
     </div>
 </div>
-
+{{-- Include supplier form for adding multiple suppliers --}}
 @push('scripts')
 <script>
 $(document).ready(function() {

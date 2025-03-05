@@ -17,6 +17,8 @@ class Product extends Model
         'unit',
         'status',
         'supp_id',
+        'description',
+        'image'
     ];
 
     public function orderDetails()

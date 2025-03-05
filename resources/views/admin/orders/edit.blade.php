@@ -236,11 +236,11 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="pay_status" class="form-label fw-bold">Payment Status</label>
-                                        <select name="pay_status" class="form-control">
-                                            <option value="Pending" {{ $order->pay_status == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                            <option value="Partially Paid" {{ $order->pay_status == 'Partially Paid' ? 'selected' : '' }}>Partially Paid</option>
-                                            <option value="Paid" {{ $order->pay_status == 'Paid' ? 'selected' : '' }}>Paid</option>
+                                        <label for="order_status" class="form-label fw-bold">Payment Status</label>
+                                        <select name="order_status" class="form-control">
+                                            <option value="Pending" {{ $order->order_status == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="Partially Paid" {{ $order->order_status == 'Partially Paid' ? 'selected' : '' }}>Partially Paid</option>
+                                            <option value="Paid" {{ $order->order_status == 'Paid' ? 'selected' : '' }}>Paid</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">

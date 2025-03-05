@@ -165,7 +165,7 @@
                             <th>Date</th>
                             <th>Amount</th>
                             <th>Type</th>
-                            <th>Payment Status</th>
+                            <th>Order Status</th>
                             <th>Delivery Status</th>
                             <th>Actions</th>
                         </tr>
@@ -194,11 +194,11 @@
                             </td>
                             <td>
                                 <span class="badge bg-{{ 
-                                    $order->pay_status == 'Paid' ? 'success' : 
-                                    ($order->pay_status == 'Partially Paid' ? 'warning' : 
-                                    ($order->pay_status == 'Cancelled' ? 'danger' : 'secondary'))
+                                    $order->order_status == 'Paid' ? 'success' : 
+                                    ($order->order_status == 'Partially Paid' ? 'warning' : 
+                                    ($order->order_status == 'Cancelled' ? 'danger' : 'secondary'))
                                 }}">
-                                    {{ $order->pay_status }}
+                                    {{ $order->order_status }}
                                 </span>
                             </td>
                             <td>

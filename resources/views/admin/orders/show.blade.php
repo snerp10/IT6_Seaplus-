@@ -226,8 +226,8 @@
                             <td>{{ $payment->reference_number ?: 'N/A' }}</td>
                             <td class="text-right">₱{{ number_format($payment->amount_paid, 2) }}</td>
                             <td>
-                                <span class="badge bg-{{ $payment->pay_status == 'Completed' ? 'success' : 'warning' }}">
-                                    {{ $payment->pay_status }}
+                                <span class="badge bg-{{ $payment->order_status == 'Completed' ? 'success' : 'warning' }}">
+                                    {{ $payment->order_status }}
                                 </span>
                             </td>
                         </tr>
