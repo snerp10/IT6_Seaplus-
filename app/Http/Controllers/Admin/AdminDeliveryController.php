@@ -84,7 +84,7 @@ class AdminDeliveryController extends Controller
             'city' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
             'special_instructions' => 'nullable|string',
-            'delivery_status' => 'required|in:Pending,Out for Delivery,Delivered,Cancelled',
+            'delivery_status' => 'required|in:Pending,Scheduled,Out for Delivery,Delivered,Failed,Returned',
             'delivery_cost' => 'nullable|numeric|min:0',
         ]);
 
@@ -179,7 +179,7 @@ class AdminDeliveryController extends Controller
             'city' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
             'special_instructions' => 'nullable|string',
-            'delivery_status' => 'required|in:Pending,Out for Delivery,Delivered,Cancelled',
+            'delivery_status' => 'required|in:Pending,Scheduled,Out for Delivery,Delivered,Failed,Returned',
             'delivery_cost' => 'nullable|numeric|min:0',
         ]);
 
@@ -273,9 +273,11 @@ class AdminDeliveryController extends Controller
         return [
             'total_deliveries' => Delivery::count(),
             'pending_deliveries' => Delivery::where('delivery_status', 'Pending')->count(),
+            'scheduled' => Delivery::where('delivery_status', 'Scheduled')->count(),
             'out_for_delivery' => Delivery::where('delivery_status', 'Out for Delivery')->count(),
             'delivered' => Delivery::where('delivery_status', 'Delivered')->count(),
-            'cancelled' => Delivery::where('delivery_status', 'Cancelled')->count(),
+            'failed' => Delivery::where('delivery_status', 'Failed')->count(),
+            'returned' => Delivery::where('delivery_status', 'Returned')->count(),
         ];
     }
     
@@ -287,7 +289,7 @@ class AdminDeliveryController extends Controller
         $stats = $this->getDeliveryStats();
         
         $deliveries = Delivery::with('order.customer')
-                             ->whereIn('delivery_status', ['Pending', 'Out for Delivery'])
+                             ->whereIn('delivery_status', ['Pending', 'Scheduled', 'Out for Delivery'])
                              ->orderBy('delivery_date')
                              ->get();
         

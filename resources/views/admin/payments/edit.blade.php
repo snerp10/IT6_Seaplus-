@@ -67,7 +67,7 @@
                                             <option value="">No Order (Direct Payment)</option>
                                             @foreach($orders as $order)
                                                 <option value="{{ $order->order_id }}" {{ (old('order_id', $payment->order_id) == $order->order_id) ? 'selected' : '' }}>
-                                                    #{{ $order->order_id }} - {{ number_format($order->total_amount, 2) }} ({{ ucfirst($order->pay_status) }})
+                                                    #{{ $order->order_id }} - {{ number_format($order->total_amount, 2) }} ({{ ucfirst($order->order_status) }})
                                                 </option>
                                             @endforeach
                                         </select>
@@ -173,9 +173,11 @@
                                     <div class="form-group">
                                         <label for="pay_status">Status</label>
                                         <select name="pay_status" id="pay_status" class="form-control @error('pay_status') is-invalid @enderror" required>
-                                            <option value="Pending" {{ old('pay_status', $payment->pay_status) == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                            <option value="Paid" {{ old('pay_status', $payment->pay_status) == 'Paid' ? 'selected' : '' }}>Paid</option>
+                                            <option value="Unpaid" {{ old('pay_status', $payment->pay_status) == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
                                             <option value="Partially Paid" {{ old('pay_status', $payment->pay_status) == 'Partially Paid' ? 'selected' : '' }}>Partially Paid</option>
+                                            <option value="Paid" {{ old('pay_status', $payment->pay_status) == 'Paid' ? 'selected' : '' }}>Paid</option>
+                                            <option value="Refunded" {{ old('pay_status', $payment->pay_status) == 'Refunded' ? 'selected' : '' }}>Refunded</option>
+                                            <option value="Failed" {{ old('pay_status', $payment->pay_status) == 'Failed' ? 'selected' : '' }}>Failed</option>
                                         </select>
                                         @error('pay_status')
                                             <div class="invalid-feedback">{{ $message }}</div>

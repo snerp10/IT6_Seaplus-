@@ -99,13 +99,13 @@
                                                     <td class="font-weight-bold">₱{{ number_format($selectedOrder->total_amount + ($selectedOrder->delivery ? $selectedOrder->delivery->delivery_cost : 0), 2) }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th>Payment Status</th>
+                                                    <th>Order Status</th>
                                                     <td>
                                                         <span class="badge badge-{{ 
-                                                            $selectedOrder->pay_status == 'Paid' ? 'success' : 
-                                                            ($selectedOrder->pay_status == 'Partially Paid' ? 'warning' : 'danger') 
+                                                            $selectedOrder->order_status == 'Completed' ? 'success' : 
+                                                            ($selectedOrder->order_status == 'Processing' ? 'warning' : 'danger') 
                                                         }}">
-                                                            {{ ucfirst($selectedOrder->pay_status) }}
+                                                            {{ ucfirst($selectedOrder->order_status) }}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -143,7 +143,7 @@
                                                 <input type="hidden" name="order_id" value="{{ $selectedOrder->order_id }}">
                                                 <input type="hidden" name="cus_id" value="{{ $selectedOrder->cus_id }}">
                                                 
-                                                @if($existingPayment && $selectedOrder->pay_status != 'Partially Paid')
+                                                @if($existingPayment && $selectedOrder->order_status != 'Processing')
                                                     <input type="hidden" name="existing_payment_id" value="{{ $existingPayment->pay_id }}">
                                                     <div class="alert alert-info">
                                                         <i class="fas fa-info-circle"></i> You are updating an existing payment record for this order.
@@ -154,7 +154,7 @@
                                                             <br>Previous amount paid: ₱{{ number_format($existingPayment->amount_paid, 2) }}
                                                         @endif
                                                     </div>
-                                                @elseif($selectedOrder->pay_status == 'Partially Paid')
+                                                @elseif($selectedOrder->order_status == 'Processing')
                                                     <div class="alert alert-warning">
                                                         <i class="fas fa-info-circle"></i> This order has a previous payment. You are recording a balance payment for the remaining amount.
                                                         <br>Previously paid: ₱{{ number_format($totalPaid, 2) }}
@@ -165,14 +165,14 @@
                                                 @if($selectedOrder && $selectedOrder->order_type == 'Bulk')
                                                 <div class="form-group">
                                                     <label>Payment Type</label>
-                                                    @if($selectedOrder->pay_status == 'Partially Paid')
-                                                        <!-- If partially paid, this is a balance payment -->
+                                                    @if($selectedOrder->order_status == 'Processing')
+                                                        <!-- If processing, this is a balance payment -->
                                                         <input type="hidden" name="payment_type" value="balance">
                                                         <div class="alert alert-info">
                                                             <i class="fas fa-info-circle"></i> This is a balance payment for a bulk order where a down payment was previously made.
                                                         </div>
                                                     @else
-                                                        <!-- If not partially paid, allow choice of down payment or full payment -->
+                                                        <!-- If not processing, allow choice of down payment or full payment -->
                                                         <div class="custom-control custom-radio mb-2">
                                                             <input type="radio" id="payment_type_full" name="payment_type" class="custom-control-input" value="full" checked>
                                                             <label class="custom-control-label" for="payment_type_full">Full Payment</label>
@@ -302,7 +302,7 @@
                 // Show down payment info
                 $('#downPaymentInfo').show();
                 
-                @if($selectedOrder->pay_status == 'Partially Paid')
+                @if($selectedOrder->order_status == 'Processing')
                     // This is already a balance payment, so set to remaining amount
                     $('#amount_paid').val(remainingAmount);
                 @else
@@ -337,7 +337,7 @@
         });
         @endif
         
-        @if($selectedOrder && $selectedOrder->pay_status == 'Partially Paid')
+        @if($selectedOrder && $selectedOrder->order_status == 'Processing')
         // For balance payments, always set to the remaining amount
         $('#amount_paid').val({{ $remainingAmount }});
         @endif

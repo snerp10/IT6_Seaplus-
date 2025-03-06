@@ -8,6 +8,9 @@
             <i class="fas fa-truck"></i> Delivery Management
         </h1>
         <div>
+            <a href="{{ route('admin.deliveries.monitoring') }}" class="btn btn-info mr-2">
+                <i class="fas fa-tv"></i> Delivery Monitoring
+            </a>
             <a href="{{ route('admin.deliveries.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Assign Delivery to Unassigned Order
             </a>
@@ -98,6 +101,57 @@
             </div>
         </div>
     </div>
+    
+    <!-- Additional status cards in a new row -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Scheduled</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $scheduled }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Failed</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $failed }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Returned</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $returned }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-undo fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Filters -->
     <div class="card shadow mb-4">
@@ -107,14 +161,16 @@
         <div class="card-body">
             <form action="{{ route('admin.deliveries.index') }}" method="GET" class="mb-3">
                 <div class="row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label for="status" class="form-label">Delivery Status</label>
                         <select name="status" id="status" class="form-control">
                             <option value="">All Statuses</option>
                             <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="Scheduled" {{ request('status') == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
                             <option value="Out for Delivery" {{ request('status') == 'Out for Delivery' ? 'selected' : '' }}>Out for Delivery</option>
                             <option value="Delivered" {{ request('status') == 'Delivered' ? 'selected' : '' }}>Delivered</option>
-                            <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            <option value="Failed" {{ request('status') == 'Failed' ? 'selected' : '' }}>Failed</option>
+                            <option value="Returned" {{ request('status') == 'Returned' ? 'selected' : '' }}>Returned</option>
                         </select>
                     </div>
 
@@ -191,7 +247,9 @@
                                 <span class="badge bg-{{ 
                                     $delivery->delivery_status == 'Delivered' ? 'success' : 
                                     ($delivery->delivery_status == 'Out for Delivery' ? 'info' : 
-                                    ($delivery->delivery_status == 'Cancelled' ? 'danger' : 'warning'))
+                                    ($delivery->delivery_status == 'Scheduled' ? 'primary' : 
+                                    ($delivery->delivery_status == 'Failed' ? 'danger' : 
+                                    ($delivery->delivery_status == 'Returned' ? 'warning' : 'secondary')))) 
                                 }}">
                                     {{ $delivery->delivery_status }}
                                 </span>
@@ -246,9 +304,11 @@
                         <select name="status" id="export-status" class="form-control">
                             <option value="">All Statuses</option>
                             <option value="Pending">Pending</option>
+                            <option value="Scheduled">Scheduled</option>
                             <option value="Out for Delivery">Out for Delivery</option>
                             <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="Failed">Failed</option>
+                            <option value="Returned">Returned</option>
                         </select>
                     </div>
                     
@@ -272,7 +332,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('scripts')

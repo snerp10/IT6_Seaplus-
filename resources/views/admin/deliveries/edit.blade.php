@@ -57,9 +57,11 @@
                                     <label for="delivery_status" class="form-label fw-bold">Delivery Status <span class="text-danger">*</span></label>
                                     <select name="delivery_status" id="delivery_status" class="form-control @error('delivery_status') is-invalid @enderror" required>
                                         <option value="Pending" {{ old('delivery_status', $delivery->delivery_status) == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="Scheduled" {{ old('delivery_status', $delivery->delivery_status) == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
                                         <option value="Out for Delivery" {{ old('delivery_status', $delivery->delivery_status) == 'Out for Delivery' ? 'selected' : '' }}>Out for Delivery</option>
                                         <option value="Delivered" {{ old('delivery_status', $delivery->delivery_status) == 'Delivered' ? 'selected' : '' }}>Delivered</option>
-                                        <option value="Cancelled" {{ old('delivery_status', $delivery->delivery_status) == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                        <option value="Failed" {{ old('delivery_status', $delivery->delivery_status) == 'Failed' ? 'selected' : '' }}>Failed</option>
+                                        <option value="Returned" {{ old('delivery_status', $delivery->delivery_status) == 'Returned' ? 'selected' : '' }}>Returned</option>
                                     </select>
                                     @error('delivery_status')
                                         <div class="invalid-feedback">{{ $message }}</div>

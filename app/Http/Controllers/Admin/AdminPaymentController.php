@@ -143,7 +143,7 @@ class AdminPaymentController extends Controller
             'pay_method' => 'required|string',
             'reference_number' => 'nullable|string',
             'pay_date' => 'required|date',
-            'pay_status' => 'nullable|in:Paid,Partially Paid,Pending',
+            'pay_status' => 'nullable|in:Unpaid,Partially Paid,Paid,Refunded,Failed',
             'payment_type' => 'nullable|in:full,down,balance',
             'notes' => 'nullable|string',
         ]);
@@ -177,7 +177,7 @@ class AdminPaymentController extends Controller
         
         // For partially paid orders (where down payment was made), always create a new payment
         // This handles balance payments for bulk orders
-        if ($order->pay_status == 'Partially Paid') {
+        if ($order->order_status == 'Processing') {
             $createNewPayment = true;
             $existingPayment = null;
         } else {
@@ -307,7 +307,7 @@ class AdminPaymentController extends Controller
             'pay_method' => 'required|string',
             'reference_number' => 'nullable|string|unique:payments,reference_number,'.$payment->pay_id.',pay_id',
             'pay_date' => 'required|date',
-            'pay_status' => 'required|in:Paid,Partially Paid,Pending',
+            'pay_status' => 'required|in:Unpaid,Partial,Paid,Refunded,Failed',
             'payment_type' => 'nullable|in:full,down',
             'notes' => 'nullable|string',
         ]);
@@ -420,7 +420,7 @@ class AdminPaymentController extends Controller
     public function changeStatus(Request $request, Payment $payment)
     {
         $request->validate([
-            'status' => 'required|in:Paid,Partially Paid,Pending',
+            'status' => 'required|in:Unpaid,Partially Paid,Paid,Refunded,Failed',
         ]);
         
         DB::beginTransaction();
@@ -463,16 +463,16 @@ class AdminPaymentController extends Controller
         
         // Update the order status based on the total amounts paid
         if ($totalPaid >= $requiredAmount) {
-            $order->update(['pay_status' => 'Paid']);
+            $order->update(['order_status' => 'Completed']);
         } else if ($isBulkOrder && $totalPaid >= $minimumDownPayment) {
             // For bulk orders, if at least 30% is paid, mark it as a special status
-            $order->update(['pay_status' => 'Partially Paid']);
+            $order->update(['order_status' => 'Processing']);
         } else if ($totalPaid > 0) {
-            $order->update(['pay_status' => 'Partially Paid']);
+            $order->update(['order_status' => 'Processing']);
         } else {
             // Check if we have any pending payments
-            $hasPendingPayments = $order->payments()->where('pay_status', 'Pending')->exists();
-            $order->update(['pay_status' => $hasPendingPayments ? 'Pending' : 'unpaid']);
+            $hasPendingPayments = $order->payments()->where('pay_status', 'Failed')->exists();
+            $order->update(['order_status' => $hasPendingPayments ? 'Pending' : 'Pending']);
         }
     }
     
@@ -495,7 +495,7 @@ class AdminPaymentController extends Controller
         $existingPayment = null;
         $defaultPaymentMethod = null;
         
-        if ($order->pay_status != 'Partially Paid') {
+        if ($order->order_status != 'Processing') {
             // Only check for existing payment if not partially paid
             $existingPayment = Payment::where('order_id', $order->order_id)
                 ->where('pay_status', '!=', 'Paid')

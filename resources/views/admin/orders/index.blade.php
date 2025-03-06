@@ -56,7 +56,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paid Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $paid_orders }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $completed_orders }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -88,7 +88,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Partially Paid Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $partially_paid_orders }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $processing_orders }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -111,8 +111,8 @@
                         <label for="status" class="form-label">Payment Status</label>
                         <select name="status" id="status" class="form-control">
                             <option value="">All Statuses</option>
-                            <option value="Paid" {{ request('status') == 'Paid' ? 'selected' : '' }}>Paid</option>
-                            <option value="Partially Paid" {{ request('status') == 'Partially Paid' ? 'selected' : '' }}>Partially Paid</option>
+                            <option value="Completed" {{ request('status') == 'Completed' ? 'selected' : '' }}>Completed</option>
+                            <option value="Processing" {{ request('status') == 'Processing' ? 'selected' : '' }}>Processing</option>
                             <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
                             <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
                         </select>
@@ -194,8 +194,8 @@
                             </td>
                             <td>
                                 <span class="badge bg-{{ 
-                                    $order->order_status == 'Paid' ? 'success' : 
-                                    ($order->order_status == 'Partially Paid' ? 'warning' : 
+                                    $order->order_status == 'Completed' ? 'success' : 
+                                    ($order->order_status == 'Processing' ? 'warning' : 
                                     ($order->order_status == 'Cancelled' ? 'danger' : 'secondary'))
                                 }}">
                                     {{ $order->order_status }}
@@ -264,9 +264,9 @@
                         <label for="export-status" class="form-label">Payment Status</label>
                         <select name="status" id="export-status" class="form-control">
                             <option value="">All Statuses</option>
-                            <option value="Paid">Paid</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Processing">Processing</option>
                             <option value="Pending">Pending</option>
-                            <option value="Partially Paid">Partially Paid</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>

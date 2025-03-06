@@ -117,9 +117,11 @@
                         <label for="status" class="form-label small">Payment Status</label>
                         <select name="status" id="status" class="form-control form-control-sm" onchange="this.form.submit()">
                             <option value="">All Statuses</option>
-                            <option value="pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="paid" {{ request('status') == 'Paid' ? 'selected' : '' }}>Paid</option>
-                            <option value="partially paid" {{ request('status') == 'Partially Paid' ? 'selected' : '' }}>Partially Paid</option>
+                            <option value="Unpaid" {{ request('status') == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
+                            <option value="Partially Paid" {{ request('status') == 'Partially Paid' ? 'selected' : '' }}>Partially Paid</option>
+                            <option value="Paid" {{ request('status') == 'Paid' ? 'selected' : '' }}>Paid</option>
+                            <option value="Refunded" {{ request('status') == 'Refunded' ? 'selected' : '' }}>Refunded</option>
+                            <option value="Failed" {{ request('status') == 'Failed' ? 'selected' : '' }}>Failed</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -219,9 +221,10 @@
                                 <span class="badge bg-{{ 
                                     $payment->pay_status == 'Paid' ? 'success' : 
                                     ($payment->pay_status == 'Partially Paid' ? 'warning' : 
-                                    ($payment->pay_status == 'Pending' ? 'info' : 'danger')) 
+                                    ($payment->pay_status == 'Refunded' ? 'info' : 
+                                    ($payment->pay_status == 'Failed' ? 'danger' : 'secondary'))) 
                                 }} text-white">
-                                    {{ ucfirst($payment->pay_status) }}
+                                    {{ $payment->pay_status }}
                                 </span>
                             </td>
                             <td>

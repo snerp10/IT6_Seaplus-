@@ -4,444 +4,389 @@
 
 @section('admin.content')
 <div class="container-fluid">
-    <!-- Content Header -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1><i class="fas fa-chart-bar mr-2"></i>Payment Reports &amp; Analytics</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.payments.index') }}">Payments</a></li>
-                        <li class="breadcrumb-item active">Reports</li>
-                    </ol>
-                </div>
-            </div>
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-chart-bar text-primary mr-2"></i> Payment Reports
+        </h1>
+        <div>
+            <a href="{{ route('admin.payments.index') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Back to Payments
+            </a>
+            <button class="btn btn-primary btn-sm" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Report
+            </button>
         </div>
-    </section>
+    </div>
 
-    <!-- Main content -->
-    <section class="content">
-        <div class="row">
-            <div class="col-12 mb-3">
-                <a href="{{ route('admin.payments.index') }}" class="btn btn-default btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back to Payments
-                </a>
-                <a href="{{ route('admin.payments.export') }}" class="btn btn-success btn-sm ml-2">
-                    <i class="fas fa-file-export"></i> Export Report Data
-                </a>
-            </div>
+    <!-- Date Range Filter -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Date Range</h6>
         </div>
-
-        <!-- Date Range Filter -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Filter Report Data</h6>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('admin.payments.reports') }}" method="GET" class="mb-0">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="date_from" class="form-label small">Start Date</label>
-                            <input type="date" name="date_from" id="date_from" class="form-control form-control-sm" 
-                                   value="{{ request('date_from', now()->subDays(30)->format('Y-m-d')) }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="date_to" class="form-label small">End Date</label>
-                            <input type="date" name="date_to" id="date_to" class="form-control form-control-sm" 
-                                   value="{{ request('date_to', now()->format('Y-m-d')) }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label d-block small">&nbsp;</label>
-                            <button type="submit" class="btn btn-primary btn-sm mr-2">
-                                <i class="fas fa-filter"></i> Apply Filter
-                            </button>
-                            <a href="{{ route('admin.payments.reports') }}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-undo"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
+        <div class="card-body">
+            <form action="{{ route('admin.payments.reports') }}" method="GET" class="form-inline">
+                <div class="form-group mr-3">
+                    <label for="date_from" class="mr-2">From:</label>
+                    <input type="date" id="date_from" name="date_from" class="form-control" value="{{ $dateFrom }}">
+                </div>
+                <div class="form-group mr-3">
+                    <label for="date_to" class="mr-2">To:</label>
+                    <input type="date" id="date_to" name="date_to" class="form-control" value="{{ $dateTo }}">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Apply Filter
+                </button>
+            </form>
         </div>
+    </div>
 
-        <!-- Summary Cards -->
-        <div class="row mb-4">
-            <!-- Total Payments -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Payments</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Paid')->sum('total'), 2) }}
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Status Summary -->
+    <div class="row">
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Payment Status Summary</h6>
                 </div>
-            </div>
-
-            <!-- Pending -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Payments</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Pending')->sum('total'), 2) }}
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-clock fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Status</th>
+                                    <th class="text-center">Count</th>
+                                    <th class="text-right">Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $totalCount = 0; $grandTotal = 0; @endphp
+                                @foreach($paymentsByStatus as $status)
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-{{ 
+                                            $status->pay_status == 'Paid' ? 'success' : 
+                                            ($status->pay_status == 'Partially Paid' ? 'warning' : 
+                                            ($status->pay_status == 'Refunded' ? 'info' : 
+                                            ($status->pay_status == 'Failed' ? 'danger' : 'secondary'))) 
+                                        }} px-3 py-2">{{ $status->pay_status }}</span>
+                                    </td>
+                                    <td class="text-center">{{ $status->count }}</td>
+                                    <td class="text-right">₱{{ number_format($status->total, 2) }}</td>
+                                </tr>
+                                @php 
+                                    $totalCount += $status->count; 
+                                    $grandTotal += $status->total; 
+                                @endphp
+                                @endforeach
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <th>Total</th>
+                                    <th class="text-center">{{ $totalCount }}</th>
+                                    <th class="text-right">₱{{ number_format($grandTotal, 2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
-                </div>
-            </div>
-
-            <!-- Partially Paid -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-danger shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Partially Paid</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Partially Paid')->sum('total'), 2) }}
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-percentage fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- All Payments -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">All Payments</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->sum('total'), 2) }}
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-wallet fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
+                    
+                    <!-- Status Chart -->
+                    <div class="chart-pie pt-4">
+                        <canvas id="paymentStatusChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Payment Status Summary -->
-            <div class="col-xl-6 col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Payment Status Summary</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-pie mb-4">
-                            <canvas id="paymentStatusChart" height="300"></canvas>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Count</th>
-                                        <th>Amount</th>
-                                        <th>Percentage</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $totalAmount = $paymentsByStatus->sum('total');
-                                        $statusColors = [
-                                            'Paid' => 'success',
-                                            'Pending' => 'warning',
-                                            'Partially Paid' => 'danger'
-                                        ];
-                                    @endphp
-                                    @foreach($paymentsByStatus as $status)
-                                    <tr>
-                                        <td>
-                                            <span class="badge bg-{{ $statusColors[$status->pay_status] ?? 'secondary' }}">
-                                                {{ ucfirst($status->pay_status) }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $status->count }}</td>
-                                        <td class="text-right">₱{{ number_format($status->total, 2) }}</td>
-                                        <td>{{ round(($status->total / ($totalAmount ?: 1)) * 100, 2) }}%</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot class="thead-light">
-                                    <tr>
-                                        <th>Total</th>
-                                        <th>{{ $paymentsByStatus->sum('count') }}</th>
-                                        <th class="text-right">₱{{ number_format($totalAmount, 2) }}</th>
-                                        <th>100%</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
+        <!-- Method Summary -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Payment Method Summary</h6>
                 </div>
-            </div>
-
-            <!-- Payment Method Summary -->
-            <div class="col-xl-6 col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Payment Method Distribution</h6>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Method</th>
+                                    <th class="text-center">Count</th>
+                                    <th class="text-right">Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $totalCount = 0; $grandTotal = 0; @endphp
+                                @foreach($paymentsByMethod as $method)
+                                <tr>
+                                    <td>{{ ucfirst($method->pay_method) }}</td>
+                                    <td class="text-center">{{ $method->count }}</td>
+                                    <td class="text-right">₱{{ number_format($method->total, 2) }}</td>
+                                </tr>
+                                @php 
+                                    $totalCount += $method->count; 
+                                    $grandTotal += $method->total; 
+                                @endphp
+                                @endforeach
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <th>Total</th>
+                                    <th class="text-center">{{ $totalCount }}</th>
+                                    <th class="text-right">₱{{ number_format($grandTotal, 2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
-                    <div class="card-body">
-                        <div class="chart-pie mb-4">
-                            <canvas id="paymentMethodChart" height="300"></canvas>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>Method</th>
-                                        <th>Count</th>
-                                        <th>Amount</th>
-                                        <th>Percentage</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $totalMethodAmount = $paymentsByMethod->sum('total');
-                                        $methodColors = [
-                                            'cash' => 'success',
-                                            'credit_card' => 'primary',
-                                            'debit_card' => 'secondary',
-                                            'bank_transfer' => 'warning',
-                                            'gcash' => 'info',
-                                            'paymaya' => 'danger'
-                                        ];
-                                    @endphp
-                                    @foreach($paymentsByMethod as $method)
-                                    <tr>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $method->pay_method)) }}</td>
-                                        <td>{{ $method->count }}</td>
-                                        <td class="text-right">₱{{ number_format($method->total, 2) }}</td>
-                                        <td>{{ round(($method->total / ($totalMethodAmount ?: 1)) * 100, 2) }}%</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot class="thead-light">
-                                    <tr>
-                                        <th>Total</th>
-                                        <th>{{ $paymentsByMethod->sum('count') }}</th>
-                                        <th class="text-right">₱{{ number_format($totalMethodAmount, 2) }}</th>
-                                        <th>100%</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
+                    
+                    <!-- Method Chart -->
+                    <div class="chart-pie pt-4">
+                        <canvas id="paymentMethodChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Daily Payment Trends -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Daily Payment Trends (Last 30 Days)</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="dailyPaymentsChart" height="100"></canvas>
-                </div>
-                <div class="mt-4 text-center small">
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-primary"></i> Daily Payment Totals
-                    </span>
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-success"></i> Trend Line
-                    </span>
-                </div>
+    <!-- Daily Payments -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Daily Payments</h6>
+        </div>
+        <div class="card-body">
+            <!-- Daily Chart -->
+            <div class="chart-area">
+                <canvas id="dailyPaymentsChart"></canvas>
             </div>
         </div>
-    </section>
+    </div>
 </div>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     $(function() {
+        // Set new default font family and font color to mimic Bootstrap's default styling
+        Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#858796';
+        
         // Status Chart
-        const statusCtx = document.getElementById('paymentStatusChart').getContext('2d');
-        const statusData = {
-            labels: [
-                @foreach($paymentsByStatus as $status)
-                    '{{ ucfirst($status->pay_status) }}',
-                @endforeach
-            ],
-            datasets: [{
-                data: [
-                    @foreach($paymentsByStatus as $status)
-                        {{ $status->total }},
-                    @endforeach
-                ],
-                backgroundColor: [
-                    @foreach($paymentsByStatus as $status)
-                        '{{ $status->pay_status == "Paid" ? "#1cc88a" : 
-                           ($status->pay_status == "Pending" ? "#f6c23e" : 
-                           ($status->pay_status == "Partially Paid" ? "#36b9cc" : "#e74a3b")) }}',
-                    @endforeach
-                ],
-                hoverBackgroundColor: [
-                    @foreach($paymentsByStatus as $status)
-                        '{{ $status->pay_status == "Paid" ? "#17a673" : 
-                           ($status->pay_status == "Pending" ? "#dda20a" : 
-                           ($status->pay_status == "Partially Paid" ? "#258391" : "#be2617")) }}',
-                    @endforeach
-                ],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        };
-        new Chart(statusCtx, {
+        var statusCtx = document.getElementById("paymentStatusChart");
+        var statusLabels = [];
+        var statusData = [];
+        var statusColors = [];
+        
+        @foreach($paymentsByStatus as $status)
+            statusLabels.push('{{ $status->pay_status }}');
+            statusData.push({{ $status->count }});
+            
+            // Assign colors based on status
+            @if($status->pay_status == 'Paid')
+                statusColors.push('#1cc88a'); // success green
+            @elseif($status->pay_status == 'Partially Paid')
+                statusColors.push('#f6c23e'); // warning yellow
+            @elseif($status->pay_status == 'Refunded')
+                statusColors.push('#36b9cc'); // info blue
+            @elseif($status->pay_status == 'Failed')
+                statusColors.push('#e74a3b'); // danger red
+            @else
+                statusColors.push('#858796'); // secondary gray
+            @endif
+        @endforeach
+        
+        var statusChart = new Chart(statusCtx, {
             type: 'doughnut',
-            data: statusData,
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: statusColors,
+                    hoverBackgroundColor: statusColors,
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
             options: {
                 maintainAspectRatio: false,
-                responsive: true,
                 tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            const label = data.labels[tooltipItem.index];
-                            const value = data.datasets[0].data[tooltipItem.index];
-                            return `${label}: ₱${Number(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                        }
-                    }
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
                 },
                 legend: {
-                    position: 'right',
-                    align: 'start'
+                    display: true,
+                    position: 'bottom'
                 },
-                cutout: '60%'
-            }
+                cutoutPercentage: 70,
+            },
         });
-
+        
         // Method Chart
-        const methodCtx = document.getElementById('paymentMethodChart').getContext('2d');
-        const methodData = {
-            labels: [
-                @foreach($paymentsByMethod as $method)
-                    '{{ ucfirst(str_replace("_", " ", $method->pay_method)) }}',
-                @endforeach
-            ],
-            datasets: [{
-                data: [
-                    @foreach($paymentsByMethod as $method)
-                        {{ $method->total }},
-                    @endforeach
-                ],
-                backgroundColor: [
-                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69'
-                ],
-                hoverBackgroundColor: [
-                    '#2e59d9', '#17a673', '#258391', '#dda20a', '#be2617', '#3a3b45'
-                ],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        };
-        new Chart(methodCtx, {
-            type: 'pie',
-            data: methodData,
+        var methodCtx = document.getElementById("paymentMethodChart");
+        var methodLabels = [];
+        var methodData = [];
+        var methodColors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'];
+        
+        @foreach($paymentsByMethod as $index => $method)
+            methodLabels.push('{{ ucfirst($method->pay_method) }}');
+            methodData.push({{ $method->count }});
+        @endforeach
+        
+        var methodChart = new Chart(methodCtx, {
+            type: 'doughnut',
+            data: {
+                labels: methodLabels,
+                datasets: [{
+                    data: methodData,
+                    backgroundColor: methodColors.slice(0, methodLabels.length),
+                    hoverBackgroundColor: methodColors.slice(0, methodLabels.length),
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
             options: {
                 maintainAspectRatio: false,
-                responsive: true,
                 tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            const label = data.labels[tooltipItem.index];
-                            const value = data.datasets[0].data[tooltipItem.index];
-                            return `${label}: ₱${Number(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                        }
-                    }
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
                 },
                 legend: {
-                    position: 'right',
-                    align: 'start'
-                }
-            }
+                    display: true,
+                    position: 'bottom'
+                },
+                cutoutPercentage: 70,
+            },
         });
-
-        // Daily Payments Chart
-        const dailyCtx = document.getElementById('dailyPaymentsChart').getContext('2d');
-        const dailyData = {
-            labels: [
-                @foreach($dailyPayments as $daily)
-                    '{{ \Carbon\Carbon::parse($daily->date)->format("M d") }}',
-                @endforeach
-            ],
-            datasets: [{
-                label: 'Daily Payment Total',
-                data: [
-                    @foreach($dailyPayments as $daily)
-                        {{ $daily->total }},
-                    @endforeach
-                ],
-                backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                borderColor: 'rgba(78, 115, 223, 1)',
-                pointRadius: 3,
-                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
-                pointBorderColor: 'rgba(78, 115, 223, 1)',
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
-                pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
-                pointHitRadius: 10,
-                pointBorderWidth: 2,
-                fill: true,
-                lineTension: 0.3
-            }]
-        };
-        new Chart(dailyCtx, {
+        
+        // Daily Chart
+        var dailyCtx = document.getElementById("dailyPaymentsChart");
+        var dailyLabels = [];
+        var dailyData = [];
+        
+        @foreach($dailyPayments as $payment)
+            dailyLabels.push('{{ \Carbon\Carbon::parse($payment->date)->format("M d") }}');
+            dailyData.push({{ $payment->total }});
+        @endforeach
+        
+        var dailyChart = new Chart(dailyCtx, {
             type: 'line',
-            data: dailyData,
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    label: "Revenue",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: dailyData,
+                }],
+            },
             options: {
                 maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₱' + Number(value).toLocaleString('en-US');
-                            }
-                        }
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
                     }
                 },
+                scales: {
+                    xAxes: [{
+                        time: {
+                            unit: 'date'
+                        },
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            maxTicksLimit: 5,
+                            padding: 10,
+                            // Include a peso sign in the ticks
+                            callback: function(value, index, values) {
+                                return '₱' + number_format(value);
+                            }
+                        },
+                        gridLines: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                },
                 tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10,
                     callbacks: {
-                        label: function(tooltipItem) {
-                            return 'Total: ₱' + Number(tooltipItem.raw).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        label: function(tooltipItem, chart) {
+                            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                            return datasetLabel + ': ₱' + number_format(tooltipItem.yLabel);
                         }
                     }
                 }
             }
         });
+        
+        // Format number utility function
+        function number_format(number, decimals, dec_point, thousands_sep) {
+            // *     example: number_format(1234.56, 2, ',', ' ');
+            // *     return: '1 234,56'
+            number = (number + '').replace(',', '').replace(' ', '');
+            var n = !isFinite(+number) ? 0 : +number,
+                prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function(n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + Math.round(n * k) / k;
+                };
+            // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+            s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+            if (s[0].length > 3) {
+                s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+            }
+            if ((s[1] || '').length < prec) {
+                s[1] = s[1] || '';
+                s[1] += new Array(prec - s[1].length + 1).join('0');
+            }
+            return s.join(dec);
+        }
     });
 </script>
 @endpush

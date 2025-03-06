@@ -41,10 +41,10 @@
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary text-white">
                     <h6 class="m-0 font-weight-bold">Order Information</h6>
                     <span class="badge bg-{{ 
-                        $order->pay_status == 'Paid' ? 'success' : 
-                        ($order->pay_status == 'Partially Paid' ? 'warning' : 
-                        ($order->pay_status == 'Cancelled' ? 'danger' : 'secondary'))
-                    }}">{{ $order->pay_status }}</span>
+                        $order->order_status == 'Completed' ? 'success' : 
+                        ($order->order_status == 'Processing' ? 'warning' : 
+                        ($order->order_status == 'Cancelled' ? 'danger' : 'secondary'))
+                    }}">{{ $order->order_status }}</span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -226,8 +226,10 @@
                             <td>{{ $payment->reference_number ?: 'N/A' }}</td>
                             <td class="text-right">₱{{ number_format($payment->amount_paid, 2) }}</td>
                             <td>
-                                <span class="badge bg-{{ $payment->order_status == 'Completed' ? 'success' : 'warning' }}">
-                                    {{ $payment->order_status }}
+                                <span class="badge bg-{{ 
+                                    $payment->pay_status == 'Paid' ? 'success' : 'warning' 
+                                }}">
+                                    {{ $payment->pay_status }}
                                 </span>
                             </td>
                         </tr>

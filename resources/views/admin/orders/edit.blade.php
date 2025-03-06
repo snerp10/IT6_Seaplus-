@@ -236,11 +236,12 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="order_status" class="form-label fw-bold">Payment Status</label>
+                                        <label for="order_status" class="form-label fw-bold">Order Status</label>
                                         <select name="order_status" class="form-control">
                                             <option value="Pending" {{ $order->order_status == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                            <option value="Partially Paid" {{ $order->order_status == 'Partially Paid' ? 'selected' : '' }}>Partially Paid</option>
-                                            <option value="Paid" {{ $order->order_status == 'Paid' ? 'selected' : '' }}>Paid</option>
+                                            <option value="Processing" {{ $order->order_status == 'Processing' ? 'selected' : '' }}>Processing</option>
+                                            <option value="Completed" {{ $order->order_status == 'Completed' ? 'selected' : '' }}>Completed</option>
+                                            <option value="Cancelled" {{ $order->order_status == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">

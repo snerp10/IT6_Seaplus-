@@ -55,15 +55,30 @@
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-{{ $payment->pay_status == 'Paid' ? 'success' : ($payment->pay_status == 'Partially Paid' ? 'warning' : 'info') }} shadow h-100 py-2">
+            <div class="card border-left-{{ 
+                $payment->pay_status == 'Paid' ? 'success' : 
+                ($payment->pay_status == 'Partially Paid' ? 'warning' : 
+                ($payment->pay_status == 'Refunded' ? 'info' : 
+                ($payment->pay_status == 'Failed' ? 'danger' : 'secondary'))) 
+            }} shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-{{ $payment->pay_status == 'Paid' ? 'success' : ($payment->pay_status == 'Partially Paid' ? 'warning' : 'info') }} text-uppercase mb-1">Status</div>
+                            <div class="text-xs font-weight-bold text-{{ 
+                                $payment->pay_status == 'Paid' ? 'success' : 
+                                ($payment->pay_status == 'Partially Paid' ? 'warning' : 
+                                ($payment->pay_status == 'Refunded' ? 'info' : 
+                                ($payment->pay_status == 'Failed' ? 'danger' : 'secondary'))) 
+                            }} text-uppercase mb-1">Status</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $payment->pay_status }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-{{ $payment->pay_status == 'Paid' ? 'check-circle' : ($payment->pay_status == 'Partially Paid' ? 'clock' : 'hourglass-half') }} fa-2x text-gray-300"></i>
+                            <i class="fas fa-{{ 
+                                $payment->pay_status == 'Paid' ? 'check-circle' : 
+                                ($payment->pay_status == 'Partially Paid' ? 'clock' : 
+                                ($payment->pay_status == 'Refunded' ? 'undo' : 
+                                ($payment->pay_status == 'Failed' ? 'times-circle' : 'question-circle'))) 
+                            }} fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
@@ -164,7 +179,9 @@
                             <div>
                                 <span class="badge badge-{{ 
                                     $payment->pay_status == 'Paid' ? 'success' : 
-                                    ($payment->pay_status == 'Partially Paid' ? 'warning' : 'info') 
+                                    ($payment->pay_status == 'Partially Paid' ? 'warning' : 
+                                    ($payment->pay_status == 'Refunded' ? 'info' : 
+                                    ($payment->pay_status == 'Failed' ? 'danger' : 'secondary'))) 
                                 }} px-3 py-2">{{ ucfirst($payment->pay_status) }}</span>
                             </div>
                         </div>
@@ -272,11 +289,12 @@
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <div class="small text-muted mb-1">Payment Status</div>
+                            <div class="small text-muted mb-1">Order Status</div>
                             <span class="badge badge-{{ 
-                                $payment->order->pay_status == 'Paid' ? 'success' : 
-                                ($payment->order->pay_status == 'Partially Paid' ? 'warning' : 'danger') 
-                            }} px-3 py-2">{{ ucfirst($payment->order->pay_status) }}</span>
+                                $payment->order->order_status == 'Completed' ? 'success' : 
+                                ($payment->order->order_status == 'Processing' ? 'warning' : 
+                                ($payment->order->order_status == 'Cancelled' ? 'danger' : 'secondary')) 
+                            }} px-3 py-2">{{ ucfirst($payment->order->order_status) }}</span>
                         </div>
                         <div class="col-md-6">
                             <div class="small text-muted mb-1">Order Type</div>

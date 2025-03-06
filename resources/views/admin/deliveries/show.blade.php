@@ -38,13 +38,17 @@
         <!-- Delivery Info Column -->
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card shadow h-100">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary text-white">
-                    <h6 class="m-0 font-weight-bold">Delivery Information</h6>
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Delivery Information</h6>
                     <span class="badge bg-{{ 
                         $delivery->delivery_status == 'Delivered' ? 'success' : 
                         ($delivery->delivery_status == 'Out for Delivery' ? 'info' : 
-                        ($delivery->delivery_status == 'Cancelled' ? 'danger' : 'warning'))
-                    }}">{{ $delivery->delivery_status }}</span>
+                        ($delivery->delivery_status == 'Scheduled' ? 'primary' : 
+                        ($delivery->delivery_status == 'Failed' ? 'danger' : 
+                        ($delivery->delivery_status == 'Returned' ? 'warning' : 'secondary')))) 
+                    }} px-3 py-2">
+                        {{ $delivery->delivery_status }}
+                    </span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -125,14 +129,15 @@
                                 <td>{{ $delivery->order->order_type }}</td>
                             </tr>
                             <tr>
-                                <th>Payment Status:</th>
+                                <th>Order Status:</th>
                                 <td>
                                     <span class="badge bg-{{ 
-                                        $delivery->order->pay_status == 'Paid' ? 'success' : 
-                                        ($delivery->order->pay_status == 'Partially Paid' ? 'warning' : 
-                                        ($delivery->order->pay_status == 'Cancelled' ? 'danger' : 'secondary'))
+                                        $delivery->order->order_status == 'Completed' ? 'success' : 
+                                        ($delivery->order->order_status == 'Processing' ? 'warning' : 
+                                        ($delivery->order->order_status == 'Cancelled' ? 'danger' : 
+                                        ($delivery->order->order_status == 'Pending' ? 'info' : 'secondary')))
                                     }}">
-                                        {{ $delivery->order->pay_status }}
+                                        {{ $delivery->order->order_status }}
                                     </span>
                                 </td>
                             </tr>

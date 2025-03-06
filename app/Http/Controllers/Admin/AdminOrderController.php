@@ -117,7 +117,7 @@ class AdminOrderController extends Controller
                 'pay_method' => $request->pay_method,
                 'reference_number' => $request->pay_method === 'GCash' ? ($request->reference_number ?? null) : null,
                 'invoice_number' => 'INV-' . time() . '-' . $order->order_id, // Make more unique
-                'order_status' => 'Pending',
+                'order_status' => 'Completed',
             ]);
 
             \Log::debug('Checkpoint 3');
@@ -258,7 +258,7 @@ class AdminOrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'order_status' => 'required|in:Paid,Pending,Partially Paid,Cancelled',
+            'order_status' => 'required|in:Pending,Processing,Completed,Cancelled',
             'order_type' => 'required|in:Retail,Bulk',
             'products' => 'nullable|array',
             'products.*.prod_id' => 'nullable|exists:products,prod_id',
@@ -426,9 +426,9 @@ class AdminOrderController extends Controller
                 // Check if payment status needs to be updated based on total
                 $totalPaid = $order->payments->sum('amount_paid');
                 if ($totalPaid >= $totalAmount && $totalAmount > 0) {
-                    $order->update(['order_status' => 'Paid']);
+                    $order->update(['order_status' => 'Completed']);
                 } elseif ($totalPaid > 0 && $totalPaid < $totalAmount) {
-                    $order->update(['order_status' => 'Partially Paid']);
+                    $order->update(['order_status' => 'Processing']);
                 }
             }
             
@@ -495,7 +495,7 @@ class AdminOrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|in:Paid,Pending,Partially Paid,Cancelled',
+            'status' => 'required|in:Pending,Processing,Completed,Cancelled',
         ]);
         
         $order->update(['order_status' => $validated['status']]);
@@ -548,9 +548,11 @@ class AdminOrderController extends Controller
             // Update order status based on total payments
             $newTotalPaid = $totalPaid + $newPaymentAmount;
             if ($newTotalPaid >= $order->total_amount) {
-                $order->update(['order_status' => 'Paid']);
+                $order->update(['order_status' => 'Completed']);
+                $order->payments()->update(['pay_status' => 'Paid']);
             } else {
-                $order->update(['order_status' => 'Partially Paid']);
+                $order->update(['order_status' => 'Processing']);
+                $payment->update(['pay_status' => 'Paid']);
             }
             
             DB::commit();
@@ -574,7 +576,7 @@ class AdminOrderController extends Controller
         // Get filtered orders
         $orders = Order::with(['customer', 'orderDetails'])
             ->when($request->status, function($query, $status) {
-                return $query->where('pay_status', $status);
+                return $query->where('order_status', $status);
             })
             ->when($request->date_from, function($query, $date) {
                 return $query->whereDate('order_date', '>=', $date);
@@ -780,11 +782,11 @@ class AdminOrderController extends Controller
         return [
             'total_orders' => Order::count(),
             'pending_orders' => Order::where('order_status', 'Pending')->count(),
-            'paid_orders' => Order::where('order_status', 'Paid')->count(),
-            'partially_paid_orders' => Order::where('order_status', 'Partially Paid')->count(),
+            'processing_orders' => Order::where('order_status', 'Processing')->count(),
+            'completed_orders' => Order::where('order_status', 'Completed')->count(),
             'cancelled_orders' => Order::where('order_status', 'Cancelled')->count(),
-            'total_revenue' => Order::where('order_status', 'Paid')->sum('total_amount'),
-            'pending_revenue' => Order::where('order_status', 'Pending')->sum('total_amount'),
+            'total_revenue' => Order::where('order_status', 'Completed')->sum('total_amount'),
+            'pending_revenue' => Order::whereIn('order_status', ['Pending', 'Processing'])->sum('total_amount'),
         ];
     }
 }
