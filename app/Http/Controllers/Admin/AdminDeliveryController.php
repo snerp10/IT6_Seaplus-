@@ -288,6 +288,7 @@ class AdminDeliveryController extends Controller
     {
         $stats = $this->getDeliveryStats();
         
+        // Fix: Use the correct field for filtering deliveries
         $deliveries = Delivery::with('order.customer')
                              ->whereIn('delivery_status', ['Pending', 'Scheduled', 'Out for Delivery'])
                              ->orderBy('delivery_date')

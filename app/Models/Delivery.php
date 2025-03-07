@@ -32,4 +32,10 @@ class Delivery extends Model
     {
         return $this->belongsTo(Order::class, 'order_id', 'order_id');
     }
+
+    // Add a scope for active deliveries
+    public function scopeActive($query)
+    {
+        return $query->whereIn('delivery_status', ['Pending', 'Scheduled', 'Out for Delivery']);
+    }
 }

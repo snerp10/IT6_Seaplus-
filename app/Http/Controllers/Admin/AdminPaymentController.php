@@ -83,8 +83,13 @@ class AdminPaymentController extends Controller
 
     public function create(Request $request)
     {
-        // Only fetch orders that require payment
-        $orders = Order::where('pay_status', '!=', 'Paid')->get();
+        // Fix: Use the scope method instead of querying a virtual attribute
+        $orders = Order::withPaymentStatus('Unpaid')
+            ->orWhere(function($query) {
+                return $query->withPaymentStatus('Partially Paid');
+            })
+            ->with(['customer'])
+            ->get();
         $customers = Customer::all();
         
         // Pre-select an order if provided in the query string
@@ -95,7 +100,7 @@ class AdminPaymentController extends Controller
         
         if ($selectedOrderId) {
             // Fix: Change orderItems to orderDetails
-            $selectedOrder = Order::with(['orderDetails.product', 'customer', 'payments'])->find($selectedOrderId);
+            $selectedOrder = Order::with(['orderDetails.product', 'customer', 'payments', 'delivery'])->find($selectedOrderId);
             
             if ($selectedOrder) {
                 // Check if there's an existing incomplete payment for this order
@@ -463,16 +468,17 @@ class AdminPaymentController extends Controller
         
         // Update the order status based on the total amounts paid
         if ($totalPaid >= $requiredAmount) {
+            // When fully paid, set order status to Completed
             $order->update(['order_status' => 'Completed']);
         } else if ($isBulkOrder && $totalPaid >= $minimumDownPayment) {
-            // For bulk orders, if at least 30% is paid, mark it as a special status
+            // For bulk orders with sufficient down payment
             $order->update(['order_status' => 'Processing']);
         } else if ($totalPaid > 0) {
+            // For any partial payment
             $order->update(['order_status' => 'Processing']);
         } else {
-            // Check if we have any pending payments
-            $hasPendingPayments = $order->payments()->where('pay_status', 'Failed')->exists();
-            $order->update(['order_status' => $hasPendingPayments ? 'Pending' : 'Pending']);
+            // No payment made yet
+            $order->update(['order_status' => 'Pending']);
         }
     }
     

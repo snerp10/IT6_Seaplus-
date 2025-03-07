@@ -1,39 +1,104 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-<div class="container">
-    <h1>Create Sales Report</h1>
-    <form action="{{ route('sales_reports.store') }}" method="POST">
-        @csrf
-        <div class="mb-3">
-            <label for="date_generated" class="form-label">Date Generated</label>
-            <input type="date" class="form-control" id="date_generated" name="date_generated" required>
+@section('title', 'Create Sales Report')
+
+@section('admin.content')
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-file-alt text-primary mr-2"></i> Create New Sales Report
+        </h1>
+        <a href="{{ route('admin.sales_reports.index') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Report Configuration</h6>
         </div>
-        <div class="mb-3">
-            <label for="total_sales" class="form-label">Total Sales</label>
-            <input type="number" step="0.01" class="form-control" id="total_sales" name="total_sales" required>
+        <div class="card-body">
+            <form action="{{ route('admin.sales_reports.store') }}" method="POST">
+                @csrf
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Report Name<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                   id="name" name="name" value="{{ old('name') }}" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="report_type">Report Type<span class="text-danger">*</span></label>
+                            <select class="form-control @error('report_type') is-invalid @enderror" 
+                                    id="report_type" name="report_type" required>
+                                <option value="daily" {{ old('report_type') == 'daily' ? 'selected' : '' }}>Daily Sales</option>
+                                <option value="weekly" {{ old('report_type') == 'weekly' ? 'selected' : '' }}>Weekly Summary</option>
+                                <option value="monthly" {{ old('report_type') == 'monthly' ? 'selected' : '' }}>Monthly Summary</option>
+                                <option value="quarterly" {{ old('report_type') == 'quarterly' ? 'selected' : '' }}>Quarterly Analysis</option>
+                                <option value="yearly" {{ old('report_type') == 'yearly' ? 'selected' : '' }}>Yearly Overview</option>
+                            </select>
+                            @error('report_type')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="date_from">Date From<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control @error('date_from') is-invalid @enderror" 
+                                   id="date_from" name="date_from" value="{{ old('date_from', now()->subDays(30)->format('Y-m-d')) }}" required>
+                            @error('date_from')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="date_to">Date To<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control @error('date_to') is-invalid @enderror" 
+                                   id="date_to" name="date_to" value="{{ old('date_to', now()->format('Y-m-d')) }}" required>
+                            @error('date_to')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="description">Description</label>
+                    <textarea class="form-control @error('description') is-invalid @enderror" 
+                              id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                    @error('description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-1"></i> Financial metrics like Total Sales, Expenses, and Net Profit will be automatically calculated based on your selected date range.
+                </div>
+                
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Create Report
+                    </button>
+                    <a href="{{ route('admin.sales_reports.index') }}" class="btn btn-secondary ml-2">
+                        <i class="fas fa-times mr-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-            <label for="total_expenses" class="form-label">Total Expenses</label>
-            <input type="number" step="0.01" class="form-control" id="total_expenses" name="total_expenses" required>
-        </div>
-        <div class="mb-3">
-            <label for="net_profit" class="form-label">Net Profit</label>
-            <input type="number" step="0.01" class="form-control" id="net_profit" name="net_profit" required>
-        </div>
-        <div class="mb-3">
-            <label for="report_type" class="form-label">Report Type</label>
-            <select class="form-control" id="report_type" name="report_type" required>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="generated_by" class="form-label">Generated By</label>
-            <input type="number" class="form-control" id="generated_by" name="generated_by" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Create</button>
-    </form>
+    </div>
 </div>
 @endsection

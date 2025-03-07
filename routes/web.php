@@ -124,8 +124,6 @@ Route::middleware(['auth'])->group(function () {
         // Manage Deliveries
         Route::get('/deliveries/export', [AdminDeliveryController::class, 'export'])->name('deliveries.export');
         Route::get('/deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');
-
-
         Route::resource('deliveries', AdminDeliveryController::class);
         
 
@@ -146,6 +144,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Manage Sales Reports
         Route::get('sales_reports/export', [AdminSalesReportController::class, 'export'])->name('sales_reports.export');
+        Route::get('sales_reports/saved', [AdminSalesReportController::class, 'savedReports'])->name('sales_reports.saved');
         Route::resource('sales_reports', AdminSalesReportController::class);
 
         // Manage Suppliers

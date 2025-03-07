@@ -8,10 +8,11 @@ use App\Models\Payment;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\Pricing;
+use App\Models\SalesReport;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-// No Excel import needed
 
 class AdminSalesReportController extends Controller
 {
@@ -26,21 +27,21 @@ class AdminSalesReportController extends Controller
             ? Carbon::parse($request->input('date_to'))->endOfDay()
             : Carbon::now()->endOfDay();
 
-        // Get daily sales data
+        // Get daily sales data - only include completed orders
         $dailySales = Order::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('SUM(total_amount) as total')
             )
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->where('order_status', '!=', 'Cancelled')
+            ->where('order_status', 'Completed') // Only include completed orders
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->get();
 
-        // Calculate total sales
+        // Calculate total sales from completed orders
         $totalSales = $dailySales->sum('total');
 
-        // Get top products - modified to use order_details and pricing tables
+        // Get top products - modified to use order_details and only consider completed orders
         $topProducts = DB::table('order_details')
             ->join('products', 'order_details.prod_id', '=', 'products.prod_id')
             ->join('orders', 'order_details.order_id', '=', 'orders.order_id')
@@ -55,13 +56,13 @@ class AdminSalesReportController extends Controller
                 DB::raw('SUM(order_details.quantity * pricing.selling_price) as revenue')
             )
             ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->where('orders.order_status', '!=', 'Cancelled')
+            ->where('orders.order_status', 'Completed') // Only include completed orders
             ->groupBy('products.prod_id', 'products.name', 'products.category')
             ->orderByDesc('revenue')
             ->limit(10)
             ->get();
 
-        // Get sales by category - modified to use order_details and pricing tables
+        // Get sales by category - only consider completed orders
         $salesByCategory = DB::table('order_details')
             ->join('products', 'order_details.prod_id', '=', 'products.prod_id')
             ->join('orders', 'order_details.order_id', '=', 'orders.order_id')
@@ -74,19 +75,19 @@ class AdminSalesReportController extends Controller
                 DB::raw('SUM(order_details.quantity * pricing.selling_price) as total')
             )
             ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->where('orders.order_status', '!=', 'Cancelled')
+            ->where('orders.order_status', 'Completed') // Only include completed orders
             ->groupBy('products.category')
             ->orderByDesc('total')
             ->get();
 
-        // Get payment methods breakdown
+        // Get payment methods breakdown - only include Paid payments
         $paymentMethods = Payment::select(
                 'pay_method',
                 DB::raw('COUNT(*) as count'),
                 DB::raw('SUM(amount_paid) as total')
             )
             ->whereBetween('pay_date', [$startDate, $endDate])
-            ->where('pay_status', '=', 'Paid')
+            ->where('pay_status', 'Paid') // Only include paid payments
             ->groupBy('pay_method')
             ->orderByDesc('total')
             ->get();
@@ -113,9 +114,9 @@ class AdminSalesReportController extends Controller
             ? Carbon::parse($request->input('date_to'))->endOfDay()
             : Carbon::now()->endOfDay();
 
-        // Get orders data
+        // Get orders data - only include completed orders with paid payments
         $orders = Order::join('payments', 'orders.order_id', '=', 'payments.order_id')
-            ->join('customers', 'orders.cust_id', '=', 'customers.cust_id')
+            ->join('customers', 'orders.cus_id', '=', 'customers.cus_id')
             ->select(
                 'orders.order_id',
                 'orders.created_at',
@@ -128,7 +129,8 @@ class AdminSalesReportController extends Controller
                 'payments.amount_paid'
             )
             ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->where('orders.order_status', '!=', 'Cancelled')
+            ->where('orders.order_status', 'Completed') // Only include completed orders
+            ->where('payments.pay_status', 'Paid') // Only include paid payments
             ->orderBy('orders.created_at', 'desc')
             ->get();
 
@@ -168,37 +170,411 @@ class AdminSalesReportController extends Controller
 
     public function create()
     {
-        // Not used in this implementation, but required for resource controller
-        return redirect()->route('admin.sales_reports.index');
+        // Show form to create a new saved report
+        return view('admin.sales_reports.create');
     }
 
     public function store(Request $request)
     {
-        // Not used in this implementation, but required for resource controller
-        return redirect()->route('admin.sales_reports.index');
+        // Validate the incoming request with more specific rules
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'date_from' => 'required|date|before_or_equal:today',
+            'date_to' => 'required|date|after_or_equal:date_from',
+            'report_type' => 'required|in:daily,weekly,monthly,quarterly,yearly',
+        ]);
+
+        DB::beginTransaction();
+        
+        try {
+            // Get data based on date range and report type
+            $startDate = Carbon::parse($validated['date_from'])->startOfDay();
+            $endDate = Carbon::parse($validated['date_to'])->endOfDay();
+            
+            // Calculate financial metrics for the report
+            $totalSales = Order::whereBetween('created_at', [$startDate, $endDate])
+                ->where('order_status', 'Completed')
+                ->sum('total_amount');
+                
+            // Calculate actual expenses based on product costs where possible
+            $totalExpenses = $this->calculateExpenses($startDate, $endDate);
+            $netProfit = $totalSales - $totalExpenses;
+            
+            // Get the employee ID from the authenticated user if available
+            $employeeId = null;
+            if (auth()->check()) {
+                $employee = Employee::where('emp_id', auth()->id())->first();
+                $employeeId = $employee ? $employee->emp_id : null;
+            }
+            
+            // Format parameters to ensure only relevant data is stored
+            $parameters = json_encode($request->only([
+                'include_delivery_costs',
+                'include_cancelled_orders',
+                'group_by',
+                'product_limit',
+                'category_filter'
+            ]));
+        
+            // Create a new sales report record with all required fields
+            $report = new SalesReport();
+            $report->name = $validated['name'];
+            $report->description = $validated['description'] ?? null;
+            $report->date_from = $startDate->format('Y-m-d');
+            $report->date_to = $endDate->format('Y-m-d');
+            $report->date_generated = now();
+            $report->report_type = $validated['report_type'];
+            $report->total_sales = $totalSales;
+            $report->total_expenses = $totalExpenses;
+            $report->net_profit = $netProfit;
+            $report->generated_by = $employeeId;
+            $report->parameters = $parameters;
+            $report->save();
+            
+            DB::commit();
+        
+            return redirect()->route('admin.sales_reports.show', $report->report_id)
+                             ->with('success', 'Sales report created successfully.');
+                             
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            \Log::error('Failed to create sales report: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to create sales report: ' . $e->getMessage());
+        }
     }
 
+    /**
+     * Calculate expenses for a given date range
+     */
+    private function calculateExpenses($startDate, $endDate)
+    {
+        // First try to calculate based on original product costs
+        $productCosts = DB::table('order_details')
+            ->join('products', 'order_details.prod_id', '=', 'products.prod_id')
+            ->join('orders', 'order_details.order_id', '=', 'orders.order_id')
+            ->join('pricing', function($join) {
+                $join->on('products.prod_id', '=', 'pricing.prod_id')
+                    ->whereNull('pricing.end_date');
+            })
+            ->select(DB::raw('SUM(order_details.quantity * pricing.original_price) as cost'))
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->where('orders.order_status', 'Completed')
+            ->first();
+        
+        // If we have product costs, add operational expenses estimate
+        if ($productCosts && $productCosts->cost > 0) {
+            // Add 15% operational costs (staff, utilities, etc.)
+            return $productCosts->cost * 1.15;
+        }
+        
+        // Fallback to a simple estimate based on total sales
+        // Use our current cost structure estimate
+        $totalSales = Order::whereBetween('created_at', [$startDate, $endDate])
+            ->where('order_status', 'Completed')
+            ->sum('total_amount');
+            
+        return $totalSales * 0.65; // Estimate: 65% of sales goes to expenses
+    }
+
+    // Update the show method to use report_id primary key
     public function show($id)
     {
-        // Not used in this implementation, but required for resource controller
-        return redirect()->route('admin.sales_reports.index');
+        // Find the saved report
+        $report = SalesReport::findOrFail($id);
+        
+        // Get the date range from the report
+        $startDate = $report->date_from ? Carbon::parse($report->date_from) : Carbon::parse($report->date_generated)->startOfMonth();
+        $endDate = $report->date_to ? Carbon::parse($report->date_to) : Carbon::parse($report->date_generated)->endOfMonth();
+        $parameters = json_decode($report->parameters, true) ?? [];
+        
+        // Get report data based on the report type
+        switch ($report->report_type) {
+            case 'daily':
+                $data = $this->getDailySalesData($startDate, $endDate, $parameters);
+                break;
+            case 'weekly':
+                $data = $this->getWeeklySalesData($startDate, $endDate, $parameters);
+                break;
+            case 'monthly':
+                $data = $this->getMonthlySalesData($startDate, $endDate, $parameters);
+                break;
+            case 'quarterly':
+                $data = $this->getQuarterlySalesData($startDate, $endDate, $parameters);
+                break;
+            case 'yearly':
+                $data = $this->getYearlySalesData($startDate, $endDate, $parameters);
+                break;
+            default:
+                $data = $this->getDailySalesData($startDate, $endDate, $parameters);
+        }
+        
+        return view('admin.sales_reports.show', compact('report', 'data', 'startDate', 'endDate'));
     }
 
     public function edit($id)
     {
-        // Not used in this implementation, but required for resource controller
-        return redirect()->route('admin.sales_reports.index');
+        // Find the saved report
+        $report = SalesReport::findOrFail($id);
+        
+        return view('admin.sales_reports.edit', compact('report'));
     }
 
+    /**
+     * Update the specified sales report.
+     */
     public function update(Request $request, $id)
     {
-        // Not used in this implementation, but required for resource controller
-        return redirect()->route('admin.sales_reports.index');
+        // Find the saved report
+        $report = SalesReport::findOrFail($id);
+        
+        // Validate the incoming request
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+            'report_type' => 'required|in:daily,weekly,monthly,quarterly,yearly',
+            'total_sales' => 'required|numeric|min:0',
+            'total_expenses' => 'required|numeric|min:0',
+            'net_profit' => 'required|numeric',
+        ]);
+        
+        // Update the report
+        $report->update($validated + [
+            'parameters' => json_encode($request->except([
+                '_token', '_method', 'name', 'description', 'date_from', 'date_to', 
+                'report_type', 'total_sales', 'total_expenses', 'net_profit'
+            ])),
+        ]);
+        
+        return redirect()->route('admin.sales_reports.show', $report->report_id)
+                         ->with('success', 'Sales report updated successfully.');
     }
 
-    public function destroy($id)
+    /**
+     * Remove the specified sales report.
+     */
+    public function destroy($report_id)
     {
-        // Not used in this implementation, but required for resource controller
-        return redirect()->route('admin.sales_reports.index');
+        // Find and delete the report
+        $report = SalesReport::findOrFail($report_id);
+        $report->delete();
+        
+        return redirect()->route('admin.sales_reports.index')
+                         ->with('success', 'Sales report deleted successfully.');
+    }
+    
+    // Update the savedReports method to eager load relationships for efficiency
+    public function savedReports()
+    {
+        $reports = SalesReport::with(['employee'])
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10);
+        return view('admin.sales_reports.saved_reports', compact('reports'));
+    }
+    
+    /**
+     * Get daily sales data for a report
+     */
+    private function getDailySalesData($startDate, $endDate, $parameters = [])
+    {
+        // Get daily sales data - only include completed orders
+        $dailySales = Order::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(total_amount) as total')
+            )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('order_status', 'Completed')
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date')
+            ->get();
+            
+        // Calculate total sales
+        $totalSales = $dailySales->sum('total');
+        
+        // Get payment methods breakdown
+        $paymentMethods = Payment::select(
+                'pay_method',
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(amount_paid) as total')
+            )
+            ->whereBetween('pay_date', [$startDate, $endDate])
+            ->where('pay_status', 'Paid')
+            ->groupBy('pay_method')
+            ->orderByDesc('total')
+            ->get();
+            
+        return [
+            'dailySales' => $dailySales,
+            'totalSales' => $totalSales,
+            'paymentMethods' => $paymentMethods
+        ];
+    }
+    
+    /**
+     * Get monthly sales data for a report
+     */
+    private function getMonthlySalesData($startDate, $endDate, $parameters = [])
+    {
+        // Get monthly sales data
+        $monthlySales = Order::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('SUM(total_amount) as total')
+            )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('order_status', 'Completed')
+            ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'))
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+            
+        $totalSales = $monthlySales->sum('total');
+        
+        return [
+            'monthlySales' => $monthlySales,
+            'totalSales' => $totalSales
+        ];
+    }
+    
+    /**
+     * Get product sales data for a report
+     */
+    private function getProductSalesData($startDate, $endDate, $parameters = [])
+    {
+        // Get top products
+        $topProducts = DB::table('order_details')
+            ->join('products', 'order_details.prod_id', '=', 'products.prod_id')
+            ->join('orders', 'order_details.order_id', '=', 'orders.order_id')
+            ->join(DB::raw('(SELECT prod_id, MAX(price_id) as latest_pricing_id FROM pricing GROUP BY prod_id) as latest_pricing'), function($join) {
+                $join->on('products.prod_id', '=', 'latest_pricing.prod_id');
+            })
+            ->join('pricing', 'latest_pricing.latest_pricing_id', '=', 'pricing.price_id')
+            ->select(
+                'products.name',
+                'products.category',
+                DB::raw('SUM(order_details.quantity) as units_sold'),
+                DB::raw('SUM(order_details.quantity * pricing.selling_price) as revenue')
+            )
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->where('orders.order_status', 'Completed')
+            ->groupBy('products.prod_id', 'products.name', 'products.category')
+            ->orderByDesc('revenue')
+            ->limit(isset($parameters['limit']) ? $parameters['limit'] : 20)
+            ->get();
+            
+        $totalSales = $topProducts->sum('revenue');
+        
+        return [
+            'products' => $topProducts,
+            'totalSales' => $totalSales
+        ];
+    }
+    
+    /**
+     * Get category sales data for a report
+     */
+    private function getCategorySalesData($startDate, $endDate, $parameters = [])
+    {
+        // Get sales by category
+        $salesByCategory = DB::table('order_details')
+            ->join('products', 'order_details.prod_id', '=', 'products.prod_id')
+            ->join('orders', 'order_details.order_id', '=', 'orders.order_id')
+            ->join(DB::raw('(SELECT prod_id, MAX(price_id) as latest_pricing_id FROM pricing GROUP BY prod_id) as latest_pricing'), function($join) {
+                $join->on('products.prod_id', '=', 'latest_pricing.prod_id');
+            })
+            ->join('pricing', 'latest_pricing.latest_pricing_id', '=', 'pricing.price_id')
+            ->select(
+                'products.category',
+                DB::raw('SUM(order_details.quantity * pricing.selling_price) as total')
+            )
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->where('orders.order_status', 'Completed')
+            ->groupBy('products.category')
+            ->orderByDesc('total')
+            ->get();
+            
+        $totalSales = $salesByCategory->sum('total');
+        
+        return [
+            'categories' => $salesByCategory,
+            'totalSales' => $totalSales
+        ];
+    }
+
+    // Add weekly sales data method
+    private function getWeeklySalesData($startDate, $endDate, $parameters = [])
+    {
+        // Group sales by week
+        $weeklySales = Order::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('WEEK(created_at, 1) as week'),
+                DB::raw('SUM(total_amount) as total')
+            )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('order_status', 'Completed')
+            ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('WEEK(created_at, 1)'))
+            ->orderBy('year')
+            ->orderBy('week')
+            ->get();
+            
+        $totalSales = $weeklySales->sum('total');
+        
+        return [
+            'weeklySales' => $weeklySales,
+            'totalSales' => $totalSales
+        ];
+    }
+
+    // Add quarterly sales data method
+    private function getQuarterlySalesData($startDate, $endDate, $parameters = [])
+    {
+        // Group sales by quarter
+        $quarterlySales = Order::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('QUARTER(created_at) as quarter'),
+                DB::raw('SUM(total_amount) as total')
+            )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('order_status', 'Completed')
+            ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('QUARTER(created_at)'))
+            ->orderBy('year')
+            ->orderBy('quarter')
+            ->get();
+            
+        $totalSales = $quarterlySales->sum('total');
+        
+        return [
+            'quarterlySales' => $quarterlySales,
+            'totalSales' => $totalSales
+        ];
+    }
+
+    // Add yearly sales data method
+    private function getYearlySalesData($startDate, $endDate, $parameters = [])
+    {
+        // Group sales by year
+        $yearlySales = Order::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('SUM(total_amount) as total')
+            )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('order_status', 'Completed')
+            ->groupBy(DB::raw('YEAR(created_at)'))
+            ->orderBy('year')
+            ->get();
+            
+        $totalSales = $yearlySales->sum('total');
+        
+        return [
+            'yearlySales' => $yearlySales,
+            'totalSales' => $totalSales
+        ];
     }
 }

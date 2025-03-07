@@ -143,7 +143,7 @@
                                                 <input type="hidden" name="order_id" value="{{ $selectedOrder->order_id }}">
                                                 <input type="hidden" name="cus_id" value="{{ $selectedOrder->cus_id }}">
                                                 
-                                                @if($existingPayment && $selectedOrder->order_status != 'Processing')
+                                                @if($existingPayment)
                                                     <input type="hidden" name="existing_payment_id" value="{{ $existingPayment->pay_id }}">
                                                     <div class="alert alert-info">
                                                         <i class="fas fa-info-circle"></i> You are updating an existing payment record for this order.
