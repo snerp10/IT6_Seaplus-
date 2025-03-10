@@ -19,6 +19,7 @@ class Delivery extends Model
     
     protected $fillable = [
         'order_id',
+        'emp_id',
         'delivery_date',
         'street',
         'city',
@@ -31,6 +32,11 @@ class Delivery extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id', 'order_id');
+    }
+
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'emp_id', 'emp_id');
     }
 
     // Add a scope for active deliveries

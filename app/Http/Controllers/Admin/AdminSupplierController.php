@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Supplier;
-use App\Models\SupplierProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -81,15 +80,16 @@ class AdminSupplierController extends Controller
                 'is_preferred' => $request->has('preferred_supplier') ? 1 : 0,
             ]);
 
-            // Handle product associations
+            // Handle direct product assignments
             if ($request->has('products')) {
                 foreach ($request->products as $productData) {
                     if (!empty($productData['prod_id'])) {
-                        SupplierProduct::create([
-                            'supp_id' => $supplier->supp_id,
-                            'prod_id' => $productData['prod_id'],
-                            'min_order_qty' => $productData['min_order_qty'] ?? 1,
-                        ]);
+                        // Update the product to have this supplier
+                        $product = Product::find($productData['prod_id']);
+                        if ($product) {
+                            $product->supp_id = $supplier->supp_id;
+                            $product->save();
+                        }
                     }
                 }
             }
@@ -104,19 +104,19 @@ class AdminSupplierController extends Controller
 
     public function show(Supplier $supplier)
     {
-        $suppliedProducts = SupplierProduct::where('supp_id', $supplier->supp_id)
-            ->with('product')
-            ->get();
-        
+        // Load directly related products
+        $suppliedProducts = Product::where('supp_id', $supplier->supp_id)->get();
+            
         return view('admin.suppliers.show', compact('supplier', 'suppliedProducts'));
     }
 
     public function edit(Supplier $supplier)
     {
+        // Get all products for selection
         $products = Product::all();
-        $supplierProducts = SupplierProduct::where('supp_id', $supplier->supp_id)
-            ->with('product')
-            ->get();
+        
+        // Get directly related products
+        $supplierProducts = Product::where('supp_id', $supplier->supp_id)->get();
         
         return view('admin.suppliers.edit', compact('supplier', 'products', 'supplierProducts'));
     }
@@ -132,13 +132,12 @@ class AdminSupplierController extends Controller
             'province' => 'required|string|max:255',
             'prod_type' => 'required|string|max:255',
         ]);
-
+        
         DB::beginTransaction();
+        
         try {
-            // Set status based on the active_supplier checkbox
             $status = $request->has('active_supplier') ? 'Active' : 'Inactive';
             
-            // Update the supplier
             $supplier->update([
                 'company_name' => $request->company_name,
                 'contact_number' => $request->contact_number,
@@ -152,18 +151,39 @@ class AdminSupplierController extends Controller
                 'is_preferred' => $request->has('preferred_supplier') ? 1 : 0,
             ]);
 
-            // Handle product associations - remove existing associations
-            SupplierProduct::where('supp_id', $supplier->supp_id)->delete();
-
-            // Add new product associations
+            // First, get the current products for this supplier
+            $currentProductIds = $supplier->products->pluck('prod_id')->toArray();
+            
+            // Get the updated product IDs from the form
+            $updatedProductIds = [];
             if ($request->has('products')) {
                 foreach ($request->products as $productData) {
                     if (!empty($productData['prod_id'])) {
-                        SupplierProduct::create([
-                            'supp_id' => $supplier->supp_id,
-                            'prod_id' => $productData['prod_id'],
-                            'min_order_qty' => $productData['min_order_qty'] ?? 1,
-                        ]);
+                        $updatedProductIds[] = $productData['prod_id'];
+                    }
+                }
+            }
+            
+            // Find products to remove (products that were associated with this supplier but aren't in the new list)
+            $productsToRemove = array_diff($currentProductIds, $updatedProductIds);
+            
+            // Remove supplier association from these products
+            if (!empty($productsToRemove)) {
+                Product::whereIn('prod_id', $productsToRemove)
+                    ->where('supp_id', $supplier->supp_id)
+                    ->update(['supp_id' => null]);
+            }
+            
+            // Add or update product associations
+            if ($request->has('products')) {
+                foreach ($request->products as $productData) {
+                    if (!empty($productData['prod_id'])) {
+                        // Update the product to have this supplier
+                        $product = Product::find($productData['prod_id']);
+                        if ($product) {
+                            $product->supp_id = $supplier->supp_id;
+                            $product->save();
+                        }
                     }
                 }
             }
@@ -175,7 +195,6 @@ class AdminSupplierController extends Controller
             return back()->with('error', 'Error updating supplier: ' . $e->getMessage())->withInput();
         }
     }
-
     
     public function export()
     {
@@ -190,17 +209,8 @@ class AdminSupplierController extends Controller
             
             DB::beginTransaction();
             
-            // Check if this supplier has products and handle relations if needed
-            if ($supplier->products()->count() > 0) {
-                // Optional: Decide if you want to prevent deletion when products exist
-                // return redirect()->route('admin.suppliers.index')->with('error', 'Cannot delete supplier because they have associated products.');
-                
-                // Or detach products from this supplier
-                $supplier->products()->detach();
-            }
-            
-            // Delete any supplier products associations
-            SupplierProduct::where('supp_id', $supplier->supp_id)->delete();
+            // Clear supplier reference from products
+            Product::where('supp_id', $supplier->supp_id)->update(['supp_id' => null]);
             
             $supplier->delete();
             DB::commit();

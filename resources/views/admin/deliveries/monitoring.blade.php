@@ -103,6 +103,7 @@
                             <th>Customer</th>
                             <th>Delivery Date</th>
                             <th>Address</th>
+                            <th>Driver</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -127,6 +128,17 @@
                                 </small>
                             </td>
                             <td>
+                                @if($delivery->driver)
+                                    <span class="text-success">
+                                        <i class="fas fa-user-check"></i> {{ $delivery->driver->fname }} {{ $delivery->driver->lname }}
+                                    </span>
+                                @else
+                                    <span class="text-danger">
+                                        <i class="fas fa-user-times"></i> Not Assigned
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
                                 <span class="badge bg-{{ 
                                     $delivery->delivery_status == 'Delivered' ? 'success' : 
                                     ($delivery->delivery_status == 'Out for Delivery' ? 'info' : 
@@ -142,16 +154,17 @@
                                     <i class="fas fa-edit"></i> Update
                                 </a>
                                 <button class="btn btn-sm btn-info quick-update-btn" 
-                                        data-delivery-id="{{ $delivery->id }}"
+                                        data-delivery-id="{{ $delivery->delivery_id }}"
                                         data-toggle="modal" 
-                                        data-target="#quickUpdateModal">
+                                        data-target="#quickUpdateModal"
+                                        data-url="{{ route('admin.deliveries.quick_update', $delivery->delivery_id) }}">
                                     <i class="fas fa-sync"></i> Quick Update
                                 </button>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">No active deliveries found.</td>
+                            <td colspan="7" class="text-center">No active deliveries found.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -175,8 +188,19 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="quick_delivery_status">Update Status:</label>
+                    <div class="form-group mb-3">
+                        <label for="emp_id"><strong>Assign Driver:</strong></label>
+                        <select name="emp_id" id="emp_id" class="form-control">
+                            <option value="">-- Select Driver --</option>
+                            @foreach($drivers as $driver)
+                                <option value="{{ $driver->emp_id }}">{{ $driver->fname }} {{ $driver->lname }}</option>
+                            @endforeach
+                        </select>
+                        <small class="form-text text-muted">Leave empty to not assign a driver</small>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="quick_delivery_status"><strong>Update Status:</strong></label>
                         <select name="delivery_status" class="form-control" id="quick_delivery_status">
                             <option value="Pending">Pending</option>
                             <option value="Scheduled">Scheduled</option>
@@ -187,7 +211,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="special_instructions">Special Notes:</label>
+                        <label for="special_instructions"><strong>Special Notes:</strong></label>
                         <textarea name="special_instructions" id="special_instructions" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
@@ -211,11 +235,14 @@
             "responsive": true
         });
         
-        // Set up quick update modal
+        // Fix the JavaScript error - remove the extra closing parenthesis
         $('.quick-update-btn').on('click', function() {
-            const deliveryId = $(this).data('delivery-id');
-            const updateUrl = "{{ url('admin/deliveries') }}/" + deliveryId;
+            const updateUrl = $(this).data('url');
             $('#quickUpdateForm').attr('action', updateUrl);
+            
+            // You may also want to add this to pre-populate driver selection
+            const deliveryId = $(this).data('delivery-id');
+            // Additional code for handling specific delivery data if needed
         });
         
         // Auto refresh data every 5 minutes

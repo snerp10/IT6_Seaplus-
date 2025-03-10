@@ -6,7 +6,6 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\EmployeeController;
@@ -28,6 +27,23 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Static Pages
+Route::get('/about', function () {
+    return view('pages.about');
+})->name('about');
+
+Route::get('/contact', function () {
+    return view('pages.contact');
+})->name('contact');
+
+Route::get('/terms', function () {
+    return view('auth.terms');
+})->name('terms');
+
+Route::get('/privacy', function () {
+    return view('auth.privacy');
+})->name('privacy');
+
 // Guest Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -35,13 +51,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/search', [ProductController::class, 'search'])->name('search');
-    Route::get('/terms', function () {
-        return view('auth.terms');
-    })->name('terms');
-    Route::get('/privacy', function () {
-        return view('auth.privacy');
-    })->name('privacy');
-
 });
 
 // Authenticated Routes
@@ -49,26 +58,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Customer Routes
-    Route::middleware(['Customer'])->prefix('customer')->group(function () {
-        // Dashboard
+    Route::prefix('customer')->name('customer.')->middleware(['Customer'])->group(function () {
+        // Dashboard - make sure it's accessible at /dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
         
         // Products (read-only)
+        Route::get('/search', [ProductController::class, 'search'])->name('products.search');
         Route::resource('products', ProductController::class)->only(['index', 'show']);
         
         // Orders
         Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::resource('orders', OrderController::class);
-        
-        //Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-        //Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
-        //Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-        //Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-        //Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
-        //Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
-        //Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
-        //Route::get('/orders/history', [OrderController::class, 'history'])->name('orders.history');
-        //Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
         
         // Payments
         Route::get('/orders/{order}/payment', [PaymentController::class, 'create'])->name('orders.payment');
@@ -76,24 +76,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/invoices/{order}', [PaymentController::class, 'showInvoice'])->name('invoices.show');
         Route::get('/invoices/{order}/download', [PaymentController::class, 'downloadInvoice'])->name('invoices.download');
         
-        
-        
-        // Profile
-        Route::get('/profile', [CustomerController::class, 'show'])->name('customer.profile');
-        Route::put('/profile', [CustomerController::class, 'update'])->name('customer.update');
+        // Profile - Fix these routes to be consistent
+        Route::get('/profile', [CustomerController::class, 'show'])->name('profile');
+        Route::put('/profile', [CustomerController::class, 'update'])->name('profile.update');
         
         // Delivery Routes
         Route::get('/orders/{order}/delivery/edit', [DeliveryController::class, 'edit'])->name('delivery.edit');
         Route::patch('/orders/{order}/delivery', [DeliveryController::class, 'update'])->name('delivery.update');
 
         // Additional custom Order routes
-        //Route::get('/orders/{order}/payment', [OrderController::class, 'create'])->name('orders.payment');
         Route::post('/orders/{order}/payment', [OrderController::class, 'processPayment'])->name('orders.processPayment');
-
-        // GCash Payment Routes
-        Route::get('/payments/gcash/redirect', [PaymentController::class, 'gcashRedirect'])->name('payments.gcash.redirect');
-        Route::get('/payments/gcash/callback', [PaymentController::class, 'gcashCallback'])->name('payments.gcash.callback');
-        Route::post('/payments/gcash/verify', [PaymentController::class, 'gcashVerify'])->name('payments.gcash.verify');
     });
 
     // Admin Routes
@@ -124,12 +116,13 @@ Route::middleware(['auth'])->group(function () {
         // Manage Deliveries
         Route::get('/deliveries/export', [AdminDeliveryController::class, 'export'])->name('deliveries.export');
         Route::get('/deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');
+        Route::put('/deliveries/{delivery}/quick-update', [AdminDeliveryController::class, 'quickUpdate'])->name('deliveries.quick_update');
         Route::resource('deliveries', AdminDeliveryController::class);
         
 
         // Manage Inventory
-        Route::get('inventories/export', [AdminInventoryController::class, 'export'])->name('inventories.export');
         Route::get('inventories/lowStockAlerts', [AdminInventoryController::class, 'lowStockAlerts'])->name('inventories.low_stock_alerts');
+        Route::get('inventories/export', [AdminInventoryController::class, 'export'])->name('inventories.export');
         Route::get('inventories/stockHistory', [AdminInventoryController::class, 'stockHistory'])->name('inventories.stock_history');
 
         Route::resource('inventories', AdminInventoryController::class);
@@ -153,4 +146,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('suppliers', AdminSupplierController::class);
     });
 });
+
+// Add this outside any middleware groups for testing
+Route::get('/test-dashboard', [App\Http\Controllers\DashboardController::class, 'index']);
+
+// GCash verification route
+Route::post('/payments/verify-gcash', [PaymentController::class, 'verifyGcashPayment'])
+    ->name('payments.verify-gcash');
 

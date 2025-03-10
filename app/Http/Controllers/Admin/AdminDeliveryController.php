@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\Customer;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,6 +63,11 @@ class AdminDeliveryController extends Controller
             ->with('customer', 'delivery')
             ->get();
         
+        // Get list of drivers for assignment
+        $drivers = Employee::where('position', 'Driver')
+                    ->orWhere('position', 'Delivery Personnel')
+                    ->get();
+        
         \Log::debug('Orders needing delivery setup: ' . $orders->count());
                        
         if ($orders->isEmpty()) {
@@ -69,7 +75,7 @@ class AdminDeliveryController extends Controller
                     ->with('info', 'All orders have complete delivery information.');
         }
                        
-        return view('admin.deliveries.create', compact('orders'));
+        return view('admin.deliveries.create', compact('orders', 'drivers'));
     }
 
     /**
@@ -78,7 +84,8 @@ class AdminDeliveryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',  // Removed the unique constraint
+            'order_id' => 'required|exists:orders,order_id',
+            'emp_id' => 'nullable|exists:employees,emp_id',
             'delivery_date' => 'nullable|date',
             'street' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
@@ -165,7 +172,10 @@ class AdminDeliveryController extends Controller
     public function edit(Delivery $delivery)
     {
         $delivery->load(['order.customer', 'order.orderDetails.product']);
-        return view('admin.deliveries.edit', compact('delivery'));
+        $drivers = Employee::where('position', 'Driver')
+                    ->orWhere('position', 'Delivery Personnel')
+                    ->get();
+        return view('admin.deliveries.edit', compact('delivery', 'drivers'));
     }
 
     /**
@@ -174,6 +184,7 @@ class AdminDeliveryController extends Controller
     public function update(Request $request, Delivery $delivery)
     {
         $validated = $request->validate([
+            'emp_id' => 'nullable|exists:employees,emp_id',
             'delivery_date' => 'nullable|date',
             'street' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
@@ -288,16 +299,38 @@ class AdminDeliveryController extends Controller
     {
         $stats = $this->getDeliveryStats();
         
-        // Fix: Use the correct field for filtering deliveries
-        $deliveries = Delivery::with('order.customer')
+        // Get list of drivers for the dropdown
+        $drivers = Employee::where('position', 'Driver')
+                    ->orWhere('position', 'Delivery Personnel')
+                    ->get();
+        
+        // Get active deliveries with driver relationship
+        $deliveries = Delivery::with(['order.customer', 'driver'])
                              ->whereIn('delivery_status', ['Pending', 'Scheduled', 'Out for Delivery'])
                              ->orderBy('delivery_date')
                              ->get();
         
         return view('admin.deliveries.monitoring', array_merge(
-            compact('deliveries'), 
+            compact('deliveries', 'drivers'), 
             $stats
         ));
+    }
+
+    /**
+     * Quick update delivery status from monitoring page.
+     */
+    public function quickUpdate(Request $request, Delivery $delivery)
+    {
+        $validated = $request->validate([
+            'delivery_status' => 'required|string',
+            'special_instructions' => 'nullable|string',
+            'emp_id' => 'nullable|exists:employees,emp_id',
+        ]);
+
+        $delivery->update($validated);
+        
+        return redirect()->route('admin.deliveries.monitoring')
+                         ->with('success', 'Delivery status updated successfully');
     }
 
     /**

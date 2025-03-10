@@ -3,84 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KSM Sand & Gravel</title>
+    <title>{{ config('app.name', 'KSM SeaPlus+') }}</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">    
-
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+        }
+        
+        .border-left-primary {
+            border-left: 4px solid #4e73df !important;
+        }
+        
+        .border-left-success {
+            border-left: 4px solid #1cc88a !important;
+        }
+        
+        .border-left-warning {
+            border-left: 4px solid #f6c23e !important;
+        }
+        
+        .border-left-info {
+            border-left: 4px solid #36b9cc !important;
+        }
+    </style>
+    
+    @stack('styles')
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background-color: #39393A;">
-        <div class="container">
-            <a class="navbar-brand me-2" href="{{ url('images/KSM_logo.png') }}">
-                <img src="{{ asset('images/KSM_logo.png') }}" alt="KSM Sand & Gravel Logo" width="50" height="50" class="d-inline-block align-text-top ms-2">
-            </a>
-            <a class="navbar-brand" href="{{ url('/login') }}">KSM Sand & Gravel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-            @guest
-            <div class="d-flex align-items-center ms-auto">     
-                <form class="d-flex" role="search" action="{{ route('search') }}" method="GET">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
-                    <button class="btn btn-outline-light" type="submit">Search</button>
-                </form>
-            </div>
-            @endguest
-
-                <ul class="navbar-nav
-                    @guest
-                        ms-auto
-                    @endguest
-                ">
-                    @guest
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">Register</a>
-                        </li>
-                    @endguest
-                </ul>
-                @auth
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard.index') }}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('products.index') }}">Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('orders.index') }}">My Orders</a>
-                        </li>
-                       
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            {{ Auth::user()->username }}
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('customer.profile') }}">Profile</a></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">Logout</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                        </ul>
-                @endauth
-            </div>
+    @include('layouts.partials.navbar')
+    
+    @auth
+        {{-- Show authenticated user content --}}
+        @if(auth()->user()->role === 'Customer')
+            @include('layouts.partials.customer_sidebar')
+        @elseif(auth()->user()->role === 'Admin')
+            {{-- Redirect to admin layout if they somehow ended up here --}}
+            <script>window.location = "{{ route('admin.dashboard') }}";</script>
+        @endif
+        
+        <main class="py-4">
+            @yield('content')
+        </main>
+    @else
+        {{-- Guest content --}}
+        <div class="welcome-section">
+            @yield('welcome')
         </div>
-    </nav>
-
-    <main>
-        @yield('content')
-    </main>
-
+        
+        <main class="py-4">
+            @yield('content')
+        </main>
+    @endauth
+    
+    @include('layouts.partials.footer')
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
     @stack('scripts')
 </body>
 </html>

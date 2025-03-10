@@ -46,6 +46,21 @@
                                 </div>
 
                                 <div class="form-group mb-3">
+                                    <label for="emp_id" class="form-label fw-bold">Assign Driver</label>
+                                    <select name="emp_id" id="emp_id" class="form-control @error('emp_id') is-invalid @enderror">
+                                        <option value="">-- No Driver Assigned --</option>
+                                        @foreach($drivers as $driver)
+                                            <option value="{{ $driver->emp_id }}" {{ old('emp_id', $delivery->emp_id) == $driver->emp_id ? 'selected' : '' }}>
+                                                {{ $driver->fname }} {{ $driver->lname }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('emp_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group mb-3">
                                     <label for="delivery_date" class="form-label fw-bold">Delivery Date</label>
                                     <input type="date" name="delivery_date" id="delivery_date" class="form-control @error('delivery_date') is-invalid @enderror" value="{{ old('delivery_date', $delivery->delivery_date) }}" min="{{ date('Y-m-d') }}">
                                     @error('delivery_date')

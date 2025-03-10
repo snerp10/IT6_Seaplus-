@@ -1,447 +1,240 @@
 @extends('layouts.admin')
 
-@section('title', 'Payment Reports')
-
 @section('admin.content')
 <div class="container-fluid">
-    <!-- Content Header -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1><i class="fas fa-chart-bar mr-2"></i>Payment Reports &amp; Analytics</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.payments.index') }}">Payments</a></li>
-                        <li class="breadcrumb-item active">Reports</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-edit"></i> Edit Product
+        </h1>
+        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Products
+        </a>
+    </div>
 
-    <!-- Main content -->
-    <section class="content">
-        <div class="row">
-            <div class="col-12 mb-3">
-                <a href="{{ route('admin.payments.index') }}" class="btn btn-default btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back to Payments
-                </a>
-                <a href="{{ route('admin.payments.export') }}" class="btn btn-success btn-sm ml-2">
-                    <i class="fas fa-file-export"></i> Export Report Data
-                </a>
-            </div>
-        </div>
+    <!-- Alert Messages -->
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
 
-        <!-- Date Range Filter -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Filter Report Data</h6>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('admin.payments.reports') }}" method="GET" class="mb-0">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="date_from" class="form-label small">Start Date</label>
-                            <input type="date" name="date_from" id="date_from" class="form-control form-control-sm" 
-                                   value="{{ request('date_from', now()->subDays(30)->format('Y-m-d')) }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="date_to" class="form-label small">End Date</label>
-                            <input type="date" name="date_to" id="date_to" class="form-control form-control-sm" 
-                                   value="{{ request('date_to', now()->format('Y-m-d')) }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label d-block small">&nbsp;</label>
-                            <button type="submit" class="btn btn-primary btn-sm mr-2">
-                                <i class="fas fa-filter"></i> Apply Filter
-                            </button>
-                            <a href="{{ route('admin.payments.reports') }}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-undo"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
 
-        <!-- Summary Cards -->
-        <div class="row mb-4">
-            <!-- Total Payments -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Payments</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Paid')->sum('total'), 2) }}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-gradient-primary text-white">
+            <h6 class="m-0 font-weight-bold">Product Information</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.products.update', $product->prod_id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card border-left-primary shadow h-100 mb-4">
+                            <div class="card-header py-3 bg-light">
+                                <h6 class="m-0 font-weight-bold text-primary">Basic Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label for="name" class="form-label fw-bold">Product Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $product->name) }}" required>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="category" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                                    <select name="category" id="category" class="form-control @error('category') is-invalid @enderror" required>
+                                        <option value="">-- Select Category --</option>
+                                        <option value="Sand" {{ old('category', $product->category) == 'Sand' ? 'selected' : '' }}>Sand</option>
+                                        <option value="Gravel" {{ old('category', $product->category) == 'Gravel' ? 'selected' : '' }}>Gravel</option>
+                                        <option value="Hollow Blocks" {{ old('category', $product->category) == 'Hollow Blocks' ? 'selected' : '' }}>Hollow Blocks</option>
+                                        <option value="Hardware Supplies" {{ old('category', $product->category) == 'Hardware Supplies' ? 'selected' : '' }}>Hardware Supplies</option>
+                                        <option value="Other" {{ old('category', $product->category) == 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('category')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="unit" class="form-label fw-bold">Unit of Measurement <span class="text-danger">*</span></label>
+                                    <input type="text" name="unit" id="unit" class="form-control @error('unit') is-invalid @enderror" value="{{ old('unit', $product->unit) }}" required>
+                                    @error('unit')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="supp_id" class="form-label fw-bold">Supplier</label>
+                                    <select name="supp_id" id="supp_id" class="form-control @error('supp_id') is-invalid @enderror">
+                                        <option value="">-- No Supplier --</option>
+                                        @foreach($suppliers as $supplier)
+                                            <option value="{{ $supplier->supp_id }}" {{ old('supp_id', $product->supp_id) == $supplier->supp_id ? 'selected' : '' }}>
+                                                {{ $supplier->company_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('supp_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
-                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Pending -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Payments</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Pending')->sum('total'), 2) }}
+                    <div class="col-md-6">
+                        <div class="card border-left-info shadow h-100 mb-4">
+                            <div class="card-header py-3 bg-light">
+                                <h6 class="m-0 font-weight-bold text-primary">Pricing & Description</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label for="selling_price" class="form-label fw-bold">Selling Price <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₱</span>
+                                        <input type="number" name="selling_price" id="selling_price" class="form-control @error('selling_price') is-invalid @enderror" value="{{ old('selling_price', $product->pricing->first()->selling_price ?? 0) }}" step="0.01" min="0" required>
+                                    </div>
+                                    @error('selling_price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="original_price" class="form-label fw-bold">Original Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₱</span>
+                                        <input type="number" name="original_price" id="original_price" class="form-control @error('original_price') is-invalid @enderror" value="{{ old('original_price', $product->pricing->first()->original_price ?? 0) }}" step="0.01" min="0">
+                                    </div>
+                                    @error('original_price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="description" class="form-label fw-bold">Product Description</label>
+                                    <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="4">{{ old('description', $product->description) }}</textarea>
+                                    @error('description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card border-left-warning shadow h-100 mb-4">
+                            <div class="card-header py-3 bg-light">
+                                <h6 class="m-0 font-weight-bold text-primary">Product Image</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="image" class="form-label fw-bold">Product Image</label>
+                                    <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror">
+                                    @error('image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                @if($product->image)
+                                <div class="mt-3">
+                                    <p><strong>Current Image:</strong></p>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                        <div class="ms-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="remove_image" id="remove_image" value="1">
+                                                <label class="form-check-label" for="remove_image">
+                                                    Remove existing image
+                                                </label>
+                                            </div>
+                                            <small class="text-muted">Check this option to remove the current image without uploading a new one.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Partially Paid -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-danger shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Partially Paid</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->where('pay_status', 'Partially Paid')->sum('total'), 2) }}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card border-left-success shadow h-100 mb-4">
+                            <div class="card-header py-3 bg-light">
+                                <h6 class="m-0 font-weight-bold text-primary">Inventory Settings</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="min_stock_level" class="form-label fw-bold">Minimum Stock Level</label>
+                                            <input type="number" name="min_stock_level" id="min_stock_level" class="form-control @error('min_stock_level') is-invalid @enderror" value="{{ old('min_stock_level', $product->min_stock_level) }}" min="0">
+                                            @error('min_stock_level')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                            <small class="text-muted">Set the minimum stock level for low stock alerts</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="status" class="form-label fw-bold">Product Status</label>
+                                            <select name="status" id="status" class="form-control @error('status') is-invalid @enderror">
+                                                <option value="Active" {{ old('status', $product->status) == 'Active' ? 'selected' : '' }}>Active</option>
+                                                <option value="Inactive" {{ old('status', $product->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                                                <option value="Out of Stock" {{ old('status', $product->status) == 'Out of Stock' ? 'selected' : '' }}>Out of Stock</option>
+                                                <option value="Discontinued" {{ old('status', $product->status) == 'Discontinued' ? 'selected' : '' }}>Discontinued</option>
+                                            </select>
+                                            @error('status')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <i class="fas fa-percentage fa-2x text-gray-300"></i>
-                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- All Payments -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body py-2">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">All Payments</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ₱{{ number_format($paymentsByStatus->sum('total'), 2) }}
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-wallet fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Product
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
-
-        <div class="row">
-            <!-- Payment Status Summary -->
-            <div class="col-xl-6 col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Payment Status Summary</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-pie mb-4">
-                            <canvas id="paymentStatusChart" height="300"></canvas>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Count</th>
-                                        <th>Amount</th>
-                                        <th>Percentage</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $totalAmount = $paymentsByStatus->sum('total');
-                                        $statusColors = [
-                                            'Paid' => 'success',
-                                            'Pending' => 'warning',
-                                            'Partially Paid' => 'danger'
-                                        ];
-                                    @endphp
-                                    @foreach($paymentsByStatus as $status)
-                                    <tr>
-                                        <td>
-                                            <span class="badge bg-{{ $statusColors[$status->pay_status] ?? 'secondary' }}">
-                                                {{ ucfirst($status->pay_status) }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $status->count }}</td>
-                                        <td class="text-right">₱{{ number_format($status->total, 2) }}</td>
-                                        <td>{{ round(($status->total / ($totalAmount ?: 1)) * 100, 2) }}%</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot class="thead-light">
-                                    <tr>
-                                        <th>Total</th>
-                                        <th>{{ $paymentsByStatus->sum('count') }}</th>
-                                        <th class="text-right">₱{{ number_format($totalAmount, 2) }}</th>
-                                        <th>100%</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Method Summary -->
-            <div class="col-xl-6 col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Payment Method Distribution</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-pie mb-4">
-                            <canvas id="paymentMethodChart" height="300"></canvas>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>Method</th>
-                                        <th>Count</th>
-                                        <th>Amount</th>
-                                        <th>Percentage</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $totalMethodAmount = $paymentsByMethod->sum('total');
-                                        $methodColors = [
-                                            'cash' => 'success',
-                                            'credit_card' => 'primary',
-                                            'debit_card' => 'secondary',
-                                            'bank_transfer' => 'warning',
-                                            'gcash' => 'info',
-                                            'paymaya' => 'danger'
-                                        ];
-                                    @endphp
-                                    @foreach($paymentsByMethod as $method)
-                                    <tr>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $method->pay_method)) }}</td>
-                                        <td>{{ $method->count }}</td>
-                                        <td class="text-right">₱{{ number_format($method->total, 2) }}</td>
-                                        <td>{{ round(($method->total / ($totalMethodAmount ?: 1)) * 100, 2) }}%</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot class="thead-light">
-                                    <tr>
-                                        <th>Total</th>
-                                        <th>{{ $paymentsByMethod->sum('count') }}</th>
-                                        <th class="text-right">₱{{ number_format($totalMethodAmount, 2) }}</th>
-                                        <th>100%</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Daily Payment Trends -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Daily Payment Trends (Last 30 Days)</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="dailyPaymentsChart" height="100"></canvas>
-                </div>
-                <div class="mt-4 text-center small">
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-primary"></i> Daily Payment Totals
-                    </span>
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-success"></i> Trend Line
-                    </span>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
 </div>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    $(function() {
-        // Status Chart
-        const statusCtx = document.getElementById('paymentStatusChart').getContext('2d');
-        const statusData = {
-            labels: [
-                @foreach($paymentsByStatus as $status)
-                    '{{ ucfirst($status->pay_status) }}',
-                @endforeach
-            ],
-            datasets: [{
-                data: [
-                    @foreach($paymentsByStatus as $status)
-                        {{ $status->total }},
-                    @endforeach
-                ],
-                backgroundColor: [
-                    @foreach($paymentsByStatus as $status)
-                        '{{ $status->pay_status == "Paid" ? "#1cc88a" : 
-                           ($status->pay_status == "Pending" ? "#f6c23e" : 
-                           ($status->pay_status == "Partially Paid" ? "#36b9cc" : "#e74a3b")) }}',
-                    @endforeach
-                ],
-                hoverBackgroundColor: [
-                    @foreach($paymentsByStatus as $status)
-                        '{{ $status->pay_status == "Paid" ? "#17a673" : 
-                           ($status->pay_status == "Pending" ? "#dda20a" : 
-                           ($status->pay_status == "Partially Paid" ? "#258391" : "#be2617")) }}',
-                    @endforeach
-                ],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        };
-        new Chart(statusCtx, {
-            type: 'doughnut',
-            data: statusData,
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            const label = data.labels[tooltipItem.index];
-                            const value = data.datasets[0].data[tooltipItem.index];
-                            return `${label}: ₱${Number(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                        }
-                    }
-                },
-                legend: {
-                    position: 'right',
-                    align: 'start'
-                },
-                cutout: '60%'
-            }
-        });
-
-        // Method Chart
-        const methodCtx = document.getElementById('paymentMethodChart').getContext('2d');
-        const methodData = {
-            labels: [
-                @foreach($paymentsByMethod as $method)
-                    '{{ ucfirst(str_replace("_", " ", $method->pay_method)) }}',
-                @endforeach
-            ],
-            datasets: [{
-                data: [
-                    @foreach($paymentsByMethod as $method)
-                        {{ $method->total }},
-                    @endforeach
-                ],
-                backgroundColor: [
-                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69'
-                ],
-                hoverBackgroundColor: [
-                    '#2e59d9', '#17a673', '#258391', '#dda20a', '#be2617', '#3a3b45'
-                ],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        };
-        new Chart(methodCtx, {
-            type: 'pie',
-            data: methodData,
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            const label = data.labels[tooltipItem.index];
-                            const value = data.datasets[0].data[tooltipItem.index];
-                            return `${label}: ₱${Number(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                        }
-                    }
-                },
-                legend: {
-                    position: 'right',
-                    align: 'start'
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle image removal checkbox
+        const removeImageCheckbox = document.getElementById('remove_image');
+        const imageInput = document.getElementById('image');
+        
+        if (removeImageCheckbox) {
+            removeImageCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    imageInput.disabled = true;
+                } else {
+                    imageInput.disabled = false;
                 }
-            }
-        });
-
-        // Daily Payments Chart
-        const dailyCtx = document.getElementById('dailyPaymentsChart').getContext('2d');
-        const dailyData = {
-            labels: [
-                @foreach($dailyPayments as $daily)
-                    '{{ \Carbon\Carbon::parse($daily->date)->format("M d") }}',
-                @endforeach
-            ],
-            datasets: [{
-                label: 'Daily Payment Total',
-                data: [
-                    @foreach($dailyPayments as $daily)
-                        {{ $daily->total }},
-                    @endforeach
-                ],
-                backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                borderColor: 'rgba(78, 115, 223, 1)',
-                pointRadius: 3,
-                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
-                pointBorderColor: 'rgba(78, 115, 223, 1)',
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
-                pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
-                pointHitRadius: 10,
-                pointBorderWidth: 2,
-                fill: true,
-                lineTension: 0.3
-            }]
-        };
-        new Chart(dailyCtx, {
-            type: 'line',
-            data: dailyData,
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₱' + Number(value).toLocaleString('en-US');
-                            }
-                        }
-                    }
-                },
-                tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            return 'Total: ₱' + Number(tooltipItem.raw).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                        }
-                    }
-                }
-            }
-        });
+            });
+        }
     });
 </script>
 @endpush

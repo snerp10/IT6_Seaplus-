@@ -18,21 +18,12 @@ class Supplier extends Model
         'street',
         'city',
         'province',
-        'postal_code',
         'prod_type'
     ];
 
-    // Get all products associated with this supplier through the junction table
+    // Direct one-to-many relationship with products
     public function products()
-{
-    return $this->belongsToMany(Product::class, 'supplier_products', 'supp_id', 'prod_id')
-        ->withPivot('min_order_qty')
-        ->withTimestamps();
-}
-
-    // Get all supplier-product relationships
-    public function supplierProducts()
     {
-        return $this->hasMany(SupplierProduct::class, 'supp_id', 'supp_id');
+        return $this->hasMany(Product::class, 'supp_id', 'supp_id');
     }
 }
