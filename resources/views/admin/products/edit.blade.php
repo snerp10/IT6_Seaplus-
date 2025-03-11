@@ -57,8 +57,9 @@
                                         <option value="">-- Select Category --</option>
                                         <option value="Sand" {{ old('category', $product->category) == 'Sand' ? 'selected' : '' }}>Sand</option>
                                         <option value="Gravel" {{ old('category', $product->category) == 'Gravel' ? 'selected' : '' }}>Gravel</option>
+                                        <option value="Filling" {{ old('category', $product->category) == 'Filling' ? 'selected' : '' }}>Filling</option>
                                         <option value="Hollow Blocks" {{ old('category', $product->category) == 'Hollow Blocks' ? 'selected' : '' }}>Hollow Blocks</option>
-                                        <option value="Hardware Supplies" {{ old('category', $product->category) == 'Hardware Supplies' ? 'selected' : '' }}>Hardware Supplies</option>
+                                        <option value="Hardware Supplies" {{ old('category', $product->category) == 'Hardware' ? 'selected' : '' }}>Hardware</option>
                                         <option value="Other" {{ old('category', $product->category) == 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
                                     @error('category')

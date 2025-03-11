@@ -167,27 +167,16 @@ class AdminProductController extends Controller
             // Calculate markup
             $markup = $validated['selling_price'] - $validated['original_price'];
             
-            // Update or create pricing record
+            // Get current active pricing record
             $currentPricing = $product->pricing()->whereNull('end_date')->orWhere('end_date', '>=', now())->first();
             
             if ($currentPricing) {
-                // If price changed, end the current pricing and create a new one
-                if ($currentPricing->selling_price != $validated['selling_price'] || 
-                    $currentPricing->original_price != $validated['original_price']) {
-                    
-                    // End current pricing
-                    $currentPricing->end_date = now();
-                    $currentPricing->save();
-                    
-                    // Create new pricing
-                    Pricing::create([
-                        'prod_id' => $product->prod_id,
-                        'original_price' => $validated['original_price'],
-                        'selling_price' => $validated['selling_price'],
-                        'markup' => $markup,
-                        'start_date' => now(),
-                    ]);
-                }
+                // Simply update the existing pricing record
+                $currentPricing->update([
+                    'original_price' => $validated['original_price'],
+                    'selling_price' => $validated['selling_price'],
+                    'markup' => $markup
+                ]);
             } else {
                 // Create new pricing if none exists
                 Pricing::create([

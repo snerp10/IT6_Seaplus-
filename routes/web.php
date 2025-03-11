@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminEmployeeController;
+use App\Http\Controllers\Admin\AdminCustomerController;
 use App\Http\Controllers\Admin\AdminDeliveryController;
 use App\Http\Controllers\Admin\AdminInventoryController;
 use App\Http\Controllers\Admin\AdminPaymentController;
@@ -112,7 +113,10 @@ Route::middleware(['auth'])->group(function () {
         
         Route::resource('employees', AdminEmployeeController::class);
 
-        
+        // Manage Customers
+        Route::get('customers/export', [AdminCustomerController::class, 'export'])->name('customers.export');
+        Route::resource('customers', AdminCustomerController::class);
+
         // Manage Deliveries
         Route::get('/deliveries/export', [AdminDeliveryController::class, 'export'])->name('deliveries.export');
         Route::get('/deliveries/monitoring', [AdminDeliveryController::class, 'monitoring'])->name('deliveries.monitoring');

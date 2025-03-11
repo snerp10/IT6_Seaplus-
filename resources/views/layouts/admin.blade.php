@@ -479,6 +479,12 @@
                     </a>
                 </li>
                 
+                <li class="{{ request()->is('admin/customers*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.customers.index') }}">
+                        <span class="sidebar-icon"><i class="fas fa-users"></i></span> Customers
+                    </a>
+                </li>
+                
                 <li class="{{ request()->is('admin/deliveries*') ? 'active' : '' }}">
                     <a href="{{ route('admin.deliveries.index') }}">
                         <span class="sidebar-icon"><i class="fas fa-truck"></i></span> Deliveries
@@ -570,6 +576,8 @@
                                     <i class="fas fa-warehouse me-2"></i> Inventory Management
                                 @elseif(request()->is('admin/employees*'))
                                     <i class="fas fa-users me-2"></i> Employees Management
+                                @elseif(request()->is('admin/customers*'))
+                                    <i class="fas fa-users me-2"></i> Customers Management
                                 @elseif(request()->is('admin/sales_reports*'))
                                     <i class="fas fa-chart-line me-2"></i> Sales Reports
                                 @elseif(request()->is('admin/suppliers*'))

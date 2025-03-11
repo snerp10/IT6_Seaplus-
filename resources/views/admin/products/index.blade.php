@@ -219,13 +219,14 @@
                                         </a>
                                         <button type="button" class="btn btn-sm btn-success" 
                                                 onclick="location.href='{{ route('admin.products.show', $product->prod_id) }}#add-stock'">
-                                            <i class="fas fa-plus-circle"></i> Stock
+                                            <i class="fas fa-plus-circle"></i>
                                         </button>
                                         <form action="{{ route('admin.products.destroy', $product->prod_id) }}" 
                                               method="POST" class="d-inline delete-product-form">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger delete-btn"
+                                                    onclick="return confirm('Are you sure you want to delete this product? This action cannot be undone.')"
                                                     data-product-name="{{ $product->name }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>

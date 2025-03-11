@@ -91,59 +91,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Supplier Products -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-cubes mr-1"></i> Supplied Products
-                    </h6>
-                </div>
-                <div class="card-body">
-                    @if($suppliedProducts->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Product Name</th>
-                                        <th>Category</th>
-                                        <th>Minimum Order</th>
-                                        <th>Unit Price</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($suppliedProducts as $supplierProduct)
-                                        <tr>
-                                            <td>{{ $supplierProduct->product->prod_id }}</td>
-                                            <td>{{ $supplierProduct->product->name }}</td>
-                                            <td>{{ $supplierProduct->product->category }}</td>
-                                            <td>{{ $supplierProduct->min_order_qty }} {{ $supplierProduct->product->unit }}</td>
-                                            <td>₱{{ number_format($supplierProduct->product->price, 2) }}</td>
-                                            <td>
-                                                <a href="{{ route('admin.products.show', $supplierProduct->product->prod_id) }}" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle mr-1"></i> No products associated with this supplier yet.
-                        </div>
-                    @endif
-                    
-                    <div class="mt-3 text-right">
-                        <a href="{{ route('admin.suppliers.edit', $supplier->supp_id) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus-circle mr-1"></i> Add/Edit Products
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Right Side Cards -->
@@ -156,10 +103,6 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-6 text-muted">Products Supplied:</div>
-                        <div class="col-6 font-weight-bold">{{ $suppliedProducts->count() }}</div>
-                    </div>
                     <div class="row mb-2">
                         <div class="col-6 text-muted">Status:</div>
                         <div class="col-6">
@@ -221,7 +164,6 @@
                 <div class="modal-body">
                     <p>Are you sure you want to delete this supplier? This action cannot be undone.</p>
                     <p><strong>Company:</strong> {{ $supplier->company_name }}</p>
-                    <p><strong>Products:</strong> {{ $suppliedProducts->count() }}</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
