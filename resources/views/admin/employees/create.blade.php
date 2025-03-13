@@ -221,6 +221,31 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Account Information -->
+                        <h5 class="mt-4 mb-3">User Account Information</h5>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle mr-1"></i> A user account will be created for this employee to access the system.
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Password must be at least 8 characters.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password_confirmation">Confirm Password</label>
+                                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justify-content-between">

@@ -24,19 +24,16 @@
     
     <!-- Main content -->
     <section class="content">
-        <div class="row">
-            <div class="col-12 mb-3">
-                <div class="float-left">
-                    <a href="{{ route('admin.payments.index') }}" class="btn btn-default">
-                        <i class="fas fa-arrow-left mr-1"></i> Back to Payments
-                    </a>
-                </div>
-                <div class="float-right">
-                    <a href="{{ route('admin.payments.show', $payment->pay_id) }}" class="btn btn-info">
-                        <i class="fas fa-eye mr-1"></i> View Details
-                    </a>
-                </div>
+        <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-between">
+                <a href="{{ route('admin.payments.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Payments
+                </a>
+                <a href="{{ route('admin.payments.show', $payment->pay_id) }}" class="btn btn-primary">
+                    <i class="fas fa-eye mr-1"></i> View Details
+                </a>
             </div>
+        </div>
             
             <div class="col-md-12">
                 <div class="card card-warning card-outline">
@@ -225,7 +222,7 @@
                             </div>
 
                             <div class="form-group text-center mt-4">
-                                <button type="submit" class="btn btn-warning btn-lg">
+                                <button type="submit" class="btn btn-primary btn-lg">
                                     <i class="fas fa-save mr-1"></i> Update Payment
                                 </button>
                                 <a href="{{ route('admin.payments.index') }}" class="btn btn-default btn-lg ml-2">

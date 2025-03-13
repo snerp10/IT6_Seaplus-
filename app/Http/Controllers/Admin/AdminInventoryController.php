@@ -10,9 +10,27 @@ use Illuminate\Support\Facades\DB;
 
 class AdminInventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $inventories = Inventory::with('product')->orderBy('created_at', 'desc')->paginate(15);
+        $inventories = Inventory::with('product');
+
+        // Apply filters if present
+        if ($request->has('prod_id') && !empty($request->prod_id)) {
+            $inventories = $inventories->where('prod_id', $request->prod_id);
+        }
+        if ($request->has('move_type') && !empty($request->move_type)) {
+            $inventories = $inventories->where('move_type', $request->move_type);
+        }
+
+        if ($request->has('date_from') && !empty($request->date_from)) {
+            $inventories = $inventories->whereDate('move_date', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && !empty($request->date_to)) {
+            $inventories = $inventories->whereDate('move_date', '<=', $request->date_to);
+        }
+
+        $inventories = $inventories->orderBy('created_at', 'desc')->paginate(8);
         $products = Product::where('status', 'Active')->get();
         
         return view('admin.inventories.index', compact('inventories', 'products'));

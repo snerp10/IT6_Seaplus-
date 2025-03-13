@@ -37,7 +37,7 @@
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-info-circle mr-1"></i> Supplier Information
                     </h6>
                     <span class="badge {{ $supplier->status == 'Active' ? 'bg-success' : 'bg-danger' }} text-white px-3 py-2">
@@ -98,7 +98,7 @@
             <!-- Supplier Stats Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-chart-pie mr-1"></i> Supplier Statistics
                     </h6>
                 </div>
@@ -130,7 +130,7 @@
             <!-- Quick Actions Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-tasks mr-1"></i> Quick Actions
                     </h6>
                 </div>

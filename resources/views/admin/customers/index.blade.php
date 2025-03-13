@@ -49,7 +49,7 @@
     <!-- Filters Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Search Customers</h6>
+            <h6 class="m-0 font-weight-bold text">Search Customers</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.customers.index') }}" method="GET" class="mb-3">
@@ -75,19 +75,19 @@
     <!-- Customers Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Customer List</h6>
+            <h6 class="m-0 font-weight-bold text">Customer List</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="customersTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Location</th>
-                            <th>Registered On</th>
-                            <th>Actions</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Email</th>
+                            <th class="text-center">Location</th>
+                            <th class="text-center">Registered On</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,11 +108,11 @@
                                 </td>
                                 <td>{{ $customer->created_at->format('M d, Y') }}</td>
                                 <td>
-                                    <div class="d-flex">
-                                        <a href="{{ route('admin.customers.show', $customer->cus_id) }}" class="btn btn-info btn-sm mr-1">
+                                    <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                        <a href="{{ route('admin.customers.show', $customer->cus_id) }}" class="btn btn-secondary btn-sm mr-1">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.customers.edit', $customer->cus_id) }}" class="btn btn-warning btn-sm mr-1">
+                                        <a href="{{ route('admin.customers.edit', $customer->cus_id) }}" class="btn btn-primary btn-sm mr-1">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('admin.customers.destroy', $customer->cus_id) }}" method="POST" class="d-inline">

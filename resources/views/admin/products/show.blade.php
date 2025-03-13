@@ -8,7 +8,7 @@
             <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Products
             </a>
-            <a href="{{ route('admin.products.edit', $product->prod_id) }}" class="btn btn-warning">
+            <a href="{{ route('admin.products.edit', $product->prod_id) }}" class="btn btn-primary">    
                 <i class="fas fa-edit"></i> Edit Product
             </a>
         </div>
@@ -91,7 +91,7 @@
         </div>
         <div class="col-md-4">
             <div class="card shadow mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg text-white">
                     <h5 class="m-0 font-weight-bold">Add Stock</h5>
                 </div>
                 <div class="card-body">
@@ -158,7 +158,7 @@
                 </table>
             </div>
             <div class="text-center">
-                <a href="{{ route('admin.inventories.index', ['prod_id' => $product->prod_id]) }}" class="btn btn-sm btn-primary">View All Inventory Records</a>
+                <a href="{{ route('admin.inventories.index', ['prod_id' => $product->prod_id]) }}" class="btn btn-sm btn">View All Inventory Records</a>
             </div>
         </div>
     </div>

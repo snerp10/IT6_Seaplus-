@@ -108,7 +108,7 @@
     <!-- Filters Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Employees</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Employees</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.employees.index') }}" method="GET" class="mb-0">
@@ -146,7 +146,7 @@
     <!-- Employees Table Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">
+            <h6 class="m-0 font-weight-bold text">
                 <i class="fas fa-list"></i> Employee List
             </h6>
         </div>
@@ -155,14 +155,14 @@
                 <table class="table table-bordered table-striped table-hover" id="employeesTable">
                     <thead class="thead-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Contact</th>
-                            <th>Email</th>
-                            <th>Salary</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Position</th>
+                            <th class="text-center">Contact</th>
+                            <th class="text-center">Email</th>
+                            <th class="text-center">Salary</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -194,48 +194,22 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('admin.employees.show', $employee->emp_id) }}" class="btn btn-sm btn-info" title="View Details">
+                                    <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                        <a href="{{ route('admin.employees.show', $employee->emp_id) }}" class="btn btn-sm btn-secondary" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <a href="{{ route('admin.employees.edit', $employee->emp_id) }}" class="btn btn-sm btn-primary" title="Edit Employee">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-danger" 
-                                                data-toggle="modal" 
-                                                data-target="#deleteModal{{ $employee->emp_id }}"
-                                                title="Delete Employee">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        
-                                        <!-- Delete Modal -->
-                                        <div class="modal fade" id="deleteModal{{ $employee->emp_id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-danger text-white">
-                                                        <h5 class="modal-title">
-                                                            <i class="fas fa-exclamation-triangle"></i> Confirm Delete
-                                                        </h5>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>Are you sure you want to delete this employee record? This action cannot be undone.</p>
-                                                        <p><strong>Employee:</strong> {{ $employee->fname }} {{ $employee->lname }}</p>
-                                                        <p><strong>Position:</strong> {{ $employee->position }}</p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                        <form action="{{ route('admin.employees.destroy', $employee->emp_id) }}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <form action="{{ route('admin.employees.destroy', $employee->emp_id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="confirmDelete(this, '{{ $employee->fname }} {{ $employee->lname }}', '{{ $employee->position }}')"
+                                                    title="Delete Employee">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -257,6 +231,13 @@
 
 @push('scripts')
 <script>
+    // Simple confirm delete function
+    function confirmDelete(button, employeeName, position) {
+        if (confirm('Are you sure you want to delete this employee record?\n\nEmployee: ' + employeeName + '\nPosition: ' + position + '\n\nThis action cannot be undone.')) {
+            button.closest('form').submit();
+        }
+    }
+
     $(function() {
         // Initialize tooltips
         $('[title]').tooltip();

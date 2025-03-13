@@ -37,7 +37,7 @@
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-info-circle mr-1"></i> Personal Information
                     </h6>
                     <span class="badge bg-{{ $employee->status == 'Active' ? 'success' : 'danger' }} text-white px-3 py-2">
@@ -106,7 +106,7 @@
             <!-- Employment History -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-history mr-1"></i> Employment History
                     </h6>
                 </div>
@@ -131,7 +131,7 @@
             <!-- Employee Profile Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-id-badge mr-1"></i> Employee Profile
                     </h6>
                 </div>
@@ -179,7 +179,7 @@
             <!-- Document Information Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-file-alt mr-1"></i> Document Information
                     </h6>
                 </div>

@@ -7,7 +7,7 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-bookmark text-primary mr-2"></i> Saved Reports
+            <i class="fas fa-bookmark text-dark mr-2"></i> Saved Reports
         </h1>
         <div>
             <a href="{{ route('admin.sales_reports.create') }}" class="btn btn-primary btn-sm">
@@ -30,7 +30,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Your Saved Reports</h6>
+            <h6 class="m-0 font-weight-bold text">Your Saved Reports</h6>
         </div>
         <div class="card-body">
             @if($reports->isEmpty())
@@ -57,7 +57,7 @@
                             @foreach($reports as $report)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('admin.sales_reports.show', $report->report_id) }}" class="font-weight-bold text-primary">
+                                        <a href="{{ route('admin.sales_reports.show', $report->report_id) }}" class="font-weight-bold text-dark">
                                             {{ $report->name }}
                                         </a>
                                         @if($report->description)
@@ -65,7 +65,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="badge badge-{{ 
+                                        <span class="badge bg-{{ 
                                             $report->report_type === 'daily' ? 'primary' : 
                                             ($report->report_type === 'monthly' ? 'success' : 
                                             ($report->report_type === 'product' ? 'info' : 'secondary')) 
@@ -76,44 +76,22 @@
                                     <td>{{ $report->date_from->format('M d, Y') }} - {{ $report->date_to->format('M d, Y') }}</td>
                                     <td>{{ $report->created_at->format('M d, Y') }}</td>
                                     <td>
-                                        <div class="btn-group">
-                                            <a href="{{ route('admin.sales_reports.show', $report->report_id) }}" class="btn btn-sm btn-info" title="View">
+                                        <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                            <a href="{{ route('admin.sales_reports.show', $report->report_id) }}" class="btn btn-sm btn-secondary" title="View">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="{{ route('admin.sales_reports.edit', $report->report_id) }}" class="btn btn-sm btn-primary" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteModal{{ $report->report_id }}" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-
-                                        <!-- Delete Modal -->
-                                        <div class="modal fade" id="deleteModal{{ $report->report_id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-danger text-white">
-                                                        <h5 class="modal-title">
-                                                            <i class="fas fa-trash-alt"></i> Delete Report
-                                                        </h5>
-                                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>Are you sure you want to delete the report <strong>{{ $report->name }}</strong>?</p>
-                                                        <p>This action cannot be undone.</p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                        <form action="{{ route('admin.sales_reports.destroy', $report->report_id) }}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <form action="{{ route('admin.sales_reports.destroy', $report->report_id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-sm btn-danger" 
+                                                        onclick="confirmDelete(this, '{{ $report->name }}')"
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -132,6 +110,13 @@
 
 @push('scripts')
 <script>
+    // Simple confirm delete function
+    function confirmDelete(button, reportName) {
+        if (confirm('Are you sure you want to delete the report "' + reportName + '"?\n\nThis action cannot be undone.')) {
+            button.closest('form').submit();
+        }
+    }
+
     $(function() {
         // Initialize DataTable
         $('#reportsTable').DataTable({

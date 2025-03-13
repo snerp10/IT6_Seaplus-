@@ -15,7 +15,7 @@
     </div>
     
     <div class="card shadow">
-        <div class="card-header bg-warning text-dark">
+        <div class="card-header bg text-primary">
             <h6 class="m-0 font-weight-bold">Products with Low Stock (Less than 10 units)</h6>
         </div>
         <div class="card-body">

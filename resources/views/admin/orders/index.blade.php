@@ -102,7 +102,7 @@
     <!-- Filters -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Orders</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Orders</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.orders.index') }}" method="GET" class="mb-3">
@@ -153,21 +153,21 @@
     <!-- Orders Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Orders List</h6>
+            <h6 class="m-0 font-weight-bold text">Orders List</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="ordersTable">
                     <thead class="table-dark">
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Type</th>
-                            <th>Order Status</th>
-                            <th>Delivery Status</th>
-                            <th>Actions</th>
+                            <th class="text-center">Order ID</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Amount</th>
+                            <th class="text-center">Type</th>
+                            <th class="text-center">Order Status</th>
+                            <th class="text-center">Delivery Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -186,7 +186,7 @@
                                 </div>
                             </td>
                             <td>{{ \Carbon\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
-                            <td class="font-weight-bold text-primary">₱{{ number_format($order->total_amount + ($order->delivery ? $order->delivery->delivery_cost : 0), 2) }}</td>
+                            <td class="font-weight-bold text-primary">₱{{ number_format($order->total_amount + $order->delivery->delivery_cost, 2) }}</td>
                             <td>
                                 <span class="badge bg-{{ $order->order_type == 'Bulk' ? 'danger' : 'info' }}">
                                     {{ $order->order_type }}
@@ -215,11 +215,11 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info">
+                                <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                    <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-secondary">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.orders.edit', $order) }}" class="btn btn-sm btn-warning">
+                                    <a href="{{ route('admin.orders.edit', $order) }}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="d-inline">

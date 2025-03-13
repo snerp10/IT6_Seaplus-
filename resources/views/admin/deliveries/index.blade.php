@@ -156,7 +156,7 @@
     <!-- Filters -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Deliveries</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Deliveries</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.deliveries.index') }}" method="GET" class="mb-3">
@@ -200,26 +200,26 @@
     <!-- Deliveries Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Deliveries List</h6>
+            <h6 class="m-0 font-weight-bold text">Deliveries List</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="deliveriesTable">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Order #</th>
-                            <th>Customer</th>
-                            <th>Delivery Date</th>
-                            <th>Address</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Order #</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Delivery Date</th>
+                            <th class="text-center">Address</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($deliveries as $delivery)
                         <tr>
-                            <td>{{ $delivery->id }}</td>
+                            <td>{{ $delivery->delivery_id }}</td>
                             <td>
                                 <a href="{{ route('admin.orders.show', $delivery->order->order_id) }}" class="text-primary font-weight-bold">
                                     #{{ $delivery->order->order_id }}
@@ -255,11 +255,11 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.deliveries.show', $delivery) }}" class="btn btn-sm btn-info">
+                                <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                    <a href="{{ route('admin.deliveries.show', $delivery) }}" class="btn btn-sm btn-secondary">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.deliveries.edit', $delivery) }}" class="btn btn-sm btn-warning">
+                                    <a href="{{ route('admin.deliveries.edit', $delivery) }}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('admin.deliveries.destroy', $delivery) }}" method="POST" class="d-inline">

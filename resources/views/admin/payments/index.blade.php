@@ -108,7 +108,7 @@
     <!-- Filters Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Payments</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Payments</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.payments.index') }}" method="GET" class="mb-0">
@@ -144,11 +144,11 @@
                     <div class="col-md-2">
                         <label class="form-label d-block small">&nbsp;</label>
                         <div class="d-flex">
-                            <button type="submit" class="btn btn-primary btn-sm mr-2">
-                                <i class="fas fa-search"></i> Search
+                            <button type="submit" class="btn btn-primary btn-sm mr-2 d-flex align-items-center">
+                                <i class="fas fa-search"></i> <span class="ml-1">Search</span>
                             </button>
-                            <a href="{{ route('admin.payments.index') }}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-undo"></i> Reset
+                            <a href="{{ route('admin.payments.index') }}" class="btn btn-secondary btn-sm d-flex align-items-center">
+                                <i class="fas fa-undo"></i> <span class="ml-1">Reset</span>
                             </a>
                         </div>
                     </div>
@@ -160,7 +160,7 @@
     <!-- Payments Table Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">
+            <h6 class="m-0 font-weight-bold text">
                 <i class="fas fa-list"></i> Payment List
             </h6>
             <div>
@@ -174,15 +174,15 @@
                 <table class="table table-bordered table-striped table-hover">
                     <thead class="thead-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Reference #</th>
-                            <th>Order #</th>
-                            <th>Customer</th>
-                            <th>Amount</th>
-                            <th>Method</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Reference #</th>
+                            <th class="text-center">Order #</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Amount</th>
+                            <th class="text-center">Method</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -206,7 +206,7 @@
                                     N/A
                                 @endif
                             </td>
-                            <td class="text-right">₱{{ number_format($payment->amount_paid + $payment->delivery_cost, 2) }}</td>
+                            <td class="text-right">₱{{ number_format($payment->amount_paid, 2) }}</td>
                             <td>
                                 <span class="badge bg-{{ 
                                     $payment->pay_method == 'Cash' ? 'success' : 
@@ -228,50 +228,22 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="btn-group">
-                                    <a href="{{ route('admin.payments.show', $payment->pay_id) }}" class="btn btn-sm btn-info" title="View">
+                                <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                    <a href="{{ route('admin.payments.show', $payment->pay_id) }}" class="btn btn-sm btn-secondary" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="{{ route('admin.payments.edit', $payment->pay_id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                            data-toggle="modal" 
-                                            data-target="#deleteModal{{ $payment->pay_id }}"
-                                            data-payment-id="{{ $payment->pay_id }}"
-                                            data-payment-ref="{{ $payment->reference_number ?? 'Payment #'.$payment->pay_id }}" 
-                                            title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-
-                                <!-- Delete Modal -->
-                                <div class="modal fade" id="deleteModal{{ $payment->pay_id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title">
-                                                    <i class="fas fa-exclamation-triangle"></i> Confirm Delete
-                                                </h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Are you sure you want to delete this payment? This action cannot be undone.</p>
-                                                <p><strong>Payment:</strong> {{ $payment->reference_number ?? 'Payment #'.$payment->pay_id }}</p>
-                                                <p><strong>Amount:</strong> ₱{{ number_format($payment->amount_paid, 2) }}</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                <form action="{{ route('admin.payments.destroy', $payment->pay_id) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <form action="{{ route('admin.payments.destroy', $payment->pay_id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                onclick="confirmDelete(this, '{{ $payment->reference_number ?? 'Payment #'.$payment->pay_id }}', '{{ number_format($payment->amount_paid, 2) }}')"
+                                                title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -293,6 +265,13 @@
 
 @push('scripts')
 <script>
+    // Simple confirm delete function
+    function confirmDelete(button, paymentRef, amount) {
+        if (confirm('Are you sure you want to delete this payment?\n\nPayment: ' + paymentRef + '\nAmount: ₱' + amount + '\n\nThis action cannot be undone.')) {
+            button.closest('form').submit();
+        }
+    }
+
     $(function() {
         // Initialize tooltips
         $('[title]').tooltip();

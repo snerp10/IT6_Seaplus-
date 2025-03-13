@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\AdminPaymentController;
 use App\Http\Controllers\Admin\AdminSalesReportController;
 use App\Http\Controllers\Admin\AdminSupplierController;
 
+
 // Public Routes
 Route::get('/', function () {
     return view('welcome');
@@ -92,7 +93,8 @@ Route::middleware(['auth'])->group(function () {
     // Admin Routes
     Route::middleware(['Admin'])->prefix('admin')->name('admin.')->group(function () {
         // Admin Dashboard
-        Route::get('/dashboard', [AdminDashboardController::class, 'AdminIndex'])->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard/notifications/{id}/mark-read', [AdminDashboardController::class, 'markNotificationAsRead'])->name('dashboard.notifications.mark-read');
 
         // Manage Products
         Route::resource('products', AdminProductController::class);

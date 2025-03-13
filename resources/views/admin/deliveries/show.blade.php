@@ -39,7 +39,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card shadow h-100">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Delivery Information</h6>
+                    <h6 class="m-0 font-weight-bold text">Delivery Information</h6>
                     <span class="badge bg-{{ 
                         $delivery->delivery_status == 'Delivered' ? 'success' : 
                         ($delivery->delivery_status == 'Out for Delivery' ? 'info' : 
@@ -85,7 +85,7 @@
         <!-- Customer Info Column -->
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card shadow h-100">
-                <div class="card-header py-3 bg-info text-white">
+                <div class="card-header py-3 bg text-white">
                     <h6 class="m-0 font-weight-bold"><i class="fas fa-user"></i> Customer Information</h6>
                 </div>
                 <div class="card-body">
@@ -110,7 +110,7 @@
         <!-- Order Info Column -->
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card shadow h-100">
-                <div class="card-header py-3 bg-success text-white">
+                <div class="card-header py-3 bg text-white">
                     <h6 class="m-0 font-weight-bold"><i class="fas fa-shopping-cart"></i> Order Information</h6>
                 </div>
                 <div class="card-body">
@@ -162,12 +162,12 @@
                 <table class="table table-bordered">
                     <thead class="bg-light">
                         <tr>
-                            <th>#</th>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Subtotal</th>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Product</th>
+                            <th class="text-center">Category</th>
+                            <th class="text-center">Price</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-center">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>

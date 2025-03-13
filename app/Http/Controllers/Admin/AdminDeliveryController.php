@@ -39,7 +39,7 @@ class AdminDeliveryController extends Controller
         $stats = $this->getDeliveryStats();
         
         // Order by date and paginate
-        $deliveries = $deliveries->orderBy('delivery_date')->paginate(15);
+        $deliveries = $deliveries->orderBy('delivery_date')->paginate(8);
         
         return view('admin.deliveries.index', array_merge(
             compact('deliveries'), 

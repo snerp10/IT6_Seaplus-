@@ -13,7 +13,7 @@
             <a href="{{ route('admin.inventories.index') }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left"></i> Back to Inventory
             </a>
-            <a href="{{ route('admin.inventories.show', $inventory->inv_id) }}" class="btn btn-info btn-sm">
+            <a href="{{ route('admin.inventories.show', $inventory->inv_id) }}" class="btn btn-primary btn-sm">
                 <i class="fas fa-eye"></i> View Details
             </a>
         </div>
@@ -38,7 +38,7 @@
     <!-- Edit Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">
+            <h6 class="m-0 font-weight-bold text">
                 <i class="fas fa-boxes mr-1"></i> Edit Movement Details
             </h6>
         </div>

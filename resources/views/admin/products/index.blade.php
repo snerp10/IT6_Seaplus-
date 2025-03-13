@@ -8,7 +8,7 @@
             <i class="fas fa-box-open text-dark"></i> Products Management
         </h1>
         <div>
-            <a href="{{ route('admin.inventories.low_stock_alerts') }}" class="btn btn-warning mr-2">
+            <a href="{{ route('admin.inventories.low_stock_alerts') }}" class="btn mr-2">
                 <i class="fas fa-exclamation-triangle"></i> Low Stock Alerts
             </a>
             <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
@@ -108,7 +108,7 @@
     <!-- Products Table Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Products</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Products</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.products.index') }}" method="GET" class="mb-3">
@@ -145,22 +145,21 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">
+            <h6 class="m-0 font-weight-bold text">
                 <i class="fas fa-list"></i> Product Inventory List
             </h6>
         </div>
         <div class="card-body">            
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" id="productsTable">
                     <thead class="table-light">
                         <tr>
-                            <th width="5%">ID</th>
-                            <th width="20%">Product</th>
-                            <th width="10%">Category</th>
-                            <th width="15%">Price</th>
-                            <th width="15%">Stock</th>
-                            <th width="10%">Status</th>
-                            <th width="25%">Actions</th>
+                            <th width="5%" class="text-center">ID</th>
+                            <th width="25%" class="text-center">Product</th>
+                            <th width="10%" class="text-center">Category</th>
+                            <th width="10%" class="text-center">Price</th>
+                            <th width="15%" class="text-center">Status</th>
+                            <th width="20%" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -188,19 +187,6 @@
                                     <small class="text-muted">per {{ $product->unit }}</small>
                                 </td>
                                 <td>
-                                    @if($product->getStockAttribute() == 0)
-                                        <span class="badge bg-danger fw-bold">Out of Stock</span>
-                                    @elseif($product->getStockAttribute() < 10)
-                                        <span class="badge bg-warning text-dark fw-bold">
-                                            Low: {{ $product->getStockAttribute() }} {{ $product->unit }}
-                                        </span>
-                                    @else
-                                        <span class="badge bg-success fw-bold">
-                                            {{ $product->getStockAttribute() }} {{ $product->unit }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
                                     @if($product->status == 'Active')
                                         <span class="badge bg-success"><i class="fas fa-check-circle"></i> Active</span>
                                     @else
@@ -208,26 +194,25 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="btn-group" role="group">
+                                    <div class="d-flex gap-1 justify-content-center" role="group" aria-label="Actions">
                                         <a href="{{ route('admin.products.show', $product->prod_id) }}" 
-                                           class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> Details
+                                           class="btn btn-sm btn-secondary text-white">
+                                            <i class="fas fa-eye"></i>
                                         </a>
                                         <a href="{{ route('admin.products.edit', $product->prod_id) }}" 
-                                           class="btn btn-sm btn-warning">
-                                            <i class="fas fa-edit"></i> Edit
+                                           class="btn btn-sm btn-primary text-white">
+                                            <i class="fas fa-edit"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-success" 
+                                        <button type="button" class="btn btn-sm btn-info text-white"
                                                 onclick="location.href='{{ route('admin.products.show', $product->prod_id) }}#add-stock'">
                                             <i class="fas fa-plus-circle"></i>
                                         </button>
                                         <form action="{{ route('admin.products.destroy', $product->prod_id) }}" 
-                                              method="POST" class="d-inline delete-product-form">
+                                              method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger delete-btn"
-                                                    onclick="return confirm('Are you sure you want to delete this product? This action cannot be undone.')"
-                                                    data-product-name="{{ $product->name }}">
+                                            <button type="button" class="btn btn-sm btn-danger text-white delete-btn"
+                                                    onclick="confirmDelete(this, '{{ $product->name }}')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -243,33 +228,22 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteConfirmationModalLabel">
-                    <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete the product: <strong id="productNameToDelete"></strong>?</p>
-                <p class="text-danger">This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Product</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @push('scripts')
 <script>
-    $(document).ready(function() {
+    // Simple confirm delete function
+    function confirmDelete(button, productName) {
+        if (confirm('Are you sure you want to delete the product: "' + productName + '"?\nThis action cannot be undone.')) {
+            button.closest('form').submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
         // Initialize DataTable with advanced features
-        const productsTable = $('#productsTable').DataTable({
+        if ($.fn.DataTable.isDataTable('#productsTable')) {
+            $('#productsTable').DataTable().destroy();
+        }
+        
+        $('#productsTable').DataTable({
             "order": [[0, "desc"]],
             "pageLength": 10,
             "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -280,59 +254,6 @@
             },
             "dom": '<"top"lf>rt<"bottom"ip>',
             "responsive": true
-        });
-        
-        // Category filter
-        $('#categoryFilter').on('change', function() {
-            let category = $(this).val();
-            
-            productsTable.columns(2).search(category).draw();
-        });
-        
-        // Status filter
-        $('#statusFilter').on('change', function() {
-            let status = $(this).val();
-            
-            // Custom filtering for status column
-            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-                if (!status) return true; // No filter applied
-                
-                const row = productsTable.row(dataIndex).node();
-                const statusValue = $(row).find('.status-cell').attr('data-status');
-                
-                return statusValue === status;
-            });
-            
-            productsTable.draw();
-            // Remove the custom filter after drawing
-            $.fn.dataTable.ext.search.pop();
-        });
-        
-        // Reset filters button
-        $('#resetFilters').on('click', function() {
-            $('#categoryFilter').val('');
-            $('#statusFilter').val('');
-            
-            // Clear all filters
-            productsTable.search('').columns().search('').draw();
-        });
-        
-        // Delete confirmation modal
-        let formToSubmit = null;
-        
-        $('.delete-btn').on('click', function(e) {
-            e.preventDefault();
-            const productName = $(this).data('product-name');
-            formToSubmit = $(this).closest('form');
-            $('#productNameToDelete').text(productName);
-            $('#deleteConfirmationModal').modal('show');
-        });
-        
-        $('#confirmDeleteBtn').on('click', function() {
-            if (formToSubmit) {
-                formToSubmit.submit();
-            }
-            $('#deleteConfirmationModal').modal('hide');
         });
     });
 </script>

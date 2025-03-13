@@ -11,7 +11,7 @@
             <a href="{{ route('admin.customers.index') }}" class="btn btn-secondary me-2">
                 <i class="fas fa-arrow-left"></i> Back to Customers
             </a>
-            <a href="{{ route('admin.customers.show', $customer->cus_id) }}" class="btn btn-info">
+            <a href="{{ route('admin.customers.show', $customer->cus_id) }}" class="btn btn-primary">
                 <i class="fas fa-eye"></i> View Customer
             </a>
         </div>
@@ -67,6 +67,14 @@
                                 </div>
                                 
                                 <div class="form-group mb-3">
+                                    <label for="birthdate" class="form-label fw-bold">Birthdate <span class="text-danger">*</span></label>
+                                    <input type="date" name="birthdate" id="birthdate" class="form-control @error('birthdate') is-invalid @enderror" value="{{ old('birthdate', $customer->birthdate ? \Carbon\Carbon::parse($customer->birthdate)->format('Y-m-d') : '') }}" required>
+                                    @error('birthdate')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="form-group mb-3">
                                     <label for="contact_number" class="form-label fw-bold">Contact Number <span class="text-danger">*</span></label>
                                     <input type="text" name="contact_number" id="contact_number" class="form-control @error('contact_number') is-invalid @enderror" value="{{ old('contact_number', $customer->contact_number) }}" required>
                                     @error('contact_number')
@@ -80,6 +88,7 @@
                                     @error('email')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                    <small class="text-muted">Changing email will also update the login email for this customer's account.</small>
                                 </div>
 
                                 <div class="form-group mb-3">
@@ -119,7 +128,35 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="postal_code" class="form-label fw-bold">Postal Code <span class="text-danger">*</span></label>
+                                    <input type="text" name="postal_code" id="postal_code" class="form-control @error('postal_code') is-invalid @enderror" value="{{ old('postal_code', $customer->postal_code) }}" required>
+                                    @error('postal_code')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="country" class="form-label fw-bold">Country <span class="text-danger">*</span></label>
+                                    <input type="text" name="country" id="country" class="form-control @error('country') is-invalid @enderror" value="{{ old('country', $customer->country) }}" required>
+                                    @error('country')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-left-success shadow h-100 mb-4">
+                    <div class="card-header py-3 bg-light">
+                        <h6 class="m-0 font-weight-bold text-primary">User Account Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> This customer has a user account with login access. 
+                            To change the password, use the password management screen.
                         </div>
                     </div>
                 </div>

@@ -12,6 +12,7 @@ use App\Models\SalesReport;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class AdminSalesReportController extends Controller
@@ -178,74 +179,94 @@ class AdminSalesReportController extends Controller
     {
         // Validate the incoming request with more specific rules
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'date_from' => 'required|date|before_or_equal:today',
-            'date_to' => 'required|date|after_or_equal:date_from',
             'report_type' => 'required|in:daily,weekly,monthly,quarterly,yearly',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
         ]);
 
         DB::beginTransaction();
         
         try {
-            // Get data based on date range and report type
+            // Get current authenticated user's employee ID
+            $currentUser = Auth::user();
+            $employeeId = null;
+            
+            // First try to get from relationship if exists
+            if ($currentUser && $currentUser->employee) {
+                $employeeId = $currentUser->employee->emp_id;
+            } 
+            // If no direct relationship, try to find by email
+            else if ($currentUser) {
+                $employee = Employee::where('email', $currentUser->email)->first();
+                if ($employee) {
+                    $employeeId = $employee->emp_id;
+                }
+            }
+            
+            // If still no employee ID, use a fallback admin employee
+            if (!$employeeId) {
+                $adminEmployee = Employee::where('position', 'Admin')->first();
+                $employeeId = $adminEmployee ? $adminEmployee->emp_id : 1; // Use ID 1 as last resort
+            }
+            
+            // Calculate date ranges based on report type
             $startDate = Carbon::parse($validated['date_from'])->startOfDay();
             $endDate = Carbon::parse($validated['date_to'])->endOfDay();
             
-            // Calculate financial metrics for the report
-            $totalSales = Order::whereBetween('created_at', [$startDate, $endDate])
-                ->where('order_status', 'Completed')
-                ->sum('total_amount');
-                
-            // Calculate actual expenses based on product costs where possible
-            $totalExpenses = $this->calculateExpenses($startDate, $endDate);
-            $netProfit = $totalSales - $totalExpenses;
-            
-            // Get the employee ID from the authenticated user if available
-            $employeeId = null;
-            if (auth()->check()) {
-                $employee = Employee::where('emp_id', auth()->id())->first();
-                $employeeId = $employee ? $employee->emp_id : null;
+            // Get the report data based on type
+            $reportData = [];
+            switch ($validated['report_type']) {
+                case 'daily':
+                    $reportData = $this->getDailySalesData($startDate, $endDate);
+                    break;
+                case 'weekly':
+                    $reportData = $this->getWeeklySalesData($startDate, $endDate);
+                    break;
+                case 'monthly':
+                    $reportData = $this->getMonthlySalesData($startDate, $endDate);
+                    break;
+                case 'quarterly':
+                    $reportData = $this->getQuarterlySalesData($startDate, $endDate);
+                    break;
+                case 'yearly':
+                    $reportData = $this->getYearlySalesData($startDate, $endDate);
+                    break;
             }
             
-            // Format parameters to ensure only relevant data is stored
-            $parameters = json_encode($request->only([
-                'include_delivery_costs',
-                'include_cancelled_orders',
-                'group_by',
-                'product_limit',
-                'category_filter'
-            ]));
-        
-            // Create a new sales report record with all required fields
-            $report = new SalesReport();
-            $report->name = $validated['name'];
-            $report->description = $validated['description'] ?? null;
-            $report->date_from = $startDate->format('Y-m-d');
-            $report->date_to = $endDate->format('Y-m-d');
-            $report->date_generated = now();
-            $report->report_type = $validated['report_type'];
-            $report->total_sales = $totalSales;
-            $report->total_expenses = $totalExpenses;
-            $report->net_profit = $netProfit;
-            $report->generated_by = $employeeId;
-            $report->parameters = $parameters;
-            $report->save();
+            // Calculate expenses for this period
+            $expenses = $this->calculateExpenses($startDate, $endDate);
+            
+            // Calculate net profit
+            $netProfit = $reportData['totalSales'] - $expenses;
+            
+            // Create the sales report
+            $salesReport = SalesReport::create([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'report_type' => $validated['report_type'],
+                'date_from' => $startDate,
+                'date_to' => $endDate,
+                'total_sales' => $reportData['totalSales'],
+                'total_expenses' => $expenses,
+                'net_profit' => $netProfit,
+                'date_generated' => now(),
+                'generated_by' => $employeeId, // Ensure generated_by is always populated
+                'parameters' => json_encode([
+                    'reportType' => $validated['report_type'],
+                    'dateRange' => [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]
+                ]),
+            ]);
             
             DB::commit();
-        
-            return redirect()->route('admin.sales_reports.show', $report->report_id)
-                             ->with('success', 'Sales report created successfully.');
-                             
+            
+            return redirect()->route('admin.sales_reports.show', $salesReport->report_id)
+                ->with('success', 'Sales report has been created successfully');
+                
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            \Log::error('Failed to create sales report: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
-            
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Failed to create sales report: ' . $e->getMessage());
+            return back()->with('error', 'Error creating sales report: ' . $e->getMessage())->withInput();
         }
     }
 

@@ -50,7 +50,7 @@ class AdminPaymentController extends Controller
             $query->whereDate('pay_date', '<=', $request->date_to);
         }
 
-        $payments = $query->with(['order', 'customer'])->latest()->paginate(10);
+        $payments = $query->with(['order', 'customer'])->latest()->paginate(8);
         
         // Get summary statistics
         $totalPaid = $this->payment->where('pay_status', 'Paid')->sum('amount_paid');

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Employee;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
@@ -35,7 +37,7 @@ class AdminEmployeeController extends Controller
             });
         }
         
-        $employees = $query->orderBy('lname')->paginate(10);
+        $employees = $query->orderBy('lname')->paginate(8);
         
         return view('admin.employees.index', compact('employees'));
     }
@@ -70,6 +72,8 @@ class AdminEmployeeController extends Controller
             'country' => 'required|string|max:50',
             'position' => 'required|string|max:100',
             'salary' => 'required|numeric|min:0',
+            // Password fields for user account
+            'password' => 'required|min:8|confirmed',
         ]);
         
         // Add additional fields
@@ -78,11 +82,20 @@ class AdminEmployeeController extends Controller
         
         DB::beginTransaction();
         try {
-            Employee::create($validated);
+            // Create the employee
+            $employee = Employee::create($validated);
+            
+            // Create user account for this employee
+            User::create([
+                'username' => strtolower($validated['fname'] . $validated['lname']), // Create a username
+                'password' => Hash::make($validated['password']),
+                'role' => 'Employee',
+                'emp_id' => $employee->emp_id, // Link to the created employee
+            ]);
             
             DB::commit();
             return redirect()->route('admin.employees.index')
-                ->with('success', 'Employee created successfully.');
+                ->with('success', 'Employee created successfully with user account.');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withErrors('Failed to create employee: ' . $e->getMessage())->withInput();

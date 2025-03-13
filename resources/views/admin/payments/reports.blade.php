@@ -7,7 +7,7 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-chart-bar text-primary mr-2"></i> Payment Reports
+            <i class="fas fa-chart-bar text-dark mr-2"></i> Payment Reports
         </h1>
         <div>
             <a href="{{ route('admin.payments.index') }}" class="btn btn-secondary btn-sm">
@@ -22,7 +22,7 @@
     <!-- Date Range Filter -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Date Range</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Date Range</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.payments.reports') }}" method="GET" class="form-inline">
@@ -46,7 +46,7 @@
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Payment Status Summary</h6>
+                    <h6 class="m-0 font-weight-bold text">Payment Status Summary</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -101,7 +101,7 @@
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Payment Method Summary</h6>
+                    <h6 class="m-0 font-weight-bold text">Payment Method Summary</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -149,7 +149,7 @@
     <!-- Daily Payments -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Daily Payments</h6>
+            <h6 class="m-0 font-weight-bold text">Daily Payments</h6>
         </div>
         <div class="card-body">
             <!-- Daily Chart -->

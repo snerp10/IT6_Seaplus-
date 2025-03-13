@@ -44,7 +44,7 @@ class AdminOrderController extends Controller
         $basicStats = $this->getBasicOrderStats();
         
         // Order by date descending and paginate
-        $orders = $orders->orderBy('order_date', 'desc')->paginate(15);
+        $orders = $orders->orderBy('order_date', 'desc')->paginate(8);
         
         return view('admin.orders.index', array_merge(
             compact('orders'), 

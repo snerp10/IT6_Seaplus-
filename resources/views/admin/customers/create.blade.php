@@ -61,6 +61,14 @@
                                 </div>
                                 
                                 <div class="form-group mb-3">
+                                    <label for="birthdate" class="form-label fw-bold">Birthdate <span class="text-danger">*</span></label>
+                                    <input type="date" name="birthdate" id="birthdate" class="form-control @error('birthdate') is-invalid @enderror" value="{{ old('birthdate') }}" required>
+                                    @error('birthdate')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="form-group mb-3">
                                     <label for="contact_number" class="form-label fw-bold">Contact Number <span class="text-danger">*</span></label>
                                     <input type="text" name="contact_number" id="contact_number" class="form-control @error('contact_number') is-invalid @enderror" value="{{ old('contact_number') }}" required>
                                     @error('contact_number')
@@ -108,6 +116,50 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="postal_code" class="form-label fw-bold">Postal Code <span class="text-danger">*</span></label>
+                                    <input type="text" name="postal_code" id="postal_code" class="form-control @error('postal_code') is-invalid @enderror" value="{{ old('postal_code') }}" required>
+                                    @error('postal_code')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="country" class="form-label fw-bold">Country <span class="text-danger">*</span></label>
+                                    <input type="text" name="country" id="country" class="form-control @error('country') is-invalid @enderror" value="{{ old('country', 'Philippines') }}" required>
+                                    @error('country')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Account Information -->
+                <div class="card border-left-success shadow h-100 mb-4">
+                    <div class="card-header py-3 bg-light">
+                        <h6 class="m-0 font-weight-bold text-primary">User Account Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> A user account with login credentials will be created for this customer.
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label fw-bold">Password <span class="text-danger">*</span></label>
+                                <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required>
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Password must be at least 8 characters.</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="password_confirmation" class="form-label fw-bold">Confirm Password <span class="text-danger">*</span></label>
+                                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
                             </div>
                         </div>
                     </div>

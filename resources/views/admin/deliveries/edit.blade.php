@@ -37,7 +37,7 @@
                     <div class="col-md-6">
                         <div class="card border-left-info shadow h-100">
                             <div class="card-header py-3 bg-light">
-                                <h6 class="m-0 font-weight-bold text-primary">Delivery Details</h6>
+                                <h6 class="m-0 font-weight-bold text-dark">Delivery Details</h6>
                             </div>
                             <div class="card-body">
                                 <div class="form-group mb-3">
@@ -101,7 +101,7 @@
                     <div class="col-md-6">
                         <div class="card border-left-warning shadow h-100">
                             <div class="card-header py-3 bg-light">
-                                <h6 class="m-0 font-weight-bold text-primary">Delivery Address</h6>
+                                <h6 class="m-0 font-weight-bold text-dark">Delivery Address</h6>
                             </div>
                             <div class="card-body">
                                 <div class="form-group mb-3">

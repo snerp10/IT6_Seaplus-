@@ -6,40 +6,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KSM SeaPlus+ Admin Panel</title>
+    <title>KSM Admin Panel</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Custom Admin Styles -->
     <style>
         :root {
-            /* Custom Color Palette */
-            --dark-color: #39393A;      /* 50% usage - Main dark color */
-            --light-color: #E6E6E6;     /* 30% usage - Light background color */
-            --accent-color: #FF8552;    /* 10% usage - Accent/highlight color */
-            --secondary-color: #297373; /* 10% usage - Secondary accent */
-            --hover-color:rgb(247, 223, 41);     /* Hover state color */
+            /* New Color Palette - Gold, Black, Myrtle */
+            --gold-color: #D4AF37;     /* Primary accent color */
+            --black-color: #222222;    /* Dark elements color */
+            --myrtle-color: #1A535C;   /* Secondary accent color */
+            --white-color: #FFFFFF;    /* Background color */
+            --light-gray: #F5F5F5;     /* Secondary background color */
+            --text-dark: #333333;      /* Main text color */
+            --text-light: #FFFFFF;     /* Light text color */
+            --text-muted: #777777;     /* Muted text color */
             
             /* Bootstrap overrides */
-            --bs-primary: var(--secondary-color);
-            --bs-secondary: var(--dark-color);
+            --bs-primary: var(--myrtle-color);
+            --bs-secondary: var(--black-color);
             --bs-success: #2E8B57;
             --bs-info: #5BC0DE;
-            --bs-warning: var(--accent-color);
+            --bs-warning: var(--gold-color);
             --bs-danger: #D9534F;
         }
         
         body {
-            font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-color);
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--white-color);
+            background-image: linear-gradient(to bottom right, rgba(245,245,245,0.7), rgba(255,255,255,1));
             margin: 0;
             min-height: 100vh;
-            color: var(--dark-color);
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
         }
         
         /* Sidebar Styling */
@@ -48,12 +59,12 @@
             position: fixed;
             left: 0;
             width: 250px;
-            background: var(--dark-color);
+            background: var(--black-color);
             color: white;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 3px 0 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
-            background-image: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 100%);
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, var(--black-color) 100%);
         }
         
         #sidebar.active {
@@ -64,7 +75,14 @@
         #sidebar .sidebar-header {
             padding: 20px;
             background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        #sidebar .sidebar-header h4 {
+            color: var(--gold-color);
+            font-size: 1.5rem;
+            margin-bottom: 0;
+            letter-spacing: 1px;
         }
         
         #sidebar ul.components {
@@ -73,15 +91,17 @@
         
         #sidebar ul li a {
             padding: 12px 15px;
-            font-size: 1em;
+            font-size: 0.85rem;
             display: block;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.3s;
-            border-left: 3px solid transparent;
+            border-left: 2px solid transparent;
             position: relative;
             z-index: 1;
             overflow: hidden;
+            letter-spacing: 0.5px;
+            font-weight: 500;
         }
         
         #sidebar ul li a:before {
@@ -91,7 +111,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(233, 215, 88, 0.1);
+            background: rgba(212, 175, 55, 0.1);
             transform: translateX(-100%);
             transition: all 0.3s ease;
             z-index: -1;
@@ -102,28 +122,16 @@
         }
         
         #sidebar ul li a:hover {
-            color: #fff;
+            color: var(--gold-color);
             text-decoration: none;
-            border-left: 3px solid var(--hover-color);
+            border-left: 2px solid var(--gold-color);
         }
         
         #sidebar ul li.active > a {
-            color: #fff;
-            background: rgba(41, 115, 115, 0.4);
-            border-left: 3px solid var(--hover-color);
+            color: var(--gold-color);
+            background: rgba(26, 83, 92, 0.2);
+            border-left: 2px solid var(--gold-color);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-        }
-        
-        #sidebar a[data-bs-toggle="collapse"] {
-            position: relative;
-        }
-        
-        .dropdown-toggle::after {
-            display: block;
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
         }
         
         /* Main Content Area */
@@ -133,9 +141,11 @@
             position: absolute;
             top: 0;
             right: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             padding: 20px;
             padding-top: 80px;
+            background-color: var(--white-color);
+            background-image: radial-gradient(circle at top right, rgba(245,245,245,0.5), transparent 70%);
         }
         
         #content.active {
@@ -145,94 +155,45 @@
         /* Top Navbar */
         .main-navbar {
             padding: 10px 20px;
-            background: white;
+            background: var(--white-color);
             border: none;
             border-radius: 0;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             position: fixed;
             width: calc(100% - 250px);
             right: 0;
             top: 0;
             z-index: 999;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
         }
         
         .main-navbar.active {
             width: 100%;
         }
         
-        .navbar-btn {
-            box-shadow: none;
-            outline: none !important;
-            border: none;
-        }
-        
-        /* UI Components */
-        .sidebar-icon {
-            width: 20px;
-            text-align: center;
-            margin-right: 10px;
-        }
-        
-        .card {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border: none;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-        
-        .card-header {
-            background: var(--dark-color);
-            color: white;
-            border-radius: 10px 10px 0 0 !important;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .card-header:after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.1) 38%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0) 48%);
-            background-size: 200% 100%;
-            animation: shine 2s infinite;
-        }
-        
-        @keyframes shine {
-            to {
-                background-position: 200% 0;
-            }
-        }
-        
-        /* Button Styling with Texture */
+        /* Button Styling with Refined Hover Effect */
         .btn {
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
             z-index: 1;
             text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
             font-weight: 500;
-            border-radius: 5px;
+            border-radius: 3px;
+            padding: 8px 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .btn:after {
             content: '';
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
@@ -261,44 +222,141 @@
         }
         
         .btn-primary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-            box-shadow: 0 4px 6px rgba(41, 115, 115, 0.2);
+            background-color: var(--myrtle-color);
+            border-color: var(--myrtle-color);
+            box-shadow: 0 2px 4px rgba(26, 83, 92, 0.2);
         }
         
         .btn-primary:hover {
-            background-color: #236363;
-            border-color: #236363;
-            box-shadow: 0 6px 10px rgba(41, 115, 115, 0.3);
+            background-color: #14424a;
+            border-color: #14424a;
+            box-shadow: 0 4px 6px rgba(26, 83, 92, 0.3);
         }
         
         .btn-secondary {
-            background-color: var(--dark-color);
-            border-color: var(--dark-color);
-            box-shadow: 0 4px 6px rgba(57, 57, 58, 0.2);
+            background-color: var(--black-color);
+            border-color: var(--black-color);
+            box-shadow: 0 2px 4px rgba(34, 34, 34, 0.2);
         }
 
         .btn-secondary:hover {
-            background-color: #2a2a2b;
-            border-color: #2a2a2b;
-            box-shadow: 0 6px 10px rgba(57, 57, 58, 0.3);
+            background-color: #1a1a1a;
+            border-color: #1a1a1a;
+            box-shadow: 0 4px 6px rgba(34, 34, 34, 0.3);
         }
         
-        .btn-accent {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
+        .btn-gold {
+            background-color: var(--gold-color);
+            border-color: var(--gold-color);
+            color: var(--black-color);
+            box-shadow: 0 2px 4px rgba(212, 175, 55, 0.2);
+            font-weight: 600;
+        }
+        
+        .btn-gold:hover {
+            background-color: #c4a22f;
+            border-color: #c4a22f;
+            color: var(--text-dark);
+            box-shadow: 0 4px 6px rgba(212, 175, 55, 0.3);
+        }
+        
+        /* Card Styling */
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background: var(--black-color);
             color: white;
-            box-shadow: 0 4px 6px rgba(255, 133, 82, 0.2);
+            border-radius: 6px 6px 0 0 !important;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
         }
         
-        .btn-accent:hover {
-            background-color: #E97747;
-            border-color: #E97747;
+        .card-header h6 {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--gold-color);
+            letter-spacing: 0.5px;
+        }
+        
+        /* Table Styling */
+        .table {
+            color: var(--text-dark);
+            font-size: 0.85rem;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+        
+        .table thead th {
+            background-color: var(--black-color);
+            color: var(--gold-color);
+            font-weight: 500;
+            border-bottom: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        /* Badge Styling */
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+        
+        .bg-gold {
+            background-color: var(--gold-color) !important;
+            color: var(--black-color);
+        }
+        
+        .bg-myrtle {
+            background-color: var(--myrtle-color) !important;
             color: white;
-            box-shadow: 0 6px 10px rgba(255, 133, 82, 0.3);
         }
         
-        /* Hamburger Menu Button with Animation */
+        /* Form Controls */
+        .form-control {
+            border-radius: 3px;
+            border: 1px solid rgba(0,0,0,0.1);
+            font-size: 0.85rem;
+            box-shadow: none;
+            transition: all 0.3s;
+            background-color: var(--white-color);
+            color: var(--text-dark);
+        }
+        
+        .form-control:focus {
+            border-color: var(--gold-color);
+            box-shadow: 0 0 0 0.1rem rgba(212, 175, 55, 0.25);
+        }
+        
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Hamburger Menu Button */
         .hamburger-btn {
             width: 35px;
             height: 35px;
@@ -312,9 +370,9 @@
         }
         
         .hamburger-btn span {
-            width: 25px;
+            width: 22px;
             height: 2px;
-            background: var(--dark-color);
+            background: var(--black-color);
             position: absolute;
             top: 50%;
             left: 50%;
@@ -327,19 +385,19 @@
         .hamburger-btn span:after {
             content: '';
             position: absolute;
-            width: 25px;
+            width: 22px;
             height: 2px;
-            background: var(--dark-color);
+            background: var(--black-color);
             transition: all 0.3s;
             border-radius: 2px;
         }
         
         .hamburger-btn span:before {
-            top: -8px;
+            top: -7px;
         }
         
         .hamburger-btn span:after {
-            top: 8px;
+            top: 7px;
         }
         
         .hamburger-btn.active span {
@@ -356,30 +414,72 @@
             transform: rotate(-45deg);
         }
         
-        /* Rest of the styles remain unchanged */
-        .badge.bg-accent {
-            background-color: var(--accent-color) !important;
-        }
-        
-        /* User Profile Elements */
+        /* Profile and User Elements */
         .profile-img {
             height: 36px;
             width: 36px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--secondary-color);
+            border: 2px solid var(--gold-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        /* Notification Indicator */
-        .notification-indicator {
+        /* Alerts */
+        .alert {
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        /* Custom Stats Cards */
+        .stats-card {
+            border-left: 4px solid;
+            border-radius: 5px;
             position: relative;
+            overflow: hidden;
         }
         
-        .notification-indicator .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            font-size: 0.6rem;
+        .border-left-gold {
+            border-left-color: var(--gold-color) !important;
+        }
+        
+        .border-left-black {
+            border-left-color: var(--black-color) !important;
+        }
+        
+        .border-left-myrtle {
+            border-left-color: var(--myrtle-color) !important;
+        }
+        
+        /* Custom Shadows */
+        .shadow-sm {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+        }
+        
+        .shadow {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
+        }
+        
+        .shadow-lg {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+        }
+        
+        /* Text Colors */
+        .text-gold {
+            color: var(--gold-color) !important;
+        }
+        
+        .text-myrtle {
+            color: var(--myrtle-color) !important;
+        }
+        
+        .text-black {
+            color: var(--black-color) !important;
+        }
+        
+        .text-muted {
+            color: var(--text-muted) !important;
         }
         
         /* Responsive Adjustments */
@@ -403,45 +503,49 @@
             .main-navbar.active {
                 width: calc(100% - 250px);
             }
+            .btn {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Custom spacing utilities */
+        .gap-2 {
+            gap: 0.5rem !important;
         }
         
-        /* Data Tables */
-        .table-responsive {
-            overflow-x: auto;
+        /* Override existing primary button colors to gold */
+        .btn-primary {
+            background-color: var(--gold-color);
+            border-color: var(--gold-color);
+            color: var(--black-color);
         }
         
-        .table {
-            color: var(--dark-color);
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #c4a22f;
+            border-color: #c4a22f;
+            color: var(--black-color);
         }
         
-        .table-hover tbody tr:hover {
-            background-color: rgba(233, 215, 88, 0.1);
+        .btn-dark {
+            background-color: var(--black-color);
+            border-color: var(--black-color);
         }
         
-        /* Custom Borders & Accents */
-        .border-accent {
-            border-color: var(--accent-color) !important;
+        .btn-dark:hover {
+            background-color: #000000;
+            border-color: #000000;
         }
         
-        .border-secondary {
-            border-color: var(--secondary-color) !important;
+        /* Custom tooltip styling */
+        .tooltip .tooltip-inner {
+            background-color: var(--black-color);
+            color: var(--gold-color);
+            font-size: 0.75rem;
         }
         
-        .border-left-accent {
-            border-left: 4px solid var(--accent-color) !important;
-        }
-        
-        .border-left-secondary {
-            border-left: 4px solid var(--secondary-color) !important;
-        }
-        
-        /* Text Colors */
-        .text-accent {
-            color: var(--accent-color) !important;
-        }
-        
-        .text-secondary-color {
-            color: var(--secondary-color) !important;
+        .bs-tooltip-auto[x-placement^=top] .arrow::before, 
+        .bs-tooltip-top .arrow::before {
+            border-top-color: var(--black-color);
         }
     </style>
 </head>
@@ -450,8 +554,10 @@
         <!-- Sidebar -->
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h4>KSM SeaPlus+</h4>
-                <p class="text-light mb-0"><small>Sand & Gravel Admin</small></p>
+                <div class="d-flex justify-content-center">
+                    <h4>KSM</h4>
+                </div>
+                <p class="text-center text-light mb-0"><small>Sand & Gravel Admin</small></p>
             </div>
 
             <ul class="list-unstyled components">
@@ -515,8 +621,8 @@
                     </a>
                 </li>
                 
-                <li class="border-top mt-3 pt-2">
-                    <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                <li class="border-top mt-3 pt-2 d-flex justify-content-center">
+                    <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle w-100">
                         <span class="sidebar-icon"><i class="fas fa-cog"></i></span> Settings
                     </a>
                     <ul class="collapse list-unstyled" id="settingsSubmenu">
@@ -533,7 +639,7 @@
                     </ul>
                 </li>
                 
-                <li class="mt-3">
+                <li class="mt-3 d-flex justify-content-center">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="btn w-100 text-start ps-3" style="background: transparent; color: white; border: none;">
@@ -604,9 +710,17 @@
                             
                             <!-- Notifications -->
                             <div class="dropdown me-3">
+                                @php
+                                    $notifications = \App\Models\Notification::orderBy('created_at', 'desc')
+                                        ->take(5)
+                                        ->get();
+                                    $unreadCount = \App\Models\Notification::where('is_read', false)->count();
+                                @endphp
                                 <button class="btn notification-indicator" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--light-color);">
                                     <i class="fas fa-bell"></i>
-                                    <span class="badge rounded-pill bg-accent">3</span>
+                                    @if($unreadCount > 0)
+                                        <span class="badge rounded-pill bg-danger">{{ $unreadCount }}</span>
+                                    @endif
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationsDropdown" style="width: 280px; max-height: 400px; overflow-y: auto;">
                                     <li>
@@ -614,54 +728,43 @@
                                             <h6 class="mb-0">Notifications</h6>
                                         </div>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center py-2" href="#">
-                                            <div class="me-3">
-                                                <div class="bg-accent text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 38px; height: 38px;">
-                                                    <i class="fas fa-shopping-cart"></i>
+                                    @forelse($notifications as $notification)
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center py-2 {{ $notification->is_read ? 'text-muted' : 'fw-bold' }}" 
+                                               href="{{ $notification->type == 'low_stock' ? route('admin.inventories.low_stock_alerts') : 
+                                                      ($notification->type == 'order_complete' ? route('admin.orders.index') : '#') }}">
+                                                <div class="me-3">
+                                                    <div class="{{ $notification->type == 'order_complete' ? 'bg-success' : 
+                                                              ($notification->type == 'low_stock' ? 'bg-warning' : 'bg-info') }} text-white rounded-circle d-flex justify-content-center align-items-center" 
+                                                         style="width: 38px; height: 38px;">
+                                                        <i class="fas {{ $notification->type == 'order_complete' ? 'fa-check' : 
+                                                                   ($notification->type == 'low_stock' ? 'fa-exclamation-triangle' : 'fa-info-circle') }}"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <p class="mb-0 fw-semibold">New order received</p>
-                                                <p class="small text-muted mb-0">Order #12345 - 30 min ago</p>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center py-2" href="#">
-                                            <div class="me-3">
-                                                <div class="bg-warning text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 38px; height: 38px;">
-                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                <div>
+                                                    <p class="mb-0 fw-semibold">{{ $notification->title }}</p>
+                                                    <p class="small text-muted mb-0">{{ $notification->message }}</p>
+                                                    <p class="small text-muted mb-0">{{ $notification->created_at->diffForHumans() }}</p>
                                                 </div>
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li>
+                                            <div class="dropdown-item text-center py-3">
+                                                <i class="fas fa-bell-slash text-muted mb-2"></i>
+                                                <p class="mb-0">No notifications</p>
                                             </div>
-                                            <div>
-                                                <p class="mb-0 fw-semibold">Low inventory alert</p>
-                                                <p class="small text-muted mb-0">Sand G1 - 2 hours ago</p>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center py-2" href="#">
-                                            <div class="me-3">
-                                                <div class="bg-secondary-color text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 38px; height: 38px; background-color: var(--secondary-color);">
-                                                    <i class="fas fa-check-circle"></i>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <p class="mb-0 fw-semibold">Payment confirmed</p>
-                                                <p class="small text-muted mb-0">Order #12340 - Yesterday</p>
-                                            </div>
-                                        </a>
-                                    </li>
+                                        </li>
+                                    @endforelse
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <a class="dropdown-item text-center small" href="#">
+                                        <a class="dropdown-item text-center small" href="#" data-bs-toggle="modal" data-bs-target="#allNotificationsModal">
                                             View All Notifications
                                         </a>
                                     </li>
                                 </ul>
                             </div>
-                            
+
                             <!-- User Profile -->
                             <div class="dropdown">
                                 <button class="btn dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--light-color);">
@@ -703,12 +806,82 @@
         </div>
     </div>
 
+    <!-- All Notifications Modal -->
+    <div class="modal fade" id="allNotificationsModal" tabindex="-1" aria-labelledby="allNotificationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="allNotificationsModalLabel">
+                        <i class="fas fa-bell me-2"></i> All Notifications
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush">
+                        @php
+                            $allNotifications = \App\Models\Notification::orderBy('created_at', 'desc')
+                                ->paginate(15);
+                        @endphp
+                        
+                        @forelse($allNotifications as $notification)
+                            <div class="list-group-item list-group-item-action d-flex align-items-center p-3 {{ $notification->is_read ? 'text-muted bg-light' : '' }}">
+                                <div class="me-3">
+                                    <div class="{{ $notification->type == 'order_complete' ? 'bg-success' : 
+                                          ($notification->type == 'low_stock' ? 'bg-warning' : 'bg-info') }} text-white rounded-circle d-flex justify-content-center align-items-center" 
+                                         style="width: 45px; height: 45px;">
+                                        <i class="fas {{ $notification->type == 'order_complete' ? 'fa-check' : 
+                                               ($notification->type == 'low_stock' ? 'fa-exclamation-triangle' : 'fa-info-circle') }} fa-lg"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 {{ $notification->is_read ? '' : 'fw-bold' }}">{{ $notification->title }}</h6>
+                                    <p class="mb-1">{{ $notification->message }}</p>
+                                    <small class="text-muted">{{ $notification->created_at->format('M d, Y h:i A') }} ({{ $notification->created_at->diffForHumans() }})</small>
+                                </div>
+                                <div>
+                                    @if(!$notification->is_read)
+                                        <form action="{{ route('admin.dashboard.notifications.mark-read', $notification->notification_id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Mark as Read">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="badge bg-light text-secondary border">Read</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-5">
+                                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                                <p>You don't have any notifications yet.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between bg-light">
+                    <div>
+                        {{ $allNotifications->links() }}
+                    </div>
+                    <div>
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-chart-line me-1"></i> Go to Dashboard
+                        </a>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call stack scripts only once -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
 
+    <!-- Call stack scripts only once -->
     @stack('scripts')
-    
+
     <script>
         $(document).ready(function () {
             // Enhanced Toggle sidebar with animation
@@ -780,7 +953,5 @@
             }
         });
     </script>
-    
-    @stack('scripts')
 </body>
 </html>

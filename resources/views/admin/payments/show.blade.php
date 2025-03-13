@@ -123,7 +123,7 @@
         <div class="col-lg-6">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-file-invoice-dollar mr-1"></i> Payment Information
                     </h6>
                     <div class="dropdown no-arrow">
@@ -163,7 +163,7 @@
                         <div class="col-md-6">
                             @if($payment->outstanding_balance > 0)
                             <div class="small text-muted mb-1">Outstanding Balance</div>
-                            <div class="h5 mb-0 font-weight-bold text-danger">₱{{ number_format($payment->outstanding_balance, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-danger">₱{{ number_format($payment->outstanding_balance + ($payment->order->delivery ? $payment->order->delivery->delivery_cost : 0), 2) }}</div>
                             @elseif($payment->change_amount > 0)
                             <div class="small text-muted mb-1">Change Amount</div>
                             <div class="h5 mb-0 font-weight-bold text-success">₱{{ number_format($payment->change_amount, 2) }}</div>
@@ -222,7 +222,7 @@
             <!-- Customer Information Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-user mr-1"></i> Customer Information
                     </h6>
                 </div>
@@ -268,7 +268,7 @@
             @if($payment->order)
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-shopping-cart mr-1"></i> Order Information
                     </h6>
                     <a href="{{ route('admin.orders.show', $payment->order->order_id) }}" class="btn btn-sm btn-info">

@@ -36,7 +36,7 @@
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Customer Information</h6>
+                    <h6 class="m-0 font-weight-bold text">Customer Information</h6>
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-4">
@@ -58,8 +58,12 @@
                         <div class="col-7">{{ $customer->contact_number }}</div>
                     </div>
                     <div class="row mb-2">
-                        <div class="col-5 text-muted">Street:</div>
-                        <div class="col-7">{{ $customer->street }}</div>
+                        <div class="col-5 text-muted">Birthdate:</div>
+                        <div class="col-7">{{ $customer->birthdate ? \Carbon\Carbon::parse($customer->birthdate)->format('M d, Y') : 'Not set' }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Address:</div>
+                        <div class="col-7">{{ $customer->address }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-5 text-muted">City:</div>
@@ -68,6 +72,14 @@
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Province:</div>
                         <div class="col-7">{{ $customer->province }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Postal Code:</div>
+                        <div class="col-7">{{ $customer->postal_code }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Country:</div>
+                        <div class="col-7">{{ $customer->country }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Registered:</div>
@@ -94,7 +106,7 @@
             <!-- Customer Stats Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Customer Statistics</h6>
+                    <h6 class="m-0 font-weight-bold text">Customer Statistics</h6>
                 </div>
                 <div class="card-body">
                     <div class="row align-items-center mb-3">
@@ -131,7 +143,7 @@
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Order History</h6>
+                    <h6 class="m-0 font-weight-bold text">Order History</h6>
                 </div>
                 <div class="card-body">
                     @if($orders->isEmpty())
@@ -143,12 +155,12 @@
                             <table class="table table-bordered" id="ordersTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Order #</th>
-                                        <th>Date</th>
-                                        <th>Type</th>
-                                        <th>Status</th>
-                                        <th>Total</th>
-                                        <th>Actions</th>
+                                        <th class="text-center">Order #</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">Type</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Total</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -190,7 +202,7 @@
             @if(!$orders->isEmpty())
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Order Statistics</h6>
+                    <h6 class="m-0 font-weight-bold text">Order Statistics</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">

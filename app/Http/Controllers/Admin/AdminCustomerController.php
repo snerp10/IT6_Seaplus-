@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class AdminCustomerController extends Controller
@@ -33,7 +35,7 @@ class AdminCustomerController extends Controller
         }
         
         // Order by registration date (newest first) and paginate
-        $customers = $query->orderBy('created_at', 'desc')->paginate(15);
+        $customers = $query->orderBy('created_at', 'desc')->paginate(8);
         
         // Get statistics for the dashboard
         $totalCustomers = Customer::count();
@@ -68,9 +70,13 @@ class AdminCustomerController extends Controller
             'lname' => 'required|string|max:100',
             'email' => 'required|email|unique:customers,email|max:100',
             'contact_number' => 'required|string|max:15|unique:customers,contact_number', 
+            'birthdate' => 'required|date',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
+            'postal_code' => 'required|string|max:20',
+            'country' => 'required|string|max:100',
+            'password' => 'required|min:8|confirmed',
         ], [
             'email.unique' => 'This email address is already registered with another customer.'
         ]);
@@ -78,25 +84,37 @@ class AdminCustomerController extends Controller
         DB::beginTransaction();
         
         try {
+            // Remove password from customer creation data
+            $customerData = array_diff_key($validated, ['password' => '', 'password_confirmation' => '']);
+            
             // Create the customer
-            $customer = Customer::create($validated);
+            $customer = Customer::create($customerData);
+            
+            // Create user account for this customer
+            User::create([
+                'username' => $validated['fname'] . ' ' . $validated['lname'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'cus_id' => $customer->cus_id,
+                'role' => 'Customer'
+            ]);
             
             // Log the successful creation
-            Log::info('Customer created successfully', ['customer_id' => $customer->cus_id]);
+            Log::info('Customer created successfully with user account', ['customer_id' => $customer->cus_id]);
             
             DB::commit();
             return redirect()->route('admin.customers.index')
-                ->with('success', 'Customer created successfully.');
+                ->with('success', 'Customer created successfully with user login.');
                 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to create customer', [
                 'error' => $e->getMessage(),
-                'data' => $request->except(['_token'])
+                'data' => $request->except(['_token', 'password', 'password_confirmation'])
             ]);
             
             return back()->with('error', 'Failed to create customer: ' . $e->getMessage())
-                ->withInput();
+                ->withInput($request->except(['password', 'password_confirmation']));
         }
     }
 
@@ -171,9 +189,12 @@ class AdminCustomerController extends Controller
                 'max:15',
                 Rule::unique('customers')->ignore($customer->cus_id, 'cus_id')
             ],
+            'birthdate' => 'required|date',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
+            'postal_code' => 'required|string|max:20',
+            'country' => 'required|string|max:100',
         ]);
         
         DB::beginTransaction();
@@ -181,6 +202,14 @@ class AdminCustomerController extends Controller
         try {
             // Update the customer
             $customer->update($validated);
+            
+            // Update the associated user's email if it changed
+            if ($customer->user) {
+                $customer->user->update([
+                    'name' => $validated['fname'] . ' ' . $validated['lname'],
+                    'email' => $validated['email']
+                ]);
+            }
             
             DB::commit();
             return redirect()->route('admin.customers.show', $customer->cus_id)

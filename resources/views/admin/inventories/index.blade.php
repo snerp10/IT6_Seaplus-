@@ -115,7 +115,7 @@
     <!-- Filters Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Inventory Records</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Inventory Records</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.inventories.index') }}" method="GET" class="mb-0">
@@ -150,11 +150,11 @@
                     <div class="col-md-2">
                         <label class="form-label d-block small">&nbsp;</label>
                         <div class="d-flex">
-                            <button type="submit" class="btn btn-primary btn-sm mr-2">
-                                <i class="fas fa-search"></i> Search
+                            <button type="submit" class="btn btn-primary btn-sm mr-2 d-flex align-items-center">
+                                <i class="fas fa-search"></i> <span class="ml-1">Search</span>
                             </button>
-                            <a href="{{ route('admin.inventories.index') }}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-undo"></i> Reset
+                            <a href="{{ route('admin.inventories.index') }}" class="btn btn-secondary btn-sm d-flex align-items-center">
+                                <i class="fas fa-undo"></i> <span class="ml-1">Reset</span>
                             </a>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
     <!-- Inventory Table Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">
+            <h6 class="m-0 font-weight-bold text">
                 <i class="fas fa-list"></i> Inventory Movement Records
             </h6>
         </div>
@@ -175,13 +175,13 @@
                 <table class="table table-bordered table-striped table-hover" id="inventoryTable">
                     <thead class="thead-dark">
                         <tr>
-                            <th>Date</th>
-                            <th>Product</th>
-                            <th>Movement Type</th>
-                            <th>Stock In</th>
-                            <th>Stock Out</th> 
-                            <th>Current Stock</th>
-                            <th>Actions</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Product</th>
+                            <th class="text-center">Movement Type</th>
+                            <th class="text-center">Stock In</th>
+                            <th class="text-center">Stock Out</th> 
+                            <th class="text-center">Current Stock</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -207,8 +207,8 @@
                                 <td>{{ $inventory->stock_out > 0 ? $inventory->stock_out : '-' }}</td>
                                 <td>{{ $inventory->curr_stock }} {{ $inventory->product->unit }}</td>
                                 <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('admin.inventories.show', $inventory->inv_id) }}" class="btn btn-sm btn-info" title="View Details">
+                                    <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                        <a href="{{ route('admin.inventories.show', $inventory->inv_id) }}" class="btn btn-sm btn-secondary" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @if($inventory->created_at->isToday())

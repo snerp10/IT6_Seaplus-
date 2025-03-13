@@ -99,13 +99,13 @@
                 <table class="table table-bordered" id="activeDeliveriesTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th>Order #</th>
-                            <th>Customer</th>
-                            <th>Delivery Date</th>
-                            <th>Address</th>
-                            <th>Driver</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-center">Order #</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Delivery Date</th>
+                            <th class="text-center">Address</th>
+                            <th class="text-center">Driver</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -150,16 +150,8 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('admin.deliveries.edit', $delivery) }}" class="btn btn-sm btn-warning">
+                                <a href="{{ route('admin.deliveries.edit', $delivery) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i> Update
-                                </a>
-                                <button class="btn btn-sm btn-info quick-update-btn" 
-                                        data-delivery-id="{{ $delivery->delivery_id }}"
-                                        data-toggle="modal" 
-                                        data-target="#quickUpdateModal"
-                                        data-url="{{ route('admin.deliveries.quick_update', $delivery->delivery_id) }}">
-                                    <i class="fas fa-sync"></i> Quick Update
-                                </button>
                             </td>
                         </tr>
                         @empty
@@ -175,14 +167,12 @@
 </div>
 
 <!-- Quick Update Modal -->
-<div class="modal fade" id="quickUpdateModal" tabindex="-1" role="dialog" aria-labelledby="quickUpdateModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="quickUpdateModal" tabindex="-1" aria-labelledby="quickUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="quickUpdateModalLabel">Quick Update Delivery Status</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="quickUpdateForm" action="" method="POST">
                 @csrf
@@ -235,14 +225,18 @@
             "responsive": true
         });
         
-        // Fix the JavaScript error - remove the extra closing parenthesis
+        // Update the quick update modal handler for Bootstrap 5
         $('.quick-update-btn').on('click', function() {
             const updateUrl = $(this).data('url');
             $('#quickUpdateForm').attr('action', updateUrl);
             
             // You may also want to add this to pre-populate driver selection
             const deliveryId = $(this).data('delivery-id');
-            // Additional code for handling specific delivery data if needed
+            
+            // Fetch delivery details if needed
+            // You could make an AJAX call here to get current values
+            
+            // No need to manually show the modal as data-bs-toggle will handle it
         });
         
         // Auto refresh data every 5 minutes

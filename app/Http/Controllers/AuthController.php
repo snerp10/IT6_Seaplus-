@@ -42,7 +42,7 @@ class AuthController extends Controller
                 if ($user->role === 'Customer') {
                     return redirect()->intended('/customer/dashboard');
                 } else if ($user->role === 'Employee') {
-                    return redirect()->intended('/employee/dashboard');
+                    return redirect()->intended('/admin/dashboard');
                 }
             }
         }

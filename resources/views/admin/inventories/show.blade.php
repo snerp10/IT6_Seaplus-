@@ -36,7 +36,7 @@
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-info-circle mr-1"></i> Inventory Movement Information
                     </h6>
                     <span class="badge badge-{{ $inventory->move_type === 'Stock_in' ? 'success' : 'danger' }} text-white px-3 py-2">
@@ -125,7 +125,7 @@
             <!-- Product Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-cube mr-1"></i> Product Information
                     </h6>
                 </div>
@@ -170,7 +170,7 @@
             <!-- Stock Movement Summary Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text">
                         <i class="fas fa-chart-line mr-1"></i> Stock History
                     </h6>
                 </div>
@@ -179,9 +179,9 @@
                         <table class="table table-sm mb-0">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Amount</th>
+                                    <th class="text-center">Date</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>

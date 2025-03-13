@@ -18,7 +18,7 @@ function getChartColor($index) {
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-chart-line text-primary mr-2"></i> Sales Reports
+            <i class="fas fa-chart-line text-dark mr-2"></i> Sales Reports
         </h1>
         <div>
             <a href="{{ route('admin.sales_reports.saved') }}" class="btn btn-info btn-sm mr-2">
@@ -99,7 +99,7 @@ function getChartColor($index) {
     <!-- Date Range Filter -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Date Range</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Date Range</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.sales_reports.index') }}" method="GET" class="form-inline">
@@ -125,7 +125,7 @@ function getChartColor($index) {
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Daily Sales</h6>
+                    <h6 class="m-0 font-weight-bold text">Daily Sales</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-area">
@@ -139,7 +139,7 @@ function getChartColor($index) {
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Payment Methods</h6>
+                    <h6 class="m-0 font-weight-bold text">Payment Methods</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-pie pt-4 pb-2">
@@ -162,7 +162,7 @@ function getChartColor($index) {
         <div class="col-xl-6">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Sales by Category</h6>
+                    <h6 class="m-0 font-weight-bold text">Sales by Category</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-bar">
@@ -176,15 +176,15 @@ function getChartColor($index) {
         <div class="col-xl-6">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Top Products</h6>
+                    <h6 class="m-0 font-weight-bold text">Top Products</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered" width="100%" cellspacing="0">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Category</th>
+                                    <th class="text-center">Product</th>
+                                    <th class="text-center">Category</th>
                                     <th class="text-center">Units Sold</th>
                                     <th class="text-right">Revenue</th>
                                 </tr>

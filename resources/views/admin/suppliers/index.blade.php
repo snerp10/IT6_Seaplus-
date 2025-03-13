@@ -10,9 +10,6 @@
             <i class="fas fa-truck-loading text-dark mr-2"></i> Suppliers Management
         </h1>
         <div>
-            <a href="{{ route('admin.suppliers.export') }}" class="btn btn-info btn-sm mr-2">
-                <i class="fas fa-file-export"></i> Export Data
-            </a>
             <a href="{{ route('admin.suppliers.create') }}" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus-circle"></i> Add New Supplier
             </a>
@@ -108,7 +105,7 @@
     <!-- Filters Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Suppliers</h6>
+            <h6 class="m-0 font-weight-bold text">Filter Suppliers</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.suppliers.index') }}" method="GET" class="mb-0">
@@ -159,7 +156,7 @@
     <!-- Suppliers Table Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">
+            <h6 class="m-0 font-weight-bold text">
                 <i class="fas fa-list"></i> Suppliers List
             </h6>
             <span>{{ $suppliers->total() }} suppliers found</span>
@@ -169,13 +166,13 @@
                 <table class="table table-bordered table-striped table-hover">
                     <thead class="thead-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Company</th>
-                            <th>Contact</th>
-                            <th>Email</th>
-                            <th>City</th>
-                            <th>Product Type</th>
-                            <th>Actions</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Company</th>
+                            <th class="text-center">Contact</th>
+                            <th class="text-center">Email</th>
+                            <th class="text-center">City</th>
+                            <th class="text-center">Product Type</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -195,48 +192,22 @@
                             <td>{{ $supplier->city }}, {{ $supplier->province }}</td>
                             <td>{{ $supplier->prod_type }}</td>
                             <td>
-                                <div class="btn-group">
-                                    <a href="{{ route('admin.suppliers.show', $supplier->supp_id) }}" class="btn btn-sm btn-info" title="View Details">
+                                <div class="btn-group" role="group" style="column-gap: 0.25rem">
+                                    <a href="{{ route('admin.suppliers.show', $supplier->supp_id) }}" class="btn btn-sm btn-secondary" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="{{ route('admin.suppliers.edit', $supplier->supp_id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger" 
-                                            data-toggle="modal" 
-                                            data-target="#deleteModal{{ $supplier->supp_id }}"
-                                            title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-
-                                <!-- Delete Modal -->
-                                <div class="modal fade" id="deleteModal{{ $supplier->supp_id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title">
-                                                    <i class="fas fa-exclamation-triangle"></i> Confirm Delete
-                                                </h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Are you sure you want to delete this supplier? This action cannot be undone.</p>
-                                                <p><strong>Company:</strong> {{ $supplier->company_name }}</p>
-                                                <p><strong>Contact:</strong> {{ $supplier->contact_number }}</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                <form action="{{ route('admin.suppliers.destroy', $supplier->supp_id) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <form action="{{ route('admin.suppliers.destroy', $supplier->supp_id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                onclick="confirmDelete(this, '{{ $supplier->company_name }}', '{{ $supplier->contact_number }}')"
+                                                title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -258,6 +229,13 @@
 
 @push('scripts')
 <script>
+    // Simple confirm delete function
+    function confirmDelete(button, companyName, contact) {
+        if (confirm('Are you sure you want to delete this supplier?\n\nCompany: ' + companyName + '\nContact: ' + contact + '\n\nThis action cannot be undone.')) {
+            button.closest('form').submit();
+        }
+    }
+
     $(function() {
         // Initialize tooltips
         $('[title]').tooltip();

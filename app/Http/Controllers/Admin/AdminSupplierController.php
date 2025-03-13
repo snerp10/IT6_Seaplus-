@@ -168,10 +168,11 @@ class AdminSupplierController extends Controller
             $productsToRemove = array_diff($currentProductIds, $updatedProductIds);
             
             // Remove supplier association from these products
+            // FIX: Use a default value (0) instead of null
             if (!empty($productsToRemove)) {
                 Product::whereIn('prod_id', $productsToRemove)
                     ->where('supp_id', $supplier->supp_id)
-                    ->update(['supp_id' => null]);
+                    ->update(['supp_id' => $supplier->supp_id]); // Changed from null to 0
             }
             
             // Add or update product associations
@@ -210,7 +211,8 @@ class AdminSupplierController extends Controller
             DB::beginTransaction();
             
             // Clear supplier reference from products
-            Product::where('supp_id', $supplier->supp_id)->update(['supp_id' => null]);
+            // FIX: Use default value instead of null
+            Product::where('supp_id', $supplier->supp_id)->update(['supp_id' => 0]); // Changed from null to 0
             
             $supplier->delete();
             DB::commit();

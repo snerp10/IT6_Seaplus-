@@ -7,7 +7,7 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-file-alt text-primary mr-2"></i> Create New Sales Report
+            <i class="fas fa-file-alt text-dark mr-2"></i> Create New Sales Report
         </h1>
         <a href="{{ route('admin.sales_reports.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Back to Reports
@@ -16,7 +16,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Report Configuration</h6>
+            <h6 class="m-0 font-weight-bold text">Report Configuration</h6>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.sales_reports.store') }}" method="POST">

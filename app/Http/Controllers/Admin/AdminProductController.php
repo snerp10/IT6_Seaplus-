@@ -30,7 +30,8 @@ class AdminProductController extends Controller
             $products = $products->where('status', $request->status);
         }
         
-        $products = $products->get();
+        // Change to paginate with 8 items per page instead of getting all products
+        $products = $products->paginate(8);
         
         return view('admin.products.index', compact('products'));
     }

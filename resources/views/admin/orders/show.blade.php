@@ -38,7 +38,7 @@
         <!-- Order Info Column -->
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card shadow h-100">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary text-white">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg text-white">
                     <h6 class="m-0 font-weight-bold">Order Information</h6>
                     <span class="badge bg-{{ 
                         $order->order_status == 'Completed' ? 'success' : 
@@ -63,7 +63,7 @@
                             </tr>
                             <tr>
                                 <th>Total Amount:</th>
-                                <td class="font-weight-bold">₱{{ number_format($order->total_amount, 2) }}</td>
+                                <td class="font-weight-bold">₱{{ number_format($order->total_amount, 2) . "+" . ($order->delivery ? "₱" . number_format($order->delivery->delivery_cost, 2) : "") }}</td>
                             </tr>
                             <tr>
                                 <th>Amount Paid:</th>
@@ -84,7 +84,7 @@
         <!-- Customer Info Column -->
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card shadow h-100">
-                <div class="card-header py-3 bg-info text-white">
+                <div class="card-header py-3 bg-gradient-primary text-white">
                     <h6 class="m-0 font-weight-bold"><i class="fas fa-user"></i> Customer Information</h6>
                 </div>
                 <div class="card-body">
@@ -109,7 +109,7 @@
         <!-- Delivery Info Column -->
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card shadow h-100">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-success text-white">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-gradient-info text-white">
                     <h6 class="m-0 font-weight-bold"><i class="fas fa-truck"></i> Delivery Information</h6>
                     <span class="badge bg-{{ 
                         $order->delivery->delivery_status == 'Delivered' ? 'success' : 

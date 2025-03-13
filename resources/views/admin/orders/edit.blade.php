@@ -283,7 +283,7 @@
                             <a href="{{ route('admin.orders.show', $order->order_id) }}" class="btn btn-secondary me-2">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
-                            <button type="submit" name="action" value="update" class="btn btn-warning">
+                            <button type="submit" name="action" value="update" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Update Order
                             </button>
                         </div>
