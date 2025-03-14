@@ -1,5 +1,5 @@
 @if(auth()->check() && auth()->user()->role !== 'Admin')
-    <script>window.location = "{{ route('dashboard.index') }}";</script>
+    <script>window.location = "{{ route('admin.dashboard.index') }}";</script>
 @endif
 <!DOCTYPE html>
 <html lang="en">
@@ -20,9 +20,9 @@
         :root {
             /* New Color Palette - Gold, Black, Myrtle */
             --gold-color: #D4AF37;     /* Primary accent color */
-            --black-color: #222222;    /* Dark elements color */
+            --black-color:rgba(34, 34, 34, 0.94);    /* Dark elements color */
             --myrtle-color: #1A535C;   /* Secondary accent color */
-            --white-color: #FFFFFF;    /* Background color */
+            --white-color:rgba(249, 249, 249, 0.08);    /* Background color */
             --light-gray: #F5F5F5;     /* Secondary background color */
             --text-dark: #333333;      /* Main text color */
             --text-light: #FFFFFF;     /* Light text color */
@@ -91,7 +91,7 @@
         
         #sidebar ul li a {
             padding: 12px 15px;
-            font-size: 0.85rem;
+            font-size: 0.80rem;
             display: block;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
@@ -182,10 +182,10 @@
             transition: all 0.3s ease;
             z-index: 1;
             text-transform: uppercase;
-            font-size: 0.75rem;
+            font-size: 0.70rem;
             letter-spacing: 0.8px;
             font-weight: 500;
-            border-radius: 3px;
+            border-radius: 4px;
             padding: 8px 16px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
@@ -264,11 +264,11 @@
         .card {
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             transition: all 0.3s ease;
             margin-bottom: 1.5rem;
             overflow: hidden;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-image: linear-gradient(to bottom, rgba(164, 164, 164, 0.24), rgba(236, 196, 66, 0.47));
         }
         
         .card:hover {
@@ -504,7 +504,7 @@
                 width: calc(100% - 250px);
             }
             .btn {
-                font-size: 0.7rem;
+                font-size: 0.6rem;
             }
         }
 
@@ -560,7 +560,7 @@
                 <p class="text-center text-light mb-0"><small>Sand & Gravel Admin</small></p>
             </div>
 
-            <ul class="list-unstyled components">
+            <ul class="list-unstyled components" style="background: linear-gradient(to bottom, rgb(0,0,0), rgba(236, 196, 66, 0.21))">
                 <li class="{{ request()->is('admin/dashboard*') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}">
                         <span class="sidebar-icon"><i class="fas fa-tachometer-alt"></i></span> Dashboard
@@ -657,7 +657,7 @@
         <!-- Page Content -->
         <div id="content">
             <!-- Top Navbar -->
-            <nav class="main-navbar d-flex align-items-center">
+            <nav class="main-navbar d-flex align-items-center" style="background: linear-gradient(to right,rgba(74, 74, 74, 0.35),rgba(224, 212, 173, 0.47),rgba(224, 198, 114, 0.53),rgb(236, 196, 66));">
                 <div class="container-fluid px-0">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div>
@@ -698,7 +698,7 @@
                         <div class="d-flex align-items-center">
                             <!-- Quick Actions Dropdown -->
                             <div class="dropdown me-3 d-none d-md-block">
-                                <button class="btn btn-accent btn-sm dropdown-toggle" type="button" id="quickActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-primary btn-sm " type="button" id="quickActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--light-color);">
                                     <i class="fas fa-bolt me-1"></i> Quick Actions
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quickActionsDropdown">
@@ -716,7 +716,7 @@
                                         ->get();
                                     $unreadCount = \App\Models\Notification::where('is_read', false)->count();
                                 @endphp
-                                <button class="btn notification-indicator" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--light-color);">
+                                <button class="btn btn-primary notification-indicator" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--light-color);">
                                     <i class="fas fa-bell"></i>
                                     @if($unreadCount > 0)
                                         <span class="badge rounded-pill bg-danger">{{ $unreadCount }}</span>
@@ -767,14 +767,14 @@
 
                             <!-- User Profile -->
                             <div class="dropdown">
-                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--light-color);">
-                                    <img src="https://via.placeholder.com/150" alt="Admin User" class="profile-img">
+                                <button class="btn btn-primary  d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--light-color);">
+                                    <img src="{{ asset('images/60111.jpg') }}" alt="Admin User" class="profile-img">
                                     <span class="ms-2 d-none d-md-inline-block">Admin User</span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
                                     <li>
                                         <div class="dropdown-header text-center">
-                                            <img src="https://via.placeholder.com/150" alt="Admin User" class="rounded-circle mb-2" width="60" height="60">
+                                            <img src="{{ asset('images/60111.jpg') }}" alt="Admin User" class="rounded-circle mb-2" width="60" height="60">
                                             <h6 class="mb-0">Admin User</h6>
                                             <p class="small text-muted mb-0">Administrator</p>
                                         </div>
@@ -820,7 +820,7 @@
                     <div class="list-group list-group-flush">
                         @php
                             $allNotifications = \App\Models\Notification::orderBy('created_at', 'desc')
-                                ->paginate(15);
+                                ->paginate(10);
                         @endphp
                         
                         @forelse($allNotifications as $notification)
